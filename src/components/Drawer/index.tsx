@@ -31,7 +31,7 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
               <span>Meus Treinos</span>
             </Link>
             <Link
-              to="/cadastro"
+              to="/workout-register"
               className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg"
               onClick={onClose}
             >
