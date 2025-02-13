@@ -7,13 +7,10 @@ interface ServiceConfig {
 
 export default class Services {
   private url: string;
-  private baseConfig: AxiosRequestConfig;
   private axios: AxiosInstance;
 
   constructor({ url = "", config = {} }: ServiceConfig) {
     this.url = url;
-    this.baseConfig = config;
-
     this.axios = axios.create(config);
   }
 
