@@ -1,3 +1,4 @@
+import { Visibility } from "@/pages/WorkoutRegister";
 import workoutService from "@/services/workout";
 import { createContext, FC, ReactNode, useContext, useState } from "react";
 import { toast } from 'react-toastify';
@@ -5,8 +6,20 @@ import { toast } from 'react-toastify';
 export interface Workout {
     id: string;
     name: string;
-    userId: string;
+    user: User;
+    visibility: Visibility;
     exercises: Exercise[];
+    likes: WorkoutLikes[];
+}
+
+export interface User {
+    id: string;
+    name: string;
+    avatar: string;
+}
+
+export interface WorkoutLikes {
+    userId: string;
 }
 
 export interface Exercise {
@@ -24,7 +37,7 @@ interface WorkoutContextType {
     workouts: Workout[];
     fetchWorkouts: (userId?: string | undefined) => void;
     workoutsLoaded: boolean;
-    addWorkout: (name: string, userId: string, exercises: Exercise[]) => Promise<void>;
+    addWorkout: (name: string, visibility: Visibility, userId: string, exercises: Exercise[]) => Promise<void>;
 }
 
 const WorkoutContext = createContext<WorkoutContextType | undefined>(undefined);
@@ -41,7 +54,7 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
         workoutService.get({ userId })
             .then(({ data }) => {
                 setWorkouts(data);
-                setWorkoutsLoaded(true); // ✅ Marcar como carregado
+                setWorkoutsLoaded(true);
             })
             .catch((error) => {
                 setWorkoutsLoaded(false);
@@ -57,8 +70,8 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
             });
     };
 
-    const addWorkout = async (name: string, userId: string, exercises: Exercise[]) => {
-        return workoutService.post({ name, userId, exercises })
+    const addWorkout = async (name: string, visibility: Visibility, userId: string, exercises: Exercise[]) => {
+        return workoutService.post({ name, userId, visibility, exercises })
             .then(({ data }) => {
                 setWorkouts([...workouts, data]);
                 toast.success('Treino cadastrado com sucesso');

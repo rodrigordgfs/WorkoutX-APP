@@ -3,6 +3,15 @@ import { LoaderIcon, Plus, PlusIcon, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useWorkout } from "@/context/WorkoutContext";
 
+export type Visibility =
+    | "PUBLIC"
+    | "PRIVATE"
+
+export const VisibilityLabels: Record<Visibility, string> = {
+    "PUBLIC": "Público",
+    "PRIVATE": "Privado"
+};
+
 interface Exercise {
     name: string;
     series: string;
@@ -29,6 +38,7 @@ const WorkoutRegisterPage = () => {
     const { addWorkout } = useWorkout();
 
     const [workoutName, setWorkoutName] = useState('');
+    const [visibility, setVisibility] = useState<Visibility>('PUBLIC');
     const [exercises, setExercises] = useState<Exercise[]>([{ ...initialExercise }]);
     const [loading, setLoading] = useState(false);
     const [userId] = useState(clerk.user?.id ?? "");
@@ -55,7 +65,7 @@ const WorkoutRegisterPage = () => {
         e.preventDefault();
         setLoading(true);
 
-        addWorkout(workoutName, userId, exercises).then(() => {
+        addWorkout(workoutName, visibility, userId, exercises).then(() => {
             clearFields();
         })
             .finally(() => {
@@ -78,7 +88,7 @@ const WorkoutRegisterPage = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="bg-white rounded-lg p-6 shadow-lg">
+                <div className="bg-white rounded-lg p-6 shadow-lg grid grid-cols-1 md:grid-cols-2 gap-4">
                     <label className="block mb-4">
                         <span className="text-gray-700">Nome do Treino</span>
                         <input
@@ -90,6 +100,21 @@ const WorkoutRegisterPage = () => {
                             required
                             disabled={loading}
                         />
+                    </label>
+
+                    <label className="block mb-4">
+                        <span className="text-gray-700">Visibilidade</span>
+                        <select
+                            value={visibility}
+                            onChange={(e) => setVisibility(e.target.value as Visibility)}
+                            className="mt-1 px-4 py-2 bg-zinc-100 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                        >
+                            {Object.entries(VisibilityLabels).map(([key, label]) => (
+                                <option key={key} value={key}>
+                                    {label}
+                                </option>
+                            ))}
+                        </select>
                     </label>
                 </div>
 
