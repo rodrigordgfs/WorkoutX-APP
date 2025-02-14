@@ -74,8 +74,6 @@ const WorkoutRegisterPage = () => {
             } else {
                 toast.error(title);
             }
-
-
         })
             .finally(() => {
                 setLoading(false);

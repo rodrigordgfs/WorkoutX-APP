@@ -2,14 +2,33 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import AuthenticatedLayout from "./layout/Authenticated";
 import WorkoutPage from "./pages/Workout";
 import { LoginPage } from "./pages/Login";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth, useClerk } from "@clerk/clerk-react";
 import WorkoutRegisterPage from "./pages/WorkoutRegister";
 import LoadingPage from "./pages/Loading";
+import { useEffect } from "react";
+import { useWorkout } from "./context/WorkoutContext";
 
 function App() {
   const { isSignedIn, isLoaded } = useAuth();
+  const { fetchWorkouts, isWorkoutsLoaded } = useWorkout();
+  const { user } = useClerk();
 
-  if (!isLoaded) return <LoadingPage />;
+  useEffect(() => {
+    const checkAndFetchWorkouts = async () => {
+      if (isSignedIn) {
+        const loaded = await isWorkoutsLoaded();
+        if (!loaded) {
+          fetchWorkouts(user?.id);
+        }
+      }
+    };
+
+    checkAndFetchWorkouts();
+  }, [isSignedIn, fetchWorkouts, isWorkoutsLoaded, user]);
+
+  if (!isLoaded) {
+    return <LoadingPage />;
+  }
 
   return (
     <Routes>

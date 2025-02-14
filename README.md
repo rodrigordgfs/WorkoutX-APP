@@ -1,50 +1,48 @@
-# React + TypeScript + Vite
+![Logo](./public/banner.png)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# WorkoutX
 
-Currently, two official plugins are available:
+**WorkoutX** é um aplicativo de treino desenvolvido em React para ajudar você a organizar e acompanhar seus treinos na academia. Com ele, você pode cadastrar seus treinos, definir séries, repetições, pesos e tempos de descanso, além de visualizar vídeos e instruções para cada exercício.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Screenshots
 
-## Expanding the ESLint configuration
+![App Screenshot](./public/workout-screen.png)
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Demonstração
 
-- Configure the top-level `parserOptions` property like this:
+Live Demo -> [https://workout-x.vercel.app/](https://workout-x.vercel.app/)
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## Stack utilizada
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+**Front-end:** React, TailwindCSS, ContextAPI, React Router, Clerk Auth, Axios, React Toastify
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+**Back-end:** Node, Fastify, Prisma
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+**Database:** PostgreSQL
+
+## Funcionalidades
+
+- Cadastro e gerenciamento de treinos
+- Organização dos exercícios com séries, repetições e pesos
+- Suporte a vídeos e instruções para cada exercício
+- Interface intuitiva e responsiva
+- Sincronização com a nuvem para acessar seus treinos de qualquer lugar
+
+## Melhorias
+
+- [x] Cadastro e gerenciamento de treinos
+- [ ] Notificações e Lembretes
+- [ ] Comunidade
+- [ ] Compartilhamento de Treinos
+
+## Suporte
+
+Para suporte, mande um email para shinodalabs@gmail.com.
+
+## Autores
+
+- [@rodrigordgfs](https://www.github.com/rodrigordgfs)
+
+## Feedback
+
+Se você tiver algum feedback, por favor nos deixe saber por meio de shinodalabs@gmail.com
