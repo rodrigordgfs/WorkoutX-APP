@@ -1,25 +1,24 @@
 import { useClerk } from "@clerk/clerk-react";
 import { LoaderIcon, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
-import workoutService from "@/services/workout";
-import { toast } from 'react-toastify';
+import { useWorkout } from "@/context/WorkoutContext";
 
-interface ExerciseForm {
+interface Exercise {
     name: string;
     series: string;
     repetitions: string;
-    weight: number;
-    restTime: number;
+    weight: string;
+    restTime: string;
     videoUrl: string;
     instructions: string;
 }
 
-const initialExercise: ExerciseForm = {
+const initialExercise: Exercise = {
     name: '',
     series: '',
     repetitions: '',
-    weight: 0,
-    restTime: 60,
+    weight: '',
+    restTime: '',
     videoUrl: '',
     instructions: ''
 };
@@ -27,11 +26,12 @@ const initialExercise: ExerciseForm = {
 
 const WorkoutRegisterPage = () => {
     const clerk = useClerk();
+    const { addWorkout } = useWorkout();
 
     const [workoutName, setWorkoutName] = useState('');
-    const [exercises, setExercises] = useState<ExerciseForm[]>([{ ...initialExercise }]);
+    const [exercises, setExercises] = useState<Exercise[]>([{ ...initialExercise }]);
     const [loading, setLoading] = useState(false);
-    const [userId] = useState(clerk.user?.id);
+    const [userId] = useState(clerk.user?.id ?? "");
 
     const addExercise = () => {
         setExercises([...exercises, { ...initialExercise }]);
@@ -41,7 +41,7 @@ const WorkoutRegisterPage = () => {
         setExercises(exercises.filter((_, i) => i !== index));
     };
 
-    const updateExercise = (index: number, field: keyof ExerciseForm, value: string | number) => {
+    const updateExercise = (index: number, field: keyof Exercise, value: string | number) => {
         const updatedExercises = exercises.map((exercise, i) => {
             if (i === index) {
                 return { ...exercise, [field]: value };
@@ -55,25 +55,8 @@ const WorkoutRegisterPage = () => {
         e.preventDefault();
         setLoading(true);
 
-        workoutService.post({
-            name: workoutName,
-            userId,
-            exercises
-        }).then((data) => {
-            console.log(data);
+        addWorkout(workoutName, userId, exercises).then(() => {
             clearFields();
-            toast.success('Treino cadastrado com sucesso!');
-        }).catch((error) => {
-            const title = error.response.data.message;
-            const errors: Record<string, { field: string; message: string }> = error.response.data.errors;
-
-            if (errors) {
-                Object.values(errors).forEach((errorMessages) => {
-                    toast.error(errorMessages.message);
-                });
-            } else {
-                toast.error(title);
-            }
         })
             .finally(() => {
                 setLoading(false);
@@ -126,7 +109,7 @@ const WorkoutRegisterPage = () => {
                                 <input
                                     type="text"
                                     value={exercise.name}
-                                    onChange={(e) => updateExercise(index, 'name', e.target.value)}
+                                    onChange={(e) => updateExercise(index, 'name', String(e.target.value))}
                                     className="mt-1 px-4 py-2 bg-zinc-100 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                                     required
                                     disabled={loading}
@@ -138,7 +121,7 @@ const WorkoutRegisterPage = () => {
                                 <input
                                     type="url"
                                     value={exercise.videoUrl}
-                                    onChange={(e) => updateExercise(index, 'videoUrl', e.target.value)}
+                                    onChange={(e) => updateExercise(index, 'videoUrl', String(e.target.value))}
                                     className="mt-1 px-4 py-2 bg-zinc-100 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                                     required
                                     disabled={loading}
@@ -170,9 +153,8 @@ const WorkoutRegisterPage = () => {
                             <label className="block">
                                 <span className="text-gray-700">Peso (kg)</span>
                                 <input
-                                    type="number"
                                     value={exercise.weight}
-                                    onChange={(e) => updateExercise(index, 'weight', parseInt(e.target.value))}
+                                    onChange={(e) => updateExercise(index, 'weight', String(e.target.value))}
                                     className="mt-1 px-4 py-2 bg-zinc-100 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                                     min="0"
                                     required
@@ -183,9 +165,8 @@ const WorkoutRegisterPage = () => {
                             <label className="block">
                                 <span className="text-gray-700">Tempo de Descanso (segundos)</span>
                                 <input
-                                    type="number"
                                     value={exercise.restTime}
-                                    onChange={(e) => updateExercise(index, 'restTime', parseInt(e.target.value))}
+                                    onChange={(e) => updateExercise(index, 'restTime', String(e.target.value))}
                                     className="mt-1 px-4 py-2 bg-zinc-100 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                                     min="0"
                                     required
@@ -197,7 +178,7 @@ const WorkoutRegisterPage = () => {
                                 <span className="text-gray-700">Instruções</span>
                                 <textarea
                                     value={exercise.instructions}
-                                    onChange={(e) => updateExercise(index, 'instructions', e.target.value)}
+                                    onChange={(e) => updateExercise(index, 'instructions', String(e.target.value))}
                                     className="mt-1 px-4 py-2 bg-zinc-100 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                                     rows={3}
                                     required

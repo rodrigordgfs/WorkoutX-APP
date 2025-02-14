@@ -1,12 +1,13 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import AuthenticatedLayout from "./layout/Authenticated";
-import WorkoutPage from "./pages/Workout";
+import WorkoutDetailsPage from "./pages/WorkoutDetails";
 import { LoginPage } from "./pages/Login";
 import { useAuth, useClerk } from "@clerk/clerk-react";
 import WorkoutRegisterPage from "./pages/WorkoutRegister";
 import LoadingPage from "./pages/Loading";
 import { useEffect } from "react";
 import { useWorkout } from "./context/WorkoutContext";
+import { WorkoutsListPage } from "./pages/WorkoutList";
 
 function App() {
   const { isSignedIn, isLoaded } = useAuth();
@@ -34,8 +35,9 @@ function App() {
     <Routes>
       {isSignedIn ? (
         <Route path="/" element={<AuthenticatedLayout />}>
-          <Route index element={<WorkoutPage />} />
-          <Route path="/workout-register" element={<WorkoutRegisterPage />} />
+          <Route index element={<WorkoutsListPage />} />
+          <Route path="/workout/:id" element={<WorkoutDetailsPage />} />
+          <Route path="/workout/new" element={<WorkoutRegisterPage />} />
         </Route>
       ) : (
         <Route path="*" element={<Navigate to="/login" replace />} />

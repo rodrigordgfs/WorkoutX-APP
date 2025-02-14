@@ -30,7 +30,9 @@ Live Demo -> [https://workout-x.vercel.app/](https://workout-x.vercel.app/)
 
 ## Melhorias
 
-- [x] Cadastro e gerenciamento de treinos
+- [x] Cadastro de treinos
+- [x] Detalhes do treino
+- [x] Listagem de treinos
 - [ ] Notificações e Lembretes
 - [ ] Comunidade
 - [ ] Compartilhamento de Treinos

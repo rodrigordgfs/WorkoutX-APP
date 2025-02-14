@@ -1,11 +1,28 @@
 import ExerciseCard from "@/components/ExerciseCard";
 import WorkoutDetails from "@/components/WorkoutDetails";
-import { workoutDays } from "@/data/workouts";
-import { useState } from "react";
+import { Exercise, useWorkout, Workout } from "@/context/WorkoutContext";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
-function WorkoutPage() {
-    const [selectedWorkout, setSelectedWorkout] = useState(workoutDays[0]);
-    const [selectedExercise, setSelectedExercise] = useState(workoutDays[0].exercises[0]);
+function WorkoutDetailsPage() {
+    const { id } = useParams();
+    const { workouts } = useWorkout();
+
+    const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
+    const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+
+    // Atualiza os estados quando os workouts estiverem carregados
+    useEffect(() => {
+        if (workouts.length > 0) {
+            const workout = workouts.find(w => w.id === id) || workouts[0];
+            setSelectedWorkout(workout);
+            setSelectedExercise(workout.exercises[0]);
+        }
+    }, [workouts, id]);
+
+    if (!selectedWorkout) {
+        return <div>Carregando...</div>; // Evita erro de acesso a propriedades indefinidas
+    }
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -15,14 +32,14 @@ function WorkoutPage() {
                         className="w-full p-2 border rounded"
                         value={selectedWorkout.id}
                         onChange={(e) => {
-                            const workout = workoutDays.find(w => w.id === e.target.value)
+                            const workout = workouts.find(w => w.id === e.target.value);
                             if (workout) {
-                                setSelectedWorkout(workout)
-                                setSelectedExercise(workout.exercises[0])
+                                setSelectedWorkout(workout);
+                                setSelectedExercise(workout.exercises[0]);
                             }
                         }}
                     >
-                        {workoutDays.map((workout) => (
+                        {workouts.map((workout) => (
                             <option key={workout.id} value={workout.id}>{workout.name}</option>
                         ))}
                     </select>
@@ -33,7 +50,7 @@ function WorkoutPage() {
                         <ExerciseCard
                             key={exercise.id}
                             exercise={exercise}
-                            isActive={exercise.id === selectedExercise.id}
+                            isActive={exercise.id === selectedExercise?.id}
                             onSelect={() => setSelectedExercise(exercise)}
                         />
                     ))}
@@ -44,7 +61,7 @@ function WorkoutPage() {
                 <WorkoutDetails exercise={selectedExercise} />
             </div>
         </div>
-    )
+    );
 }
 
-export default WorkoutPage
+export default WorkoutDetailsPage;

@@ -2,15 +2,15 @@ import workoutService from "@/services/workout";
 import { createContext, FC, ReactNode, useContext, useState } from "react";
 import { toast } from 'react-toastify';
 
-interface Workout {
+export interface Workout {
     id: string;
     name: string;
     userId: string;
-    exercices: Exercices[];
+    exercises: Exercise[];
 }
 
-interface Exercices {
-    id: string;
+export interface Exercise {
+    id?: string | undefined;
     name: string;
     series: string;
     repetitions: string;
@@ -24,6 +24,7 @@ interface WorkoutContextType {
     workouts: Workout[];
     fetchWorkouts: (userId?: string | undefined) => void;
     isWorkoutsLoaded: () => Promise<boolean>;
+    addWorkout: (name: string, userId: string, exercises: Exercise[]) => Promise<void>;
 }
 
 const WorkoutContext = createContext<WorkoutContextType | undefined>(undefined);
@@ -54,12 +55,32 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
             });
     };
 
+    const addWorkout = async (name: string, userId: string, exercises: Exercise[]) => {
+        return workoutService.post({ name, userId, exercises })
+            .then(({ data }) => {
+                setWorkouts([...workouts, data]);
+                toast.success('Treino cadastrado com sucesso');
+            })
+            .catch((error) => {
+                const title = error.response?.data?.message;
+                const errors: Record<string, { field: string; message: string }> = error.response?.data?.errors;
+
+                if (errors) {
+                    Object.values(errors).forEach((errorMessages) => {
+                        toast.error(errorMessages.message);
+                    });
+                } else {
+                    toast.error(title || "Erro ao cadastrar treino");
+                }
+            });
+    };
+
     const isWorkoutsLoaded = async () => {
         return workouts.length > 0;
     }
 
     return (
-        <WorkoutContext.Provider value={{ workouts, fetchWorkouts, isWorkoutsLoaded }}>
+        <WorkoutContext.Provider value={{ workouts, fetchWorkouts, isWorkoutsLoaded, addWorkout }}>
             {children}
         </WorkoutContext.Provider>
     );
