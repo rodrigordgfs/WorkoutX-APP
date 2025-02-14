@@ -28,7 +28,7 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
               onClick={onClose}
             >
               <Dumbbell size={20} />
-              <span>Meus Treinos</span>
+              <span>Treinar</span>
             </Link>
             <Link
               to="/workout-register"
