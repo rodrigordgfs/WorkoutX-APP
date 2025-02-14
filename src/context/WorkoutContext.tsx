@@ -23,7 +23,7 @@ export interface Exercise {
 interface WorkoutContextType {
     workouts: Workout[];
     fetchWorkouts: (userId?: string | undefined) => void;
-    isWorkoutsLoaded: () => Promise<boolean>;
+    workoutsLoaded: boolean;
     addWorkout: (name: string, userId: string, exercises: Exercise[]) => Promise<void>;
 }
 
@@ -35,16 +35,18 @@ interface WorkoutProviderProps {
 
 export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
     const [workouts, setWorkouts] = useState<Workout[]>([]);
+    const [workoutsLoaded, setWorkoutsLoaded] = useState(false);
 
     const fetchWorkouts = async (userId?: string | undefined) => {
         workoutService.get({ userId })
             .then(({ data }) => {
                 setWorkouts(data);
+                setWorkoutsLoaded(true); // ✅ Marcar como carregado
             })
             .catch((error) => {
+                setWorkoutsLoaded(false);
                 const title = error.response?.data?.message;
                 const errors: Record<string, { field: string; message: string }> = error.response?.data?.errors;
-
                 if (errors) {
                     Object.values(errors).forEach((errorMessages) => {
                         toast.error(errorMessages.message);
@@ -75,12 +77,8 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
             });
     };
 
-    const isWorkoutsLoaded = async () => {
-        return workouts.length > 0;
-    }
-
     return (
-        <WorkoutContext.Provider value={{ workouts, fetchWorkouts, isWorkoutsLoaded, addWorkout }}>
+        <WorkoutContext.Provider value={{ workouts, fetchWorkouts, addWorkout, workoutsLoaded }}>
             {children}
         </WorkoutContext.Provider>
     );

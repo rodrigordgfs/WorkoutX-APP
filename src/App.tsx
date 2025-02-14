@@ -8,24 +8,25 @@ import LoadingPage from "./pages/Loading";
 import { useEffect } from "react";
 import { useWorkout } from "./context/WorkoutContext";
 import { WorkoutsListPage } from "./pages/WorkoutList";
+import { ProfilePage } from "./pages/Profile";
+import { useUserProfile } from "./context/UserContext";
 
 function App() {
   const { isSignedIn, isLoaded } = useAuth();
-  const { fetchWorkouts, isWorkoutsLoaded } = useWorkout();
+  const { fetchProfile, userProfileLoaded } = useUserProfile();
+  const { fetchWorkouts, workoutsLoaded } = useWorkout();
   const { user } = useClerk();
 
   useEffect(() => {
-    const checkAndFetchWorkouts = async () => {
-      if (isSignedIn) {
-        const loaded = await isWorkoutsLoaded();
-        if (!loaded) {
-          fetchWorkouts(user?.id);
-        }
-      }
-    };
+    if (isSignedIn && !userProfileLoaded) {
+      fetchProfile(user?.id, user?.fullName, user?.imageUrl, user?.emailAddresses[0]?.emailAddress);
+    }
 
-    checkAndFetchWorkouts();
-  }, [isSignedIn, fetchWorkouts, isWorkoutsLoaded, user]);
+    if (isSignedIn && !workoutsLoaded) {
+      fetchWorkouts(user?.id);
+    }
+
+  }, [isSignedIn, fetchWorkouts, workoutsLoaded, user, fetchProfile, userProfileLoaded]);
 
   if (!isLoaded) {
     return <LoadingPage />;
@@ -38,6 +39,7 @@ function App() {
           <Route index element={<WorkoutsListPage />} />
           <Route path="/workout/:id" element={<WorkoutDetailsPage />} />
           <Route path="/workout/new" element={<WorkoutRegisterPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Route>
       ) : (
         <Route path="*" element={<Navigate to="/login" replace />} />

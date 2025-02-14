@@ -1,4 +1,4 @@
-import { X, Dumbbell, Plus } from 'lucide-react';
+import { X, Dumbbell, Plus, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface DrawerProps {
@@ -36,6 +36,14 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
             >
               <Plus size={20} />
               <span>Cadastrar Treino</span>
+            </Link>
+            <Link
+              to="/profile"
+              className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg"
+              onClick={onClose}
+            >
+              <User size={20} />
+              <span>Meu Perfil</span>
             </Link>
           </div>
         </div>

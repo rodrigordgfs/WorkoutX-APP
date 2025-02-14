@@ -7,6 +7,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { ClerkProvider } from '@clerk/clerk-react'
 import { ToastContainer } from 'react-toastify';
 import { WorkoutProvider } from './context/WorkoutContext.tsx'
+import { UserProvider } from './context/UserContext.tsx'
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
@@ -18,11 +19,13 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
-        <MenuProvider>
-          <WorkoutProvider>
-            <App />
-          </WorkoutProvider>
-        </MenuProvider>
+        <UserProvider>
+          <MenuProvider>
+            <WorkoutProvider>
+              <App />
+            </WorkoutProvider>
+          </MenuProvider>
+        </UserProvider>
       </ClerkProvider>
     </BrowserRouter>
     <ToastContainer />
