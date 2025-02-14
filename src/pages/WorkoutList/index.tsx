@@ -42,7 +42,12 @@ export function WorkoutsListPage() {
     return (
         <div className="max-w-4xl mx-auto">
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold">Meus Treinos</h2>
+                <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
+                        <Dumbbell size={24} />
+                    </div>
+                    <h2 className="text-2xl font-bold">Meus Treinos</h2>
+                </div>
                 <Link
                     to="/workout/new"
                     className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"

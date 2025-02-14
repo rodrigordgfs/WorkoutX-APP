@@ -1,5 +1,5 @@
 import { useClerk } from "@clerk/clerk-react";
-import { LoaderIcon, Plus, Trash2 } from "lucide-react";
+import { LoaderIcon, Plus, PlusIcon, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useWorkout } from "@/context/WorkoutContext";
 
@@ -70,7 +70,12 @@ const WorkoutRegisterPage = () => {
 
     return (
         <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold mb-6">Cadastrar Novo Treino</h2>
+            <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
+                    <PlusIcon size={24} />
+                </div>
+                <h2 className="text-2xl font-bold">Meus Treinos</h2>
+            </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="bg-white rounded-lg p-6 shadow-lg">
