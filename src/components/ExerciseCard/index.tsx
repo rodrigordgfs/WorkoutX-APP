@@ -1,4 +1,4 @@
-import { Exercise } from "@/data/workouts"
+import { Exercise } from "@/context/WorkoutContext"
 import { Repeat, Timer, Weight } from "lucide-react"
 
 interface ExerciseCardProps {
