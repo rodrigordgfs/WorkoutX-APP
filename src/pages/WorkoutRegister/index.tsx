@@ -1,7 +1,8 @@
 import { useClerk } from "@clerk/clerk-react";
-import { LoaderIcon, Plus, PlusIcon, Trash2 } from "lucide-react";
+import { LoaderIcon, Plus, PlusIcon, Sparkles, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useWorkout } from "@/context/WorkoutContext";
+import { AIWorkoutFormData, AIWorkoutModal } from "@/components/AIWorkoutModal";
 
 export type Visibility =
     | "PUBLIC"
@@ -42,6 +43,16 @@ const WorkoutRegisterPage = () => {
     const [exercises, setExercises] = useState<Exercise[]>([{ ...initialExercise }]);
     const [loading, setLoading] = useState(false);
     const [userId] = useState(clerk.user?.id ?? "");
+    const [isModalOpen, setIsModalOpen] = useState(false)
+
+    const handleOpenModal = () => setIsModalOpen(true)
+    const handleCloseModal = () => setIsModalOpen(false)
+
+    const handleGenerateWorkout = (formData: AIWorkoutFormData) => {
+        // Handle the form submission here
+        console.log("Workout data:", formData)
+        setIsModalOpen(false)
+    }
 
     const addExercise = () => {
         setExercises([...exercises, { ...initialExercise }]);
@@ -80,11 +91,21 @@ const WorkoutRegisterPage = () => {
 
     return (
         <div className="max-w-4xl mx-auto">
-            <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
-                    <PlusIcon size={24} />
+
+            <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
+                        <PlusIcon size={24} />
+                    </div>
+                    <h2 className="text-2xl font-bold">Meus Treinos</h2>
                 </div>
-                <h2 className="text-2xl font-bold">Meus Treinos</h2>
+                <button
+                    onClick={handleOpenModal}
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-colors shadow-md"
+                >
+                    <Sparkles size={20} />
+                    Gerar com IA
+                </button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -241,6 +262,8 @@ const WorkoutRegisterPage = () => {
                     </button>
                 </div>
             </form>
+
+            <AIWorkoutModal isOpen={isModalOpen} onClose={handleCloseModal} onGenerate={handleGenerateWorkout} />
         </div>
     );
 }
