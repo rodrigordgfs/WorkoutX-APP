@@ -34,6 +34,7 @@ Live Demo -> [https://workout-x.vercel.app/](https://workout-x.vercel.app/)
 - [x] Detalhes do treino
 - [x] Listagem de treinos
 - [x] Perfil de Usuário
+- [x] Gerar treinos com IA
 - [ ] Notificações e Lembretes
 - [ ] Comunidade
 - [ ] Compartilhamento de Treinos

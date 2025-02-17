@@ -3,6 +3,9 @@ import { LoaderIcon, Plus, PlusIcon, Sparkles, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useWorkout } from "@/context/WorkoutContext";
 import { AIWorkoutFormData, AIWorkoutModal } from "@/components/AIWorkoutModal";
+import { toast } from 'react-toastify';
+import workoutAIService from "@/services/workoutAi";
+import { useNavigate } from "react-router-dom";
 
 export type Visibility =
     | "PUBLIC"
@@ -36,7 +39,8 @@ const initialExercise: Exercise = {
 
 const WorkoutRegisterPage = () => {
     const clerk = useClerk();
-    const { addWorkout } = useWorkout();
+    const { addWorkout, appendWortkout } = useWorkout();
+    const navigate = useNavigate();
 
     const [workoutName, setWorkoutName] = useState('');
     const [visibility, setVisibility] = useState<Visibility>('PUBLIC');
@@ -44,14 +48,39 @@ const WorkoutRegisterPage = () => {
     const [loading, setLoading] = useState(false);
     const [userId] = useState(clerk.user?.id ?? "");
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const [isGenerateAIWorkoutLoading, setIsGenerateAIWorkoutLoading] = useState(false)
 
     const handleOpenModal = () => setIsModalOpen(true)
     const handleCloseModal = () => setIsModalOpen(false)
 
-    const handleGenerateWorkout = (formData: AIWorkoutFormData) => {
-        // Handle the form submission here
-        console.log("Workout data:", formData)
-        setIsModalOpen(false)
+    const handleGenerateWorkout = (form: AIWorkoutFormData) => {
+        workoutAIService.post({
+            userId,
+            ...form
+        })
+            .then(({ data }) => {
+                setIsModalOpen(false)
+                setIsGenerateAIWorkoutLoading(true)
+                toast.success('Treino gerado com sucesso!');
+                const workout = data[0];
+                appendWortkout(workout);
+                navigate(`/workout/${workout.id}`);
+            })
+            .catch((error) => {
+                const title = error.response?.data?.message;
+                const errors: Record<string, { field: string; message: string }> = error.response?.data?.errors;
+
+                if (errors) {
+                    Object.values(errors).forEach((errorMessages) => {
+                        toast.error(errorMessages.message);
+                    });
+                } else {
+                    toast.error(title || "Erro ao cadastrar treino");
+                }
+            })
+            .finally(() => {
+                setIsGenerateAIWorkoutLoading(false)
+            })
     }
 
     const addExercise = () => {
@@ -263,7 +292,7 @@ const WorkoutRegisterPage = () => {
                 </div>
             </form>
 
-            <AIWorkoutModal isOpen={isModalOpen} onClose={handleCloseModal} onGenerate={handleGenerateWorkout} />
+            <AIWorkoutModal isOpen={isModalOpen} onClose={handleCloseModal} onGenerate={handleGenerateWorkout} isLoading={isGenerateAIWorkoutLoading} />
         </div>
     );
 }
