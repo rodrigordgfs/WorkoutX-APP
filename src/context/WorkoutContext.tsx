@@ -40,6 +40,7 @@ interface WorkoutContextType {
     addWorkout: (name: string, visibility: Visibility, userId: string, exercises: Exercise[]) => Promise<void>;
     appendWortkout: (workout: Workout) => void;
     isWorkoutsEmpty: () => boolean;
+    loadingWorkouts: boolean;
 }
 
 const WorkoutContext = createContext<WorkoutContextType | undefined>(undefined);
@@ -51,6 +52,7 @@ interface WorkoutProviderProps {
 export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
     const [workouts, setWorkouts] = useState<Workout[]>([]);
     const [workoutsLoaded, setWorkoutsLoaded] = useState(false);
+    const [loadingWorkouts, setLoadingWorkouts] = useState(false);
 
     const isWorkoutsEmpty = () => {
         return workouts.length === 0;
@@ -61,10 +63,12 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
     }
 
     const fetchWorkouts = async (userId?: string | undefined) => {
+        setLoadingWorkouts(true);
         workoutService.get({ userId })
             .then(({ data }) => {
                 setWorkouts(data);
                 setWorkoutsLoaded(true);
+                setLoadingWorkouts(false);
             })
             .catch((error) => {
                 setWorkoutsLoaded(false);
@@ -101,7 +105,7 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
     };
 
     return (
-        <WorkoutContext.Provider value={{ workouts, fetchWorkouts, addWorkout, workoutsLoaded, appendWortkout, isWorkoutsEmpty }}>
+        <WorkoutContext.Provider value={{ workouts, fetchWorkouts, addWorkout, workoutsLoaded, appendWortkout, isWorkoutsEmpty, loadingWorkouts }}>
             {children}
         </WorkoutContext.Provider>
     );
