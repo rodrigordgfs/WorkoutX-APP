@@ -10,6 +10,7 @@ import { useWorkout } from "./context/WorkoutContext";
 import { WorkoutsListPage } from "./pages/WorkoutList";
 import { ProfilePage } from "./pages/Profile";
 import { useUserProfile } from "./context/UserContext";
+import { CommunityPage } from "./pages/Community";
 
 function App() {
   const { isSignedIn, isLoaded } = useAuth();
@@ -40,6 +41,7 @@ function App() {
           <Route path="/workout/:id" element={<WorkoutDetailsPage />} />
           <Route path="/workout/new" element={<WorkoutRegisterPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/community" element={<CommunityPage />} />
         </Route>
       ) : (
         <Route path="*" element={<Navigate to="/login" replace />} />
