@@ -3,13 +3,15 @@ import { Trash } from "lucide-react";
 import { Modal } from "../Modal";
 import { useState } from "react";
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 
 interface WordkoutDetailsProps {
     exercise: Exercise | null
 }
 
 const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
-    const { deleteExercise } = useWorkout();
+    const navigate = useNavigate();
+    const { deleteExercise, getWorkoutByExerciseId, isLastExerciseInWorkout, deleteWorkout } = useWorkout();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -21,22 +23,39 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
 
     const handleDeleteExercise = async () => {
         setIsDeleting(true);
-        axios.delete(`/workout/exercise/${exercise?.id}`, {
-            baseURL: import.meta.env.VITE_API_BASE_URL,
-        }).then(() => {
-            deleteExercise(exercise?.id ?? "");
-            setIsDeleting(false);
-            setIsModalOpen(false);
-        }).catch((error) => {
-            console.error(error);
-            setIsDeleting(false);
-        });
+
+        const workout = getWorkoutByExerciseId(exercise?.id ?? "");
+
+        if (isLastExerciseInWorkout(workout, exercise?.id ?? "")) {
+            axios.delete(`/workout/${workout?.id}`, {
+                baseURL: import.meta.env.VITE_API_BASE_URL,
+            }).then(() => {
+                deleteWorkout(workout?.id ?? "");
+                setIsDeleting(false);
+                setIsModalOpen(false);
+                navigate("/");
+            }).catch((error) => {
+                console.error(error);
+                setIsDeleting(false);
+            });
+        } else {
+            axios.delete(`/workout/exercise/${exercise?.id}`, {
+                baseURL: import.meta.env.VITE_API_BASE_URL,
+            }).then(() => {
+                deleteExercise(exercise?.id ?? "");
+                setIsDeleting(false);
+                setIsModalOpen(false);
+            }).catch((error) => {
+                console.error(error);
+                setIsDeleting(false);
+            });
+        }
     }
 
     return <div className="bg-white rounded-lg p-6 shadow-lg">
         <div className="flex items-center justify-between gap-4 mb-2">
             <h2 className="text-2xl font-bold mb-4 mt-2">{exercise?.name}</h2>
-            <button onClick={() => setIsModalOpen(true)} className="text-red-500 hover:text-white hover:bg-red-500 transition-all rounded-md p-2">
+            <button onClick={() => setIsModalOpen(true)} className="text-white bg-red-500 hover:bg-red-600 transition-all rounded-md p-2">
                 <Trash size={24} />
             </button>
         </div>
@@ -78,8 +97,8 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
             onClose={() => setIsModalOpen(false)}
             onConfirm={handleDeleteExercise}
             loading={isDeleting}
-            title="Remover Exercício"
-            content="Tem certeza que deseja remover esse exercício?"
+            title="Excluir Exercício"
+            content="Tem certeza que deseja excluir esse exercício?"
         />
     </div>
 }

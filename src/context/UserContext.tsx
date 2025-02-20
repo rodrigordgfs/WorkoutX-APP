@@ -57,8 +57,6 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     }
 
     const updateProfile = (profile: UserProfile) => {
-        console.log('Updating profile:', profile);
-
         setSavingProfile(true);
         authService.patch(`/${profile.id}`, profile)
             .then(({ data }) => {

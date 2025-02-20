@@ -46,6 +46,9 @@ interface WorkoutContextType {
     setSelectedWorkout: (workout: Workout | null) => void;
     selectedWorkout: Workout | null;
     deleteExercise: (exerciseId: string) => void;
+    deleteWorkout: (workoutId: string) => void;
+    isLastExerciseInWorkout: (workout: Workout | undefined, exerciseId: string) => boolean;
+    getWorkoutByExerciseId: (exerciseId: string) => Workout | undefined;
 }
 
 const WorkoutContext = createContext<WorkoutContextType | undefined>(undefined);
@@ -61,6 +64,14 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
     const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
     const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
 
+    const getWorkoutByExerciseId = (exerciseId: string) => {
+        return workouts.find((workout) => workout.exercises.some((exercise) => exercise.id === exerciseId));
+    }
+
+    const isLastExerciseInWorkout = (workout: Workout | undefined, exerciseId: string) => {
+        return workout?.exercises.length === 1 && workout?.exercises[0].id === exerciseId;
+    }
+
     const deleteExercise = async (exerciseId: string) => {
         const updatedWorkouts = workouts.map((workout) => {
             const updatedExercises = workout.exercises.filter((exercise) => exercise.id !== exerciseId);
@@ -69,6 +80,13 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
         setWorkouts(updatedWorkouts);
         setSelectedExercise(selectedWorkout?.exercises[0] ?? updatedWorkouts[0].exercises[0]);
         toast.success('Exercício deletado com sucesso');
+    }
+
+    const deleteWorkout = async (workoutId: string) => {
+        const updatedWorkouts = workouts.filter((workout) => workout.id !== workoutId);
+        setWorkouts(updatedWorkouts);
+        setSelectedWorkout(null);
+        toast.success('Treino deletado com sucesso');
     }
 
     const isWorkoutsEmpty = () => {
@@ -122,7 +140,7 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
     };
 
     return (
-        <WorkoutContext.Provider value={{ workouts, fetchWorkouts, addWorkout, workoutsLoaded, appendWorkout, isWorkoutsEmpty, loadingWorkouts, selectedExercise, setSelectedExercise, selectedWorkout, setSelectedWorkout, deleteExercise }}>
+        <WorkoutContext.Provider value={{ workouts, fetchWorkouts, addWorkout, workoutsLoaded, appendWorkout, isWorkoutsEmpty, loadingWorkouts, selectedExercise, setSelectedExercise, selectedWorkout, setSelectedWorkout, deleteExercise, deleteWorkout, getWorkoutByExerciseId, isLastExerciseInWorkout }}>
             {children}
         </WorkoutContext.Provider>
     );

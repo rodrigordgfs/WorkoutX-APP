@@ -43,7 +43,7 @@ export function WorkoutsListPage() {
                 {workouts.map((wk) => {
                     const isOpen = openWorkouts.includes(wk.id);
                     return (
-                        <WorkoutListItem workout={wk} isOpen={isOpen} onToggle={toggleWorkout} />
+                        <WorkoutListItem key={wk.id} workout={wk} isOpen={isOpen} onToggle={toggleWorkout} />
                     );
                 })}
             </div>
