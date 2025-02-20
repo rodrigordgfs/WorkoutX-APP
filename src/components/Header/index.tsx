@@ -1,5 +1,4 @@
 import { useMenu } from "@/context/MenuContext";
-import { UserButton } from "@clerk/clerk-react";
 import { Dumbbell, Menu } from "lucide-react";
 
 const Header = () => {
@@ -15,7 +14,6 @@ const Header = () => {
                     <Dumbbell size={24} />
                     <h1 className="text-xl font-bold">WorkoutX</h1>
                 </div>
-                <UserButton />
             </div>
         </header>
     );

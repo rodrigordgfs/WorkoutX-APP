@@ -38,7 +38,7 @@ interface WorkoutContextType {
     fetchWorkouts: (userId?: string | undefined) => void;
     workoutsLoaded: boolean;
     addWorkout: (name: string, visibility: Visibility, userId: string, exercises: Exercise[]) => Promise<void>;
-    appendWortkout: (workout: Workout) => void;
+    appendWorkout: (workout: Workout) => void;
     isWorkoutsEmpty: () => boolean;
     loadingWorkouts: boolean;
     selectedExercise: Exercise | null;
@@ -75,7 +75,7 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
         return workouts.length === 0;
     }
 
-    const appendWortkout = (workout: Workout) => {
+    const appendWorkout = (workout: Workout) => {
         setWorkouts([...workouts, workout]);
     }
 
@@ -122,7 +122,7 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
     };
 
     return (
-        <WorkoutContext.Provider value={{ workouts, fetchWorkouts, addWorkout, workoutsLoaded, appendWortkout, isWorkoutsEmpty, loadingWorkouts, selectedExercise, setSelectedExercise, selectedWorkout, setSelectedWorkout, deleteExercise }}>
+        <WorkoutContext.Provider value={{ workouts, fetchWorkouts, addWorkout, workoutsLoaded, appendWorkout, isWorkoutsEmpty, loadingWorkouts, selectedExercise, setSelectedExercise, selectedWorkout, setSelectedWorkout, deleteExercise }}>
             {children}
         </WorkoutContext.Provider>
     );

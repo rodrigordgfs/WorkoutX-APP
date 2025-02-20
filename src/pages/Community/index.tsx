@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 
 export function CommunityPage() {
   const clerk = useClerk();
-  const { appendWortkout } = useWorkout();
+  const { appendWorkout } = useWorkout();
   const navigate = useNavigate();
 
   const [userId] = useState(clerk.user?.id ?? "");
@@ -33,7 +33,7 @@ export function CommunityPage() {
     }, {
       baseURL: import.meta.env.VITE_API_BASE_URL,
     }).then(({ data }) => {
-      appendWortkout(data);
+      appendWorkout(data);
       setIsCopying(false);
       setIsModalOpen(false);
       navigate(`/workout/${data.id}`);
