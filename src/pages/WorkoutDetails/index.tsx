@@ -1,15 +1,12 @@
 import ExerciseCard from "@/components/ExerciseCard";
 import WorkoutDetails from "@/components/WorkoutDetails";
-import { Exercise, useWorkout, Workout } from "@/context/WorkoutContext";
-import { useEffect, useState } from "react";
+import { useWorkout } from "@/context/WorkoutContext";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 function WorkoutDetailsPage() {
     const { id } = useParams();
-    const { workouts } = useWorkout();
-
-    const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
-    const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+    const { workouts, setSelectedExercise, selectedExercise, selectedWorkout, setSelectedWorkout } = useWorkout();
 
     // Atualiza os estados quando os workouts estiverem carregados
     useEffect(() => {
@@ -18,7 +15,7 @@ function WorkoutDetailsPage() {
             setSelectedWorkout(workout);
             setSelectedExercise(workout.exercises[0]);
         }
-    }, [workouts, id]);
+    }, [workouts, id, setSelectedExercise, setSelectedWorkout]);
 
     if (!selectedWorkout) {
         return <div>Carregando...</div>; // Evita erro de acesso a propriedades indefinidas

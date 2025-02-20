@@ -41,6 +41,11 @@ interface WorkoutContextType {
     appendWortkout: (workout: Workout) => void;
     isWorkoutsEmpty: () => boolean;
     loadingWorkouts: boolean;
+    selectedExercise: Exercise | null;
+    setSelectedExercise: (exercise: Exercise | null) => void;
+    setSelectedWorkout: (workout: Workout | null) => void;
+    selectedWorkout: Workout | null;
+    deleteExercise: (exerciseId: string) => void;
 }
 
 const WorkoutContext = createContext<WorkoutContextType | undefined>(undefined);
@@ -53,6 +58,18 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
     const [workouts, setWorkouts] = useState<Workout[]>([]);
     const [workoutsLoaded, setWorkoutsLoaded] = useState(false);
     const [loadingWorkouts, setLoadingWorkouts] = useState(false);
+    const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
+    const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+
+    const deleteExercise = async (exerciseId: string) => {
+        const updatedWorkouts = workouts.map((workout) => {
+            const updatedExercises = workout.exercises.filter((exercise) => exercise.id !== exerciseId);
+            return { ...workout, exercises: updatedExercises };
+        });
+        setWorkouts(updatedWorkouts);
+        setSelectedExercise(selectedWorkout?.exercises[0] ?? updatedWorkouts[0].exercises[0]);
+        toast.success('Exercício deletado com sucesso');
+    }
 
     const isWorkoutsEmpty = () => {
         return workouts.length === 0;
@@ -105,7 +122,7 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
     };
 
     return (
-        <WorkoutContext.Provider value={{ workouts, fetchWorkouts, addWorkout, workoutsLoaded, appendWortkout, isWorkoutsEmpty, loadingWorkouts }}>
+        <WorkoutContext.Provider value={{ workouts, fetchWorkouts, addWorkout, workoutsLoaded, appendWortkout, isWorkoutsEmpty, loadingWorkouts, selectedExercise, setSelectedExercise, selectedWorkout, setSelectedWorkout, deleteExercise }}>
             {children}
         </WorkoutContext.Provider>
     );

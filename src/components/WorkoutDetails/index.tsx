@@ -1,17 +1,47 @@
-import { Exercise } from "@/context/WorkoutContext";
+import { Exercise, useWorkout } from "@/context/WorkoutContext";
+import { Trash } from "lucide-react";
+import { Modal } from "../Modal";
+import { useState } from "react";
+import axios from 'axios';
 
 interface WordkoutDetailsProps {
     exercise: Exercise | null
 }
 
 const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
+    const { deleteExercise } = useWorkout();
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+
     const getEmbedUrl = (url: string | "") => {
         const videoIdMatch = url?.match(/(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/ ]{11})/);
         return videoIdMatch ? `https://www.youtube.com/embed/${videoIdMatch[1]}` : url;
     };
 
+    const handleDeleteExercise = async () => {
+        setIsDeleting(true);
+
+        axios.delete(`/workout/exercise/${exercise?.id}`, {
+            baseURL: import.meta.env.VITE_API_BASE_URL,
+        }).then(() => {
+            deleteExercise(exercise?.id ?? "");
+            setIsDeleting(false);
+            setIsModalOpen(false);
+        }).catch((error) => {
+            console.error(error);
+            setIsDeleting(false);
+            setIsModalOpen(false);
+        });
+    }
+
     return <div className="bg-white rounded-lg p-6 shadow-lg">
-        <h2 className="text-2xl font-bold mb-4">{exercise?.name}</h2>
+        <div className="flex items-center justify-between gap-4 mb-2">
+            <h2 className="text-2xl font-bold mb-4 mt-2">{exercise?.name}</h2>
+            <button onClick={() => setIsModalOpen(true)} className="text-red-500 hover:text-white hover:bg-red-500 transition-all rounded-md p-2">
+                <Trash size={24} />
+            </button>
+        </div>
 
         <div className="aspect-video w-full mb-6">
             <iframe
@@ -44,6 +74,15 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
                 </div>
             </div>
         </div>
+
+        <Modal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onConfirm={handleDeleteExercise}
+            loading={isDeleting}
+            title="Remover Exercício"
+            content="Tem certeza que deseja remover esse exercício?"
+        />
     </div>
 }
 
