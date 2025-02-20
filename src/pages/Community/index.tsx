@@ -14,15 +14,18 @@ export function CommunityPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [loadingLikes, setLoadingLikes] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchPublicWorkouts();
   }, []);
 
   const fetchPublicWorkouts = () => {
+    setLoading(true);
     workoutService.get({ visibility: 'PUBLIC' })
       .then(({ data }) => {
         setWorkouts(data);
+        setLoading(false);
       })
       .catch((error) => {
         const title = error.response?.data?.message;
@@ -36,8 +39,11 @@ export function CommunityPage() {
           toast.error(title || "Erro ao cadastrar treino");
         }
       })
-      .finally(() => { });
   }
+
+  const isLiked = (workout: Workout) => {
+    return workout.likes.some((like) => like.userId === userId);
+  };
 
   const toogleLike = async (id: string) => {
     setLoadingLikes((prev) => new Set(prev).add(id));
@@ -98,7 +104,26 @@ export function CommunityPage() {
       </div>
 
       <div className="grid gap-6">
-        {workouts.map((workout) => (
+        {loading ? (
+          Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden animate-pulse">
+              <div className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+                  <div>
+                    <div className="h-5 bg-gray-300 rounded w-32 mb-2"></div>
+                    <div className="h-4 bg-gray-300 rounded w-24"></div>
+                  </div>
+                </div>
+                <div className="h-5 bg-gray-300 rounded w-48 mb-4"></div>
+                <div className="h-4 bg-gray-300 rounded w-32"></div>
+              </div>
+              <div className="p-4 bg-gray-50 border-t border-gray-100">
+                <div className="h-10 bg-gray-300 rounded"></div>
+              </div>
+            </div>
+          ))
+        ) : workouts.map((workout) => (
           <div key={workout.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
@@ -121,7 +146,7 @@ export function CommunityPage() {
                       </div>
                     ) : (
                       <div className={`flex items-center gap-1 ${workout.likes.some(like => like.userId === userId) ? 'text-blue-500' : 'text-gray-500 hover:text-blue-500'} transition-colors`}>
-                        <Heart size={20} />
+                        {isLiked(workout) ? <Heart size={20} fill="#2563EB" /> : <Heart size={20} />}
                         <span>{workout.likes.length}</span>
                       </div>
                     )}

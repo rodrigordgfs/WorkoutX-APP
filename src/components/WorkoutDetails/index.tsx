@@ -29,16 +29,16 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
                 <p className="text-gray-600">{exercise?.instructions}</p>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
-                <div className="bg-blue-50 p-4 rounded-lg">
+            <div className="flex flex-col sm:flex-row gap-4">
+                <div className="bg-blue-50 p-4 rounded-lg text-center flex-1">
                     <h4 className="font-semibold">Séries</h4>
                     <p className="text-2xl font-bold text-blue-600">{exercise?.series}</p>
                 </div>
-                <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="bg-blue-50 p-4 rounded-lg text-center flex-1">
                     <h4 className="font-semibold">Repetições</h4>
                     <p className="text-2xl font-bold text-blue-600">{exercise?.repetitions}</p>
                 </div>
-                <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="bg-blue-50 p-4 rounded-lg text-center flex-1">
                     <h4 className="font-semibold">Descanso</h4>
                     <p className="text-2xl font-bold text-blue-600">{exercise?.restTime}s</p>
                 </div>
