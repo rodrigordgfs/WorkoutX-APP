@@ -21,7 +21,6 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
 
     const handleDeleteExercise = async () => {
         setIsDeleting(true);
-
         axios.delete(`/workout/exercise/${exercise?.id}`, {
             baseURL: import.meta.env.VITE_API_BASE_URL,
         }).then(() => {
@@ -31,7 +30,6 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
         }).catch((error) => {
             console.error(error);
             setIsDeleting(false);
-            setIsModalOpen(false);
         });
     }
 

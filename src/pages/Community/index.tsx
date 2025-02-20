@@ -1,24 +1,57 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Search, Users, Heart, Share2, Dumbbell, Weight, Timer, Repeat } from 'lucide-react';
 import workoutService from '@/services/workout';
 import { toast } from 'react-toastify';
-import { Workout } from '@/context/WorkoutContext';
+import { useWorkout, Workout } from '@/context/WorkoutContext';
 import axios from 'axios';
 import { useClerk } from '@clerk/clerk-react';
+import { Modal } from '@/components/Modal';
+import { useNavigate } from 'react-router-dom';
 
 export function CommunityPage() {
   const clerk = useClerk();
+  const { appendWortkout } = useWorkout();
+  const navigate = useNavigate();
 
   const [userId] = useState(clerk.user?.id ?? "");
   const [searchTerm, setSearchTerm] = useState('');
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [loadingLikes, setLoadingLikes] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCopying, setIsCopying] = useState(false);
+  const [workoutSelectedID, setWorkoutSelectedID] = useState<string | null>(null);
 
   useEffect(() => {
     fetchPublicWorkouts();
   }, []);
+
+  const handleCopyExercise = async () => {
+    setIsCopying(true);
+    axios.post(`/workout/${workoutSelectedID}/copy`, {
+      userId
+    }, {
+      baseURL: import.meta.env.VITE_API_BASE_URL,
+    }).then(({ data }) => {
+      appendWortkout(data);
+      setIsCopying(false);
+      setIsModalOpen(false);
+      navigate(`/workout/${data.id}`);
+    }).catch((error) => {
+      console.error(error);
+      setIsCopying(false);
+    });
+  }
+
+  const handleOpenModal = (id: string) => {
+    setIsModalOpen(true);
+    setWorkoutSelectedID(id);
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setWorkoutSelectedID(null);
+  }
 
   const fetchPublicWorkouts = () => {
     setLoading(true);
@@ -196,16 +229,25 @@ export function CommunityPage() {
             </div>
 
             <div className="p-4 bg-gray-50 border-t border-gray-100">
-              <Link
-                to={`/treino/${workout.id}`}
+              <button
+                onClick={() => handleOpenModal(workout.id)}
                 className="block w-full py-2 px-4 bg-blue-600 text-white text-center rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Copiar Treino
-              </Link>
+              </button>
             </div>
           </div>
         ))}
       </div>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onConfirm={handleCopyExercise}
+        loading={isCopying}
+        title="Copiar Exercício"
+        content="Tem certeza que deseja copiar esse exercício?"
+      />
     </div>
   );
 }

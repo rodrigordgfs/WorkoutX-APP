@@ -33,11 +33,13 @@ Live Demo -> [https://workout-x.vercel.app/](https://workout-x.vercel.app/)
 - [x] Cadastro de treinos
 - [x] Detalhes do treino
 - [x] Listagem de treinos
-- [x] Perfil de Usuário
+- [x] Perfil de usuário
 - [x] Gerar treinos com IA
-- [ ] Notificações e Lembretes
-- [ ] Comunidade
-- [ ] Compartilhamento de Treinos
+- [x] Excluir exercícios
+- [x] Compartilhamento de treinos
+- [x] Copiar treinos de outros usuários atravéz da comunidade
+- [x] Comunidade
+- [ ] Notificações e lembretes
 
 ## Suporte
 
