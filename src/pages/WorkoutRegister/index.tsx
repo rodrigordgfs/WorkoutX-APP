@@ -39,7 +39,7 @@ const initialExercise: Exercise = {
 
 const WorkoutRegisterPage = () => {
     const clerk = useClerk();
-    const { addWorkout, appendWortkout } = useWorkout();
+    const { addWorkout, appendWorkout } = useWorkout();
     const navigate = useNavigate();
 
     const [workoutName, setWorkoutName] = useState('');
@@ -61,9 +61,8 @@ const WorkoutRegisterPage = () => {
                 .then(({ data }) => {
                     setIsModalOpen(false)
                     toast.success('Treino gerado com sucesso!');
-                    const workout = data[0];
-                    appendWortkout(workout);
-                    navigate(`/workout/${workout.id}`);
+                    appendWorkout(data);
+                    navigate(`/workout/${data.id}`);
                 })
                 .catch((error) => {
                     const title = error.response?.data?.message;
@@ -74,6 +73,7 @@ const WorkoutRegisterPage = () => {
                             toast.error(errorMessages.message);
                         });
                     } else {
+                        console.log(error);
                         toast.error(title || "Erro ao cadastrar treino");
                     }
                 })
