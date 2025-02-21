@@ -1,5 +1,4 @@
 import { Exercise, useWorkout } from "@/context/WorkoutContext";
-import { Trash } from "lucide-react";
 import { Modal } from "../Modal";
 import { useState } from "react";
 import axios from 'axios';
@@ -55,9 +54,9 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
     return <div className="bg-white rounded-lg p-6 shadow-lg">
         <div className="flex items-center justify-between gap-4 mb-2">
             <h2 className="text-2xl font-bold mb-4 mt-2">{exercise?.name}</h2>
-            <button onClick={() => setIsModalOpen(true)} className="text-white bg-red-500 hover:bg-red-600 transition-all rounded-md p-2">
+            {/* <button onClick={() => setIsModalOpen(true)} className="text-white bg-red-500 hover:bg-red-600 transition-all rounded-md p-2">
                 <Trash size={24} />
-            </button>
+            </button> */}
         </div>
 
         <div className="aspect-video w-full mb-6">

@@ -33,6 +33,26 @@ export interface Exercise {
     instructions: string;
 }
 
+export interface ExerciseSession {
+    id: string;
+    series: string;
+    repetitions: string;
+    weight: string;
+    restTime: string;
+    completed: boolean;
+    exercise: {
+        id: string;
+        name: string;
+    }
+}
+
+export interface WorkoutSession {
+    id: string;
+    startedAt: string;
+    endedAt: string | null;
+    exercises: ExerciseSession[];
+}
+
 interface WorkoutContextType {
     workouts: Workout[];
     fetchWorkouts: (userId?: string | undefined) => void;
@@ -49,6 +69,11 @@ interface WorkoutContextType {
     deleteWorkout: (workoutId: string) => void;
     isLastExerciseInWorkout: (workout: Workout | undefined, exerciseId: string) => boolean;
     getWorkoutByExerciseId: (exerciseId: string) => Workout | undefined;
+    workoutSession: WorkoutSession | null;
+    setWorkoutSession: (workoutSession: WorkoutSession | null) => void;
+    workoutSessionInProgress: () => boolean;
+    workoutSessionCompleted: () => boolean;
+    existExercisesUncompleted: () => boolean | undefined;
 }
 
 const WorkoutContext = createContext<WorkoutContextType | undefined>(undefined);
@@ -63,6 +88,19 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
     const [loadingWorkouts, setLoadingWorkouts] = useState(false);
     const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
     const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+    const [workoutSession, setWorkoutSession] = useState<WorkoutSession | null>(null);
+
+    const workoutSessionInProgress = () => {
+        return workoutSession !== null && workoutSession.endedAt === null;
+    }
+
+    const workoutSessionCompleted = () => {
+        return workoutSession !== null && workoutSession.endedAt !== null;
+    }
+
+    const existExercisesUncompleted = () => {
+        return workoutSession?.exercises.some((exercise) => !exercise.completed);
+    }
 
     const getWorkoutByExerciseId = (exerciseId: string) => {
         return workouts.find((workout) => workout.exercises.some((exercise) => exercise.id === exerciseId));
@@ -140,7 +178,28 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
     };
 
     return (
-        <WorkoutContext.Provider value={{ workouts, fetchWorkouts, addWorkout, workoutsLoaded, appendWorkout, isWorkoutsEmpty, loadingWorkouts, selectedExercise, setSelectedExercise, selectedWorkout, setSelectedWorkout, deleteExercise, deleteWorkout, getWorkoutByExerciseId, isLastExerciseInWorkout }}>
+        <WorkoutContext.Provider value={{
+            workouts,
+            fetchWorkouts,
+            addWorkout,
+            workoutsLoaded,
+            appendWorkout,
+            isWorkoutsEmpty,
+            loadingWorkouts,
+            selectedExercise,
+            setSelectedExercise,
+            selectedWorkout,
+            setSelectedWorkout,
+            deleteExercise,
+            deleteWorkout,
+            getWorkoutByExerciseId,
+            isLastExerciseInWorkout,
+            workoutSession,
+            setWorkoutSession,
+            workoutSessionInProgress,
+            workoutSessionCompleted,
+            existExercisesUncompleted
+        }}>
             {children}
         </WorkoutContext.Provider>
     );
