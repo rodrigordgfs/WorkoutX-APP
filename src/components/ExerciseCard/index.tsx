@@ -22,7 +22,7 @@ interface ExerciseCardProps {
 }
 
 const ExerciseCard = ({ exercise, isActive, onSelect }: ExerciseCardProps) => {
-  const { workoutSession, setWorkoutSession, workoutSessionCompleted } =
+  const { workoutSession, setWorkoutSession, workoutSessionCompleted, workoutSessionInProgress } =
     useWorkout();
 
   const [loadingCompleteExercise, setLoadingCompleteExercise] = useState(false);
@@ -91,7 +91,7 @@ const ExerciseCard = ({ exercise, isActive, onSelect }: ExerciseCardProps) => {
               handleCompleteExercise();
             }
           }}
-          disabled={loadingCompleteExercise}
+          disabled={loadingCompleteExercise || !workoutSessionInProgress()}
           className={`flex items-center justify-center p-2 rounded-full bg-blue-500 text-white transition-all ${
             loadingCompleteExercise && "cursor-not-allowed"
           } ${
