@@ -93,7 +93,7 @@ const ExerciseCard = ({ exercise, isActive, onSelect }: ExerciseCardProps) => {
           }}
           disabled={loadingCompleteExercise || !workoutSessionInProgress()}
           className={`flex items-center justify-center p-2 rounded-full bg-blue-500 text-white transition-all ${
-            loadingCompleteExercise && "cursor-not-allowed"
+            loadingCompleteExercise || !workoutSessionInProgress() && "cursor-not-allowed"
           } ${
             workoutSessionExercise?.completed
               ? "bg-green-500"
