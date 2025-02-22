@@ -13,7 +13,7 @@ const ExerciseCard = ({ exercise, isActive, onSelect }: ExerciseCardProps) => {
       className={`p-4 rounded-lg mb-2 cursor-pointer transition-all ${
         isActive
           ? "bg-blue-500 text-white shadow-lg"
-          : "bg-white hover:bg-gray-50"
+          : "bg-white hover:bg-gray-50 shadow-lg"
       }`}
       onClick={onSelect}
     >

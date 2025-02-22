@@ -23,6 +23,8 @@ function WorkoutDetailsPage() {
     workoutSessionInProgress,
     workoutSessionCompleted,
     existExercisesUncompleted,
+    getUncompletedExercisesWithDetails,
+    getCompletedExercisesWithDetails,
   } = useWorkout();
   const navigate = useNavigate();
 
@@ -256,14 +258,57 @@ function WorkoutDetailsPage() {
         </div>
 
         <div className="space-y-2">
-          {selectedWorkout.exercises.map((exercise) => (
-            <ExerciseCard
-              key={exercise.id}
-              exercise={exercise}
-              isActive={exercise.id === selectedExercise?.id}
-              onSelect={() => setSelectedExercise(exercise)}
-            />
-          ))}
+          {!workoutSessionInProgress() ? (
+            <div className="bg-white shadow-md rounded-lg p-4">
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                Exercícios
+              </h3>
+              {selectedWorkout.exercises.map((exercise) => (
+                <ExerciseCard
+                  key={exercise.id}
+                  exercise={exercise}
+                  isActive={exercise.id === selectedExercise?.id}
+                  onSelect={() => setSelectedExercise(exercise)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col space-y-4">
+              <div className="bg-white shadow-md rounded-lg p-4">
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                  Exercícios Pendentes
+                </h3>
+                {getUncompletedExercisesWithDetails()?.length === 0 ? (
+                  <p className="text-gray-600">
+                    Parabéns! Você concluiu todos os exercícios. Se desejar,
+                    revise os exercícios finalizados ou finalize o treino.
+                  </p>
+                ) : (
+                  getUncompletedExercisesWithDetails()?.map((exercise) => (
+                    <ExerciseCard
+                      key={exercise.id}
+                      exercise={exercise}
+                      isActive={exercise.id === selectedExercise?.id}
+                      onSelect={() => setSelectedExercise(exercise)}
+                    />
+                  ))
+                )}
+              </div>
+              <div className="bg-white shadow-md rounded-lg p-4">
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                  Exercícios Finalizados
+                </h3>
+                {getCompletedExercisesWithDetails()?.map((exercise) => (
+                  <ExerciseCard
+                    key={exercise.id}
+                    exercise={exercise}
+                    isActive={exercise.id === selectedExercise?.id}
+                    onSelect={() => setSelectedExercise(exercise)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
