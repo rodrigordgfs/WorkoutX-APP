@@ -18,6 +18,26 @@ export interface User {
   avatar: string;
 }
 
+export interface WorkoutStats {
+  totalExercises: number;
+  completedExercises: number;
+  completionRate: string;
+}
+
+export interface WorkoutHistory {
+  id: string;
+  startedAt: string;
+  endedAt: string | null;
+  duration: string | number;
+  workout: {
+    name: string;
+    visibility: string;
+    createdAt: string;
+  };
+  exercises: Exercise[];
+  stats: WorkoutStats;
+}
+
 export interface WorkoutLikes {
   userId: string;
 }

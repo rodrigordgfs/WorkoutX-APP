@@ -1,6 +1,6 @@
 import { useUserProfile } from "@/context/UserContext"
 import { useClerk } from "@clerk/clerk-react"
-import { X, Dumbbell, Plus, User, Users, LogOut } from "lucide-react"
+import { X, Dumbbell, Plus, User, Users, LogOut, Calendar } from "lucide-react"
 import { Link } from "react-router-dom"
 
 interface DrawerProps {
@@ -78,6 +78,16 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
               >
                 <Plus className="h-5 w-5 text-blue-600" />
                 <span>Cadastrar Treino</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/workout/history"
+                className="flex items-center gap-3 p-3 hover:bg-blue-50 rounded-lg transition-colors"
+                onClick={onClose}
+              >
+                <Calendar className="h-5 w-5 text-blue-600" />
+                <span>Histórico de Treinos</span>
               </Link>
             </li>
 
