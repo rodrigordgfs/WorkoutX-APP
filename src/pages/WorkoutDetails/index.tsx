@@ -200,6 +200,9 @@ function WorkoutDetailsPage() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-1">
         <div className="flex flex-col gap-2 bg-white rounded-lg p-4 shadow mb-4">
+          <h3 className="text-2xl font-bold text-gray-900 mb-3">
+            Treino: {selectedWorkout.name}
+          </h3>
           <select
             className="w-full p-2 border rounded"
             value={selectedWorkout.id}
@@ -298,14 +301,21 @@ function WorkoutDetailsPage() {
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">
                   Exercícios Finalizados
                 </h3>
-                {getCompletedExercisesWithDetails()?.map((exercise) => (
-                  <ExerciseCard
-                    key={exercise.id}
-                    exercise={exercise}
-                    isActive={exercise.id === selectedExercise?.id}
-                    onSelect={() => setSelectedExercise(exercise)}
-                  />
-                ))}
+                {getCompletedExercisesWithDetails()?.length === 0 ? (
+                  <p className="text-gray-600">
+                    Nenhum exercício foi concluído ainda. Continue se esforçando
+                    e finalize seus exercícios!
+                  </p>
+                ) : (
+                  getCompletedExercisesWithDetails()?.map((exercise) => (
+                    <ExerciseCard
+                      key={exercise.id}
+                      exercise={exercise}
+                      isActive={exercise.id === selectedExercise?.id}
+                      onSelect={() => setSelectedExercise(exercise)}
+                    />
+                  ))
+                )}
               </div>
             </div>
           )}

@@ -134,7 +134,9 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
   return (
     <div className="bg-white rounded-lg p-6 shadow-lg">
       <div className="flex flex-col md:flex-row items-center justify-between mb-2">
-        <h2 className="text-2xl font-bold mb-4 mt-2">{exercise?.name}</h2>
+        <h2 className="text-2xl font-bold mb-4 mt-2">
+          Exercício: {exercise?.name}
+        </h2>
         <button
           onClick={handleCompleteExercise}
           disabled={loadingCompleteExercise}
