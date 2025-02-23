@@ -20,21 +20,26 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
     }
   }
 
-
   return (
     <>
-      {isOpen && <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" onClick={onClose} />}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 dark:bg-black/60 backdrop-blur-md z-40 transition-opacity"
+          onClick={onClose}
+        />
+      )}
       <aside
-        className={`fixed top-0 left-0 h-full w-80 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-50 flex flex-col ${isOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
+        className={`fixed top-0 left-0 h-full w-80 bg-white dark:bg-zinc-900 shadow-lg transform transition-transform duration-300 ease-in-out z-50 flex flex-col ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
       >
-        <header className="bg-blue-600 text-white p-6 relative">
+        <header className="bg-blue-600 dark:bg-blue-700 text-white p-6 relative">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 hover:bg-blue-700 rounded-full p-1.5 transition-colors"
+            className="absolute top-4 right-4 hover:bg-blue-700 dark:hover:bg-blue-800 rounded-full p-1.5 transition-colors focus:outline-none focus:ring-2 focus:ring-white"
           >
             <X size={24} />
-            <span className="sr-only">Close menu</span>
+            <span className="sr-only">Fechar menu</span>
           </button>
 
           <div className="flex items-center gap-4 mt-4">
@@ -46,14 +51,14 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
                   className="rounded-full w-full h-full object-cover border-2 border-white"
                 />
               ) : (
-                <div className="w-full h-full rounded-full bg-blue-700 border-2 border-white flex items-center justify-center text-lg font-semibold">
+                <div className="w-full h-full rounded-full bg-blue-700 dark:bg-blue-800 border-2 border-white flex items-center justify-center text-lg font-semibold">
                   {profile.name.charAt(0)}
                 </div>
               )}
             </div>
             <div>
-              <h2 className="font-semibold">{profile.name}</h2>
-              <p className="text-sm text-blue-100">Membro</p>
+              <h2 className="font-semibold text-white">{profile.name}</h2>
+              <p className="text-sm text-blue-200 dark:text-blue-300">Membro</p>
             </div>
           </div>
         </header>
@@ -63,67 +68,67 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
             <li>
               <Link
                 to="/"
-                className="flex items-center gap-3 p-3 hover:bg-blue-50 rounded-lg transition-colors"
+                className="flex items-center gap-3 p-3 hover:bg-blue-50 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                 onClick={onClose}
               >
-                <Dumbbell className="h-5 w-5 text-blue-600" />
-                <span>Meus Treinos</span>
+                <Dumbbell className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <span className="text-zinc-900 dark:text-zinc-100">Meus Treinos</span>
               </Link>
             </li>
             <li>
               <Link
                 to="/workout/new"
-                className="flex items-center gap-3 p-3 hover:bg-blue-50 rounded-lg transition-colors"
+                className="flex items-center gap-3 p-3 hover:bg-blue-50 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                 onClick={onClose}
               >
-                <Plus className="h-5 w-5 text-blue-600" />
-                <span>Cadastrar Treino</span>
+                <Plus className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <span className="text-zinc-900 dark:text-zinc-100">Cadastrar Treino</span>
               </Link>
             </li>
             <li>
               <Link
                 to="/workout/history"
-                className="flex items-center gap-3 p-3 hover:bg-blue-50 rounded-lg transition-colors"
+                className="flex items-center gap-3 p-3 hover:bg-blue-50 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                 onClick={onClose}
               >
-                <Calendar className="h-5 w-5 text-blue-600" />
-                <span>Histórico de Treinos</span>
+                <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <span className="text-zinc-900 dark:text-zinc-100">Histórico de Treinos</span>
               </Link>
             </li>
 
-            <div className="h-px bg-gray-200 my-4" />
+            <div className="h-px bg-zinc-200 dark:bg-zinc-700 my-4" />
 
             <li>
               <Link
                 to="/profile"
-                className="flex items-center gap-3 p-3 hover:bg-blue-50 rounded-lg transition-colors"
+                className="flex items-center gap-3 p-3 hover:bg-blue-50 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                 onClick={onClose}
               >
-                <User className="h-5 w-5 text-blue-600" />
-                <span>Meu Perfil</span>
+                <User className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <span className="text-zinc-900 dark:text-zinc-100">Meu Perfil</span>
               </Link>
             </li>
             <li>
               <Link
                 to="/community"
-                className="flex items-center gap-3 p-3 hover:bg-blue-50 rounded-lg transition-colors"
+                className="flex items-center gap-3 p-3 hover:bg-blue-50 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                 onClick={onClose}
               >
-                <Users className="h-5 w-5 text-blue-600" />
-                <span>Comunidade</span>
+                <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <span className="text-zinc-900 dark:text-zinc-100">Comunidade</span>
               </Link>
             </li>
 
-            <div className="h-px bg-gray-200 my-4" />
+            <div className="h-px bg-zinc-200 dark:bg-zinc-700 my-4" />
 
             <li>
-              <div
-                className="flex items-center gap-3 p-3 hover:bg-blue-50 rounded-lg cursor-pointer transition-colors"
+              <button
+                className="flex items-center gap-3 p-3 hover:bg-blue-50 dark:hover:bg-zinc-800 rounded-lg transition-colors w-full text-left"
                 onClick={handleLogout}
               >
-                <LogOut className="h-5 w-5 text-blue-600" />
-                <span>Sair</span>
-              </div>
+                <LogOut className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <span className="text-zinc-900 dark:text-zinc-100">Sair</span>
+              </button>
             </li>
           </ul>
         </nav>
@@ -131,4 +136,3 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
     </>
   )
 }
-

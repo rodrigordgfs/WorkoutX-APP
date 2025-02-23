@@ -2,11 +2,12 @@ import { Drawer } from "@/components/Drawer";
 import Header from "@/components/Header";
 import { useMenu } from "@/context/MenuContext";
 import { Outlet } from "react-router-dom";
+
 function AuthenticatedLayout() {
     const { toogleMenu, isMenuOpen } = useMenu();
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
             <Header />
 
             <Drawer isOpen={isMenuOpen} onClose={() => toogleMenu()} />
@@ -15,7 +16,7 @@ function AuthenticatedLayout() {
                 <Outlet />
             </main>
         </div>
-    )
+    );
 }
 
-export default AuthenticatedLayout
+export default AuthenticatedLayout;
