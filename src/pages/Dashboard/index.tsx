@@ -16,25 +16,14 @@ import {
   TrendingUp,
   Calendar,
   Clock,
-  Weight as WeightIcon,
-  Target,
   Dumbbell,
   BarChart3,
   Trophy,
-  Zap,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useClerk } from "@clerk/clerk-react";
-
-interface WorkoutDashboard {
-  workoutMonthAmmount: number;
-  workoutPercentageChange: number;
-  consecutiveWorkoutDays: number;
-  averageWorkoutDuration: number;
-  completionRate: string;
-}
 
 interface WorkoutExercicesAmmount {
   exercise: {
