@@ -3,7 +3,7 @@ import {
   ExerciseSession,
   useWorkout,
 } from "@/context/WorkoutContext";
-import { Modal } from "../Modal";
+import { Modal } from "../Shared/Modal";
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -171,7 +171,7 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
       <div className="space-y-4">
         <div>
           <h3 className="text-lg font-semibold mb-2">Instruções:</h3>
-          <p className="text-gray-600">{exercise?.instructions}</p>
+          <p className="text-zinc-600 dark:text-zinc-400">{exercise?.instructions}</p>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4">

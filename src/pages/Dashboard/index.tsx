@@ -23,6 +23,36 @@ import {
   Trophy,
   Zap,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useClerk } from "@clerk/clerk-react";
+
+interface WorkoutDashboard {
+  workoutMonthAmmount: number;
+  workoutPercentageChange: number;
+  consecutiveWorkoutDays: number;
+  averageWorkoutDuration: number;
+  completionRate: string;
+}
+
+interface WorkoutExercicesAmmount {
+  exercise: {
+    id: string;
+    name: string;
+  };
+  count: number;
+}
+
+interface RecentActivity {
+  id: string;
+  workout: {
+    id: string;
+    name: string;
+  },
+  exerciseCount: number;
+  duration: number;
+}
 
 ChartJS.register(
   CategoryScale,
@@ -45,14 +75,14 @@ const StatCard = ({
 }: {
   icon: any;
   title: string;
-  value: string | number;
+  value: string | number | null | undefined;
   trend?: string;
   color?: "blue" | "green" | "yellow" | "purple" | "pink";
 }) => (
   <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl shadow-lg">
     <div className="flex items-center gap-4">
       <div
-        className={`p-3 bg-${color}-100 dark:bg-${color}-700 text-${color}-200 bg:text-${color}-200 rounded-lg`}
+        className={`p-3 bg-${color}-100 dark:bg-${color}-700 text-${color}-200 dark:text-${color}-200 rounded-lg`}
       >
         <Icon size={24} />
       </div>
@@ -135,24 +165,99 @@ const progressChart = {
   ],
 };
 
-const muscleGroupChart = {
-  labels: Object.keys(mockData.muscleGroups),
-  datasets: [
-    {
-      data: Object.values(mockData.muscleGroups),
-      backgroundColor: [
-        "rgba(59, 130, 246, 0.8)", // blue
-        "rgba(34, 197, 94, 0.8)", // green
-        "rgba(249, 115, 22, 0.8)", // orange
-        "rgba(168, 85, 247, 0.8)", // purple
-        "rgba(236, 72, 153, 0.8)", // pink
-        "rgba(234, 179, 8, 0.8)", // yellow
-      ],
-    },
-  ],
-};
-
 export function DashboardPage() {
+  const { user } = useClerk();
+
+  const [workoutMonthAmmount, setWorkoutMonthAmmount] = useState<number>(0);
+  const [workoutPercentageChange, setWorkoutPercentageChange] =
+    useState<number>(0);
+  const [consecutiveWorkoutDays, setConsecutiveWorkoutDays] =
+    useState<number>(0);
+  const [averageWorkoutDuration, setAverageWorkoutDuration] =
+    useState<number>(0);
+  const [completionRate, setCompletionRate] = useState<string>("0");
+  const [workoutExercisesAmmount, setWorkoutExercisesAmmount] = useState<
+    Record<string, number>
+  >({});
+  const [loading, setLoading] = useState<boolean>(false);
+  const [recentsActivities, setRecentsActivities] = useState<RecentActivity[]>([]);
+
+  const workoutExercisesAmmountChart = {
+    labels: Object.keys(workoutExercisesAmmount),
+    datasets: [
+      {
+        data: Object.values(workoutExercisesAmmount),
+        backgroundColor: [
+          "rgba(59, 130, 246, 0.8)",
+          "rgba(34, 197, 94, 0.8)",
+          "rgba(249, 115, 22, 0.8)",
+          "rgba(168, 85, 247, 0.8)",
+          "rgba(236, 72, 153, 0.8)",
+          "rgba(234, 179, 8, 0.8)",
+          "rgba(139, 92, 246, 0.8)",
+          "rgba(15, 118, 110, 0.8)",
+          "rgba(255, 159, 28, 0.8)",
+          "rgba(22, 163, 74, 0.8)",
+        ],
+      },
+    ],
+  };
+
+  useEffect(() => {
+    console.log(Object.keys(workoutExercisesAmmount));
+    console.log(Object.values(workoutExercisesAmmount));
+  }, [workoutExercisesAmmount]);
+
+  useEffect(() => {
+    setLoading(true);
+    const fetchWorkoutDashboard = () => {
+      axios
+        .get("/workout/dashboard", {
+          baseURL: import.meta.env.VITE_API_BASE_URL,
+          params: {
+            userId: user?.id,
+          },
+        })
+        .then(({ data }) => {
+          setWorkoutMonthAmmount(data.workoutMonthAmmount);
+          setWorkoutPercentageChange(data.workoutPercentageChange);
+          setConsecutiveWorkoutDays(data.consecutiveWorkoutDays);
+          setAverageWorkoutDuration(data.averageWorkoutDuration);
+          setCompletionRate(data.completionRate);
+          const exercisesAmmount: Record<string, number> =
+            data.workoutExercises.reduce(
+              (
+                acc: Record<string, number>,
+                workout: WorkoutExercicesAmmount
+              ) => {
+                acc[workout.exercise.name] = workout.count;
+                return acc;
+              },
+              {}
+            );
+          setWorkoutExercisesAmmount(exercisesAmmount);
+          
+          setRecentsActivities(data.recentActivities);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.log(error);
+
+          const title = error.response?.data?.message;
+          const errors: Record<string, { field: string; message: string }> =
+            error.response?.data?.errors;
+          if (errors) {
+            Object.values(errors).forEach((errorMessages) => {
+              toast.error(errorMessages.message);
+            });
+          } else {
+            toast.error(title || "Erro ao buscar o dashboard de treinos");
+          }
+        });
+    };
+
+    fetchWorkoutDashboard();
+  }, [user]);
   return (
     <div className="max-w-7xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
@@ -162,209 +267,210 @@ export function DashboardPage() {
         <h2 className="text-2xl font-bold">Dashboard</h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <StatCard
-          icon={Activity}
-          title="Treinos este mês"
-          value={mockData.workoutStats.thisMonth}
-          trend="+23% vs. mês anterior"
-        />
-        <StatCard
-          icon={Calendar}
-          title="Sequência atual"
-          value={`${mockData.workoutStats.streak} dias`}
-          color="green"
-        />
-        <StatCard
-          icon={Clock}
-          title="Duração média"
-          value={`${mockData.workoutStats.avgDuration}min`}
-          color="yellow"
-        />
-        <StatCard
-          icon={Trophy}
-          title="Taxa de conclusão"
-          value={`${mockData.workoutStats.completionRate}%`}
-          color="purple"
-        />
-      </div>
+      {loading ? (
+        <div className="max-w-7xl mx-auto">
+          {/* Loading for Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl shadow-lg animate-pulse">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-zinc-300 dark:bg-zinc-700 rounded-lg"></div>
+                <div className="space-y-4 w-1/2">
+                  <div className="h-3 bg-zinc-300 dark:bg-zinc-700 rounded w-3/4"></div>
+                  <div className="h-6 bg-zinc-300 dark:bg-zinc-700 rounded w-1/2"></div>
+                  <div className="h-3 bg-zinc-300 dark:bg-zinc-700 rounded w-1/3"></div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl shadow-lg animate-pulse">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-zinc-300 dark:bg-zinc-700 rounded-lg"></div>
+                <div className="space-y-4 w-1/2">
+                  <div className="h-3 bg-zinc-300 dark:bg-zinc-700 rounded w-3/4"></div>
+                  <div className="h-6 bg-zinc-300 dark:bg-zinc-700 rounded w-1/2"></div>
+                  <div className="h-3 bg-zinc-300 dark:bg-zinc-700 rounded w-1/3"></div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl shadow-lg animate-pulse">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-zinc-300 dark:bg-zinc-700 rounded-lg"></div>
+                <div className="space-y-4 w-1/2">
+                  <div className="h-3 bg-zinc-300 dark:bg-zinc-700 rounded w-3/4"></div>
+                  <div className="h-6 bg-zinc-300 dark:bg-zinc-700 rounded w-1/2"></div>
+                  <div className="h-3 bg-zinc-300 dark:bg-zinc-700 rounded w-1/3"></div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl shadow-lg animate-pulse">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-zinc-300 dark:bg-zinc-700 rounded-lg"></div>
+                <div className="space-y-4 w-1/2">
+                  <div className="h-3 bg-zinc-300 dark:bg-zinc-700 rounded w-3/4"></div>
+                  <div className="h-6 bg-zinc-300 dark:bg-zinc-700 rounded w-1/2"></div>
+                  <div className="h-3 bg-zinc-300 dark:bg-zinc-700 rounded w-1/3"></div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white dark:bg-zinc-800  p-6 rounded-xl shadow-lg">
-          <h3 className="text-lg font-semibold mb-4">Progresso do Peso</h3>
-          <Line
-            data={progressChart}
-            options={{
-              responsive: true,
-              plugins: {
-                legend: {
-                  position: "bottom" as const,
-                },
-              },
-              scales: {
-                y: {
-                  beginAtZero: false,
-                  title: {
-                    display: true,
-                    text: "Peso (kg)",
-                  },
-                },
-              },
-            }}
-          />
+          {/* Loading for Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl shadow-lg animate-pulse">
+              <div className="h-6 bg-zinc-300 dark:bg-zinc-700 rounded w-1/2 mb-4"></div>
+              <div className="h-40 bg-zinc-300 dark:bg-zinc-700 rounded"></div>
+            </div>
+
+            <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl shadow-lg animate-pulse">
+              <div className="h-6 bg-zinc-300 dark:bg-zinc-700 rounded w-1/2 mb-4"></div>
+              <div className="h-40 bg-zinc-300 dark:bg-zinc-700 rounded"></div>
+            </div>
+          </div>
+
+          {/* Loading for Personal Records and Goals */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl shadow-lg animate-pulse">
+              <div className="h-6 bg-zinc-300 dark:bg-zinc-700 rounded w-1/2 mb-4"></div>
+              <div className="space-y-4">
+                <div className="h-12 bg-zinc-300 dark:bg-zinc-700 rounded w-2/3"></div>
+                <div className="h-12 bg-zinc-300 dark:bg-zinc-700 rounded w-1/2"></div>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl shadow-lg animate-pulse">
+              <div className="h-6 bg-zinc-300 dark:bg-zinc-700 rounded w-1/2 mb-4"></div>
+              <div className="space-y-4">
+                <div className="h-12 bg-zinc-300 dark:bg-zinc-700 rounded w-2/3"></div>
+                <div className="h-12 bg-zinc-300 dark:bg-zinc-700 rounded w-1/2"></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Loading for Recent Activity */}
+          <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl shadow-lg animate-pulse">
+            <div className="h-6 bg-zinc-300 dark:bg-zinc-700 rounded w-1/2 mb-4"></div>
+            <div className="space-y-4">
+              <div className="h-16 bg-zinc-300 dark:bg-zinc-700 rounded w-full"></div>
+              <div className="h-16 bg-zinc-300 dark:bg-zinc-700 rounded w-full"></div>
+              <div className="h-16 bg-zinc-300 dark:bg-zinc-700 rounded w-full"></div>
+            </div>
+          </div>
         </div>
-
-        <div className="bg-white dark:bg-zinc-800  p-6 rounded-xl shadow-lg">
-          <h3 className="text-lg font-semibold mb-4">
-            Volume por Grupo Muscular
-          </h3>
-          <div className="aspect-square max-w-md mx-auto">
-            <Doughnut
-              data={muscleGroupChart}
-              options={{
-                responsive: true,
-                plugins: {
-                  legend: {
-                    position: "bottom" as const,
-                  },
-                },
-              }}
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <StatCard
+              icon={Activity}
+              title="Treinos este mês"
+              value={workoutMonthAmmount}
+              trend={`${workoutPercentageChange}% vs. mês anterior`}
+            />
+            <StatCard
+              icon={Calendar}
+              title="Sequência atual"
+              value={`${consecutiveWorkoutDays} dias`}
+              color="green"
+            />
+            <StatCard
+              icon={Clock}
+              title="Duração média"
+              value={`${Number(averageWorkoutDuration).toFixed(0)}min`}
+              color="yellow"
+            />
+            <StatCard
+              icon={Trophy}
+              title="Taxa de conclusão"
+              value={`${Number(completionRate).toFixed(0)}%`}
+              color="purple"
             />
           </div>
-        </div>
-      </div>
 
-      {/* Personal Records and Goals */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white dark:bg-zinc-800  p-6 rounded-xl shadow-lg">
-          <div className="flex items-center gap-2 mb-4">
-            <Trophy className="text-yellow-500" size={24} />
-            <h3 className="text-lg font-semibold">Recordes Pessoais</h3>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            {mockData.personalRecords.map((record, index) => (
-              <div key={index} className="border rounded-lg p-4">
-                <h4 className="font-semibold text-zinc-900 dark:text-zinc-200">
-                  {record.exercise}
-                </h4>
-                <div className="mt-2 flex items-center gap-2">
-                  <WeightIcon size={16} className="text-blue-600" />
-                  <span className="text-2xl text-zinc-600 dark:text-zinc-300 font-bold">
-                    {record.weight}kg
-                  </span>
-                </div>
-                <p className="text-sm text-zinc-500 dark:text-zinc-200 mt-1">
-                  {record.date}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-zinc-800  p-6 rounded-xl shadow-lg">
-          <div className="flex items-center gap-2 mb-4">
-            <Target className="text-blue-500" size={24} />
-            <h3 className="text-lg font-semibold">Metas e Objetivos</h3>
-          </div>
-
-          <div className="space-y-6">
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <div>
-                  <h4 className="font-medium">Objetivo Principal</h4>
-                  <p className="text-sm text-zinc-600 dark:text-zinc-300">
-                    Ganho de Massa Muscular
-                  </p>
-                </div>
-                <Zap className="text-yellow-500" size={24} />
-              </div>
-              <div className="w-full bg-zinc-200 rounded-full h-2">
-                <div
-                  className="bg-yellow-500 h-2 rounded-full"
-                  style={{ width: "75%" }}
-                />
-              </div>
+          {/* Charts Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div className="bg-white dark:bg-zinc-800  p-6 rounded-xl shadow-lg">
+              <h3 className="text-lg font-semibold mb-4">Progresso do Peso</h3>
+              <Line
+                data={progressChart}
+                options={{
+                  responsive: true,
+                  plugins: {
+                    legend: {
+                      position: "bottom" as const,
+                    },
+                  },
+                  scales: {
+                    y: {
+                      beginAtZero: false,
+                      title: {
+                        display: true,
+                        text: "Peso (kg)",
+                      },
+                    },
+                  },
+                }}
+              />
             </div>
 
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <div>
-                  <h4 className="font-medium">Meta de Treinos</h4>
-                  <p className="text-sm text-zinc-600 dark:text-zinc-300">
-                    12 de 15 treinos este mês
-                  </p>
-                </div>
-                <Dumbbell className="text-purple-500" size={24} />
-              </div>
-              <div className="w-full bg-zinc-200 rounded-full h-2">
-                <div
-                  className="bg-purple-500 h-2 rounded-full"
-                  style={{ width: "80%" }}
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <div>
-                  <h4 className="font-medium">Meta de Peso</h4>
-                  <p className="text-sm text-zinc-600 dark:text-zinc-300">
-                    75kg / 78kg
-                  </p>
-                </div>
-                <WeightIcon className="text-green-500" size={24} />
-              </div>
-              <div className="w-full bg-zinc-200 rounded-full h-2">
-                <div
-                  className="bg-green-500 h-2 rounded-full"
-                  style={{ width: "65%" }}
+            <div className="bg-white dark:bg-zinc-800  p-6 rounded-xl shadow-lg">
+              <h3 className="text-lg font-semibold mb-4">
+                Exercícios mais realizados
+              </h3>
+              <div className="aspect-square max-w-md mx-auto">
+                <Doughnut
+                  data={workoutExercisesAmmountChart}
+                  options={{
+                    responsive: true,
+                    plugins: {
+                      legend: {
+                        position: "bottom" as const,
+                      },
+                    },
+                  }}
                 />
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Recent Activity */}
-      <div className="bg-white dark:bg-zinc-800  p-6 rounded-xl shadow-lg">
-        <div className="flex items-center gap-2 mb-6">
-          <Activity className="text-blue-500" size={24} />
-          <h3 className="text-lg font-semibold">Atividade Recente</h3>
-        </div>
+          {/* Recent Activity */}
+          <div className="bg-white dark:bg-zinc-800  p-6 rounded-xl shadow-lg">
+            <div className="flex items-center gap-2 mb-6">
+              <Activity className="text-blue-500" size={24} />
+              <h3 className="text-lg font-semibold">Atividade Recente</h3>
+            </div>
 
-        <div className="space-y-4">
-          {mockData.recentWorkouts.map((workout, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-900 rounded-lg"
-            >
-              <div className="flex items-center gap-4">
-                <div className="p-2 bg-blue-100 dark:bg-blue-700 text-blue-600 dark:text-blue-200 rounded-lg">
-                  <Dumbbell size={20} />
-                </div>
-                <div>
-                  <h4 className="font-medium">{workout.name}</h4>
-                  <p className="text-sm text-zinc-600 dark:text-zinc-300">
-                    {workout.exercises} exercícios • {workout.duration} minutos
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span
-                  className={`px-3 py-1 rounded-full text-sm ${
-                    workout.intensity === "Alta"
-                      ? "bg-red-100 text-red-700"
-                      : "bg-yellow-100 text-yellow-700"
-                  }`}
+            <div className="space-y-4">
+              {recentsActivities.map((workouSession, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-900 rounded-lg"
                 >
-                  {workout.intensity}
-                </span>
-              </div>
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 bg-blue-100 dark:bg-blue-700 text-blue-600 dark:text-blue-200 rounded-lg">
+                      <Dumbbell size={20} />
+                    </div>
+                    <div>
+                      <h4 className="font-medium">{workouSession.workout.name}</h4>
+                      <p className="text-sm text-zinc-600 dark:text-zinc-300">
+                        {workouSession.exerciseCount} exercícios • {workouSession.duration ? `${workouSession.duration} minutos` : 'Em andamento'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm ${
+                        workouSession.duration
+                          ? "bg-green-100 text-green-700"
+                          : "bg-yellow-100 text-yellow-700"
+                      }`}
+                    >
+                      {workouSession.duration ? 'Concluído' : 'Em andamento'}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

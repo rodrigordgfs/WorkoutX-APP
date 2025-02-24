@@ -8,10 +8,10 @@ export function LoginPage() {
                 <div className="max-w-md w-full px-6">
                     <div className="text-center">
                         <Dumbbell className="h-12 w-12 text-blue-600 mx-auto" />
-                        <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+                        <h2 className="mt-6 text-3xl font-extrabold text-zinc-900">
                             Bem-vindo de volta
                         </h2>
-                        <p className="mt-2 text-sm text-gray-600">
+                        <p className="mt-2 text-sm text-zinc-600">
                             Entre para acessar seus treinos
                         </p>
                     </div>

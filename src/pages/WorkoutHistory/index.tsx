@@ -154,7 +154,7 @@ export function WorkoutHistoryPage() {
           </div>
           <button
             onClick={() => setFilterModalOpen(!filterModalOpen)}
-            className="px-4 py-2 bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-200 dark:text-zinc-200 rounded-lg hover:bg-zinc-200 flex items-center gap-2"
+            className="px-4 py-2 bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-200 rounded-lg hover:bg-zinc-200 flex items-center gap-2"
           >
             <Filter size={20} />
             Filtros

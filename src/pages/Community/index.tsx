@@ -14,7 +14,7 @@ import { toast } from "react-toastify";
 import { useWorkout, Workout } from "@/context/WorkoutContext";
 import axios from "axios";
 import { useClerk } from "@clerk/clerk-react";
-import { Modal } from "@/components/Modal";
+import { Modal } from "@/components/Shared/Modal";
 import { useNavigate } from "react-router-dom";
 
 export function CommunityPage() {

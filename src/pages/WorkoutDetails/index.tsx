@@ -1,5 +1,5 @@
 import ExerciseCard from "@/components/ExerciseCard";
-import { Modal } from "@/components/Modal";
+import { Modal } from "@/components/Shared/Modal";
 import WorkoutDetails from "@/components/WorkoutDetails";
 import { ExerciseSession, useWorkout } from "@/context/WorkoutContext";
 import { useClerk } from "@clerk/clerk-react";
@@ -213,7 +213,36 @@ function WorkoutDetailsPage() {
   }, [id, setWorkoutSession]);
 
   if (!selectedWorkout) {
-    return <div>Carregando...</div>; // Evita erro de acesso a propriedades indefinidas
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-1">
+          <div className="flex flex-col gap-2 bg-white dark:bg-zinc-800 rounded-lg p-4 shadow mb-4 animate-pulse">
+            <div className="w-full h-6 bg-zinc-300 dark:bg-zinc-700 rounded mb-3"></div>
+            <div className="w-full h-10 bg-zinc-300 dark:bg-zinc-700 rounded mb-4"></div>
+
+            <div className="flex md:flex-row flex-col items-center gap-2">
+              <div className="w-full h-12 bg-zinc-300 dark:bg-zinc-700 rounded-md"></div>
+              <div className="w-full h-12 bg-zinc-300 dark:bg-zinc-700 rounded-md"></div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <div className="bg-white dark:bg-zinc-800 shadow-md rounded-lg p-4 animate-pulse">
+              <div className="w-full h-6 bg-zinc-300 dark:bg-zinc-700 rounded mb-3"></div>
+              <div className="w-full h-10 bg-zinc-300 dark:bg-zinc-700 rounded mb-4"></div>
+            </div>
+            <div className="bg-white dark:bg-zinc-800 shadow-md rounded-lg p-4 animate-pulse">
+              <div className="w-full h-6 bg-zinc-300 dark:bg-zinc-700 rounded mb-3"></div>
+              <div className="w-full h-10 bg-zinc-300 dark:bg-zinc-700 rounded mb-4"></div>
+            </div>
+          </div>
+        </div>
+
+        <div className="lg:col-span-2 animate-pulse">
+          <div className="bg-white dark:bg-zinc-800 shadow-md rounded-lg p-4 h-96"></div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -314,7 +343,7 @@ function WorkoutDetailsPage() {
                   Exercícios Pendentes
                 </h3>
                 {getUncompletedExercisesWithDetails()?.length === 0 ? (
-                  <p className="text-gray-600">
+                  <p className="text-zinc-600 dark:text-zinc-400">
                     Parabéns! Você concluiu todos os exercícios. Se desejar,
                     revise os exercícios finalizados ou finalize o treino.
                   </p>
@@ -334,7 +363,7 @@ function WorkoutDetailsPage() {
                   Exercícios Finalizados
                 </h3>
                 {getCompletedExercisesWithDetails()?.length === 0 ? (
-                  <p className="text-gray-600">
+                  <p className="text-zinc-600 dark:text-zinc-400">
                     Nenhum exercício foi concluído ainda. Continue se esforçando
                     e finalize seus exercícios!
                   </p>

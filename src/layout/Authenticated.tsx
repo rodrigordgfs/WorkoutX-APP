@@ -1,5 +1,5 @@
-import { Drawer } from "@/components/Drawer";
-import Header from "@/components/Header";
+import { Drawer } from "@/components/Shared/Drawer";
+import Header from "@/components/Shared/Header";
 import { useMenu } from "@/context/MenuContext";
 import { Outlet } from "react-router-dom";
 

@@ -188,7 +188,7 @@ export function ProfilePage() {
                 onChange={(e) =>
                   handleChange("goal", e.target.value as FitnessGoal)
                 }
-                className="mt-1 px-4 py-2 bg-zinc-100 dark:bg-zinc-900 block w-full rounded-lg border-zinc-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                className="mt-1 px-4 py-2 bg-zinc-100 dark:bg-zinc-900 block w-full rounded-lg border-zinc-300 dark:border-zinc-950 shadow-sm focus:border-blue-300 dark:focus:border-blue-700 focus:ring focus:ring-blue-200 dark:focus:ring-blue-700 focus:ring-opacity-50"
               >
                 {Object.entries(FitnessGoalLabels).map(([key, label]) => (
                   <option key={key} value={key}>
@@ -207,7 +207,7 @@ export function ProfilePage() {
                 onChange={(e) =>
                   handleChange("experience", e.target.value as ExperienceLevel)
                 }
-                className="mt-1 px-4 py-2 bg-zinc-100 dark:bg-zinc-900 block w-full rounded-lg border-zinc-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                className="mt-1 px-4 py-2 bg-zinc-100 dark:bg-zinc-900 block w-full rounded-lg border-zinc-300 dark:border-zinc-950 shadow-sm focus:border-blue-300 dark:focus:border-blue-700 focus:ring focus:ring-blue-200 dark:focus:ring-blue-700 focus:ring-opacity-50"
               >
                 {Object.entries(ExperienceLevelLabels).map(([key, label]) => (
                   <option key={key} value={key}>
