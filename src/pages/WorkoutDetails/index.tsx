@@ -199,12 +199,12 @@ function WorkoutDetailsPage() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-1">
-        <div className="flex flex-col gap-2 bg-white rounded-lg p-4 shadow mb-4">
-          <h3 className="text-2xl font-bold text-gray-900 mb-3">
+        <div className="flex flex-col gap-2 bg-white dark:bg-zinc-800 rounded-lg p-4 shadow mb-4">
+          <h3 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-3">
             Treino: {selectedWorkout.name}
           </h3>
           <select
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded bg-white dark:bg-zinc-900"
             value={selectedWorkout.id}
             onChange={(e) => {
               navigate(`/workout/${e.target.value}`);
@@ -262,8 +262,8 @@ function WorkoutDetailsPage() {
 
         <div className="space-y-2">
           {!workoutSessionInProgress() ? (
-            <div className="bg-white shadow-md rounded-lg p-4">
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+            <div className="bg-white dark:bg-zinc-800 shadow-md rounded-lg p-4">
+              <h3 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-3">
                 Exercícios
               </h3>
               {selectedWorkout.exercises.map((exercise) => (
@@ -277,8 +277,8 @@ function WorkoutDetailsPage() {
             </div>
           ) : (
             <div className="flex flex-col space-y-4">
-              <div className="bg-white shadow-md rounded-lg p-4">
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+              <div className="bg-white dark:bg-zinc-800 shadow-md rounded-lg p-4">
+                <h3 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-3">
                   Exercícios Pendentes
                 </h3>
                 {getUncompletedExercisesWithDetails()?.length === 0 ? (
@@ -297,8 +297,8 @@ function WorkoutDetailsPage() {
                   ))
                 )}
               </div>
-              <div className="bg-white shadow-md rounded-lg p-4">
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+              <div className="bg-white dark:bg-zinc-800 shadow-md rounded-lg p-4">
+                <h3 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-3">
                   Exercícios Finalizados
                 </h3>
                 {getCompletedExercisesWithDetails()?.length === 0 ? (

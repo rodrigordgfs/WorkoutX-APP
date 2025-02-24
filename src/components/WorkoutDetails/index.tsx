@@ -128,7 +128,7 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
   };
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow-lg">
+    <div className="bg-white dark:bg-zinc-800 rounded-lg p-6 shadow-lg">
       <div className="flex flex-col md:flex-row items-center justify-between mb-2">
         <h2 className="text-2xl font-bold mb-4 mt-2">
           Exercício: {exercise?.name}
@@ -175,21 +175,21 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4">
-          <div className="bg-blue-50 p-4 rounded-lg text-center flex-1">
-            <h4 className="font-semibold">Séries</h4>
-            <p className="text-2xl font-bold text-blue-600">
+          <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg text-center flex-1">
+            <h4 className="font-semibold dark:text-white">Séries</h4>
+            <p className="text-2xl font-bold text-blue-600 dark:text-blue-300">
               {exercise?.series}
             </p>
           </div>
-          <div className="bg-blue-50 p-4 rounded-lg text-center flex-1">
-            <h4 className="font-semibold">Repetições</h4>
-            <p className="text-2xl font-bold text-blue-600">
+          <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg text-center flex-1">
+            <h4 className="font-semibold dark:text-white">Repetições</h4>
+            <p className="text-2xl font-bold text-blue-600 dark:text-blue-300">
               {exercise?.repetitions}
             </p>
           </div>
-          <div className="bg-blue-50 p-4 rounded-lg text-center flex-1">
-            <h4 className="font-semibold">Descanso</h4>
-            <p className="text-2xl font-bold text-blue-600">
+          <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg text-center flex-1">
+            <h4 className="font-semibold dark:text-white">Descanso</h4>
+            <p className="text-2xl font-bold text-blue-600 dark:text-blue-300">
               {exercise?.restTime}s
             </p>
           </div>
