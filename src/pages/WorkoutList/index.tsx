@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Dumbbell, Plus, PlusIcon } from "lucide-react";
+import { Dumbbell, Plus } from "lucide-react";
 import { useWorkout } from "@/context/WorkoutContext";
 import { useState } from "react";
 import WorkoutEmpty from "../../components/WorkoutEmpty";
