@@ -1,24 +1,33 @@
-import { useUserProfile } from "@/context/UserContext"
-import { useClerk } from "@clerk/clerk-react"
-import { X, Dumbbell, Plus, User, Users, LogOut, Calendar } from "lucide-react"
-import { Link } from "react-router-dom"
+import { useUserProfile } from "@/context/UserContext";
+import { useClerk } from "@clerk/clerk-react";
+import {
+  X,
+  Dumbbell,
+  Plus,
+  User,
+  Users,
+  LogOut,
+  Calendar,
+  LayoutDashboard,
+} from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface DrawerProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export function Drawer({ isOpen, onClose }: DrawerProps) {
-  const { profile } = useUserProfile()
-  const { signOut } = useClerk()
+  const { profile } = useUserProfile();
+  const { signOut } = useClerk();
 
   const handleLogout = async () => {
     try {
-      await signOut()
+      await signOut();
     } catch (error) {
-      console.error("Failed to sign out", error)
+      console.error("Failed to sign out", error);
     }
-  }
+  };
 
   return (
     <>
@@ -71,8 +80,22 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
                 className="flex items-center gap-3 p-3 hover:bg-blue-50 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                 onClick={onClose}
               >
+                <LayoutDashboard className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <span className="text-zinc-900 dark:text-zinc-100">
+                  Dashboard
+                </span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/workout"
+                className="flex items-center gap-3 p-3 hover:bg-blue-50 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                onClick={onClose}
+              >
                 <Dumbbell className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                <span className="text-zinc-900 dark:text-zinc-100">Meus Treinos</span>
+                <span className="text-zinc-900 dark:text-zinc-100">
+                  Meus Treinos
+                </span>
               </Link>
             </li>
             <li>
@@ -82,7 +105,9 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
                 onClick={onClose}
               >
                 <Plus className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                <span className="text-zinc-900 dark:text-zinc-100">Cadastrar Treino</span>
+                <span className="text-zinc-900 dark:text-zinc-100">
+                  Cadastrar Treino
+                </span>
               </Link>
             </li>
             <li>
@@ -92,7 +117,9 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
                 onClick={onClose}
               >
                 <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                <span className="text-zinc-900 dark:text-zinc-100">Histórico de Treinos</span>
+                <span className="text-zinc-900 dark:text-zinc-100">
+                  Histórico de Treinos
+                </span>
               </Link>
             </li>
 
@@ -105,7 +132,9 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
                 onClick={onClose}
               >
                 <User className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                <span className="text-zinc-900 dark:text-zinc-100">Meu Perfil</span>
+                <span className="text-zinc-900 dark:text-zinc-100">
+                  Meu Perfil
+                </span>
               </Link>
             </li>
             <li>
@@ -115,7 +144,9 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
                 onClick={onClose}
               >
                 <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                <span className="text-zinc-900 dark:text-zinc-100">Comunidade</span>
+                <span className="text-zinc-900 dark:text-zinc-100">
+                  Comunidade
+                </span>
               </Link>
             </li>
 
@@ -134,5 +165,5 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
         </nav>
       </aside>
     </>
-  )
+  );
 }

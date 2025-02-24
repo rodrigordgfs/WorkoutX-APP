@@ -35,10 +35,6 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
   );
 
   const handleCompleteExercise = () => {
-    if (!workoutSessionInProgress()) {
-      toast.info("Treino ainda não foi iniciado ou já esta concluído");
-      return;
-    }
     if (workoutSessionCompleted()) {
       toast.info("Treino já foi concluído");
       return;
@@ -137,27 +133,29 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
         <h2 className="text-2xl font-bold mb-4 mt-2">
           Exercício: {exercise?.name}
         </h2>
-        <button
-          onClick={handleCompleteExercise}
-          disabled={loadingCompleteExercise}
-          className={`py-2 px-4 rounded-lg text-white transition-all mb-2 md:mb-0 w-full md:w-auto ${
-            loadingCompleteExercise && "cursor-not-allowed opacity-75"
-          } ${
-            workoutSessionExercise?.completed
-              ? "bg-green-500 hover:bg-green-600"
-              : "bg-blue-500 hover:bg-blue-600"
-          }`}
-        >
-          {workoutSessionExercise?.completed ? (
-            <div className="flex items-center justify-center gap-2">
-              Exercício Concluído
-            </div>
-          ) : (
-            <div className="flex items-center justify-center gap-2">
-              Concluir Exercício
-            </div>
-          )}
-        </button>
+        {workoutSessionInProgress() && (
+          <button
+            onClick={handleCompleteExercise}
+            disabled={loadingCompleteExercise}
+            className={`py-2 px-4 rounded-lg text-white transition-all mb-2 md:mb-0 w-full md:w-auto ${
+              loadingCompleteExercise && "cursor-not-allowed opacity-75"
+            } ${
+              workoutSessionExercise?.completed
+                ? "bg-green-500 hover:bg-green-600"
+                : "bg-blue-500 hover:bg-blue-600"
+            }`}
+          >
+            {workoutSessionExercise?.completed ? (
+              <div className="flex items-center justify-center gap-2">
+                Exercício Concluído
+              </div>
+            ) : (
+              <div className="flex items-center justify-center gap-2">
+                Concluir Exercício
+              </div>
+            )}
+          </button>
+        )}
       </div>
 
       <div className="aspect-video w-full mb-6">

@@ -12,6 +12,7 @@ import { ProfilePage } from "./pages/Profile";
 import { useUserProfile } from "./context/UserContext";
 import { CommunityPage } from "./pages/Community";
 import { WorkoutHistoryPage } from "./pages/WorkoutHistory";
+import { DashboardPage } from "./pages/Dashboard";
 
 function App() {
   const { isSignedIn, isLoaded } = useAuth();
@@ -21,14 +22,25 @@ function App() {
 
   useEffect(() => {
     if (isSignedIn && !userProfileLoaded) {
-      fetchProfile(user?.id, user?.fullName, user?.imageUrl, user?.emailAddresses[0]?.emailAddress);
+      fetchProfile(
+        user?.id,
+        user?.fullName,
+        user?.imageUrl,
+        user?.emailAddresses[0]?.emailAddress
+      );
     }
 
     if (isSignedIn && !workoutsLoaded) {
       fetchWorkouts(user?.id);
     }
-
-  }, [isSignedIn, fetchWorkouts, workoutsLoaded, user, fetchProfile, userProfileLoaded]);
+  }, [
+    isSignedIn,
+    fetchWorkouts,
+    workoutsLoaded,
+    user,
+    fetchProfile,
+    userProfileLoaded,
+  ]);
 
   if (!isLoaded) {
     return <LoadingPage />;
@@ -38,7 +50,8 @@ function App() {
     <Routes>
       {isSignedIn ? (
         <Route path="/" element={<AuthenticatedLayout />}>
-          <Route index element={<WorkoutsListPage />} />
+          <Route index element={<DashboardPage />} />
+          <Route path="/workout" element={<WorkoutsListPage />} />
           <Route path="/workout/:id" element={<WorkoutDetailsPage />} />
           <Route path="/workout/new" element={<WorkoutRegisterPage />} />
           <Route path="/profile" element={<ProfilePage />} />
