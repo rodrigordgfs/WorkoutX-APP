@@ -35,6 +35,8 @@ function WorkoutDetailsPage() {
     useState(false);
   const [loadingStartWorkoutSession, setLoadingStartWorkoutSession] =
     useState(false);
+  const [loadingStopWorkoutSession, setLoadingStopWorkoutSession] =
+    useState(false);
   const [loadingCompleteWorkoutSession, setLoadingCompleteWorkoutSession] =
     useState(false);
 
@@ -96,6 +98,24 @@ function WorkoutDetailsPage() {
       })
       .finally(() => {
         setLoadingStartWorkoutSession(false);
+      });
+  };
+
+  const handleStopWorkoutSession = () => {
+    setLoadingStopWorkoutSession(true);
+    axios
+      .delete(`/workout/session/${workoutSession?.id}`, {
+        baseURL: import.meta.env.VITE_API_BASE_URL,
+      })
+      .then(() => {
+        setWorkoutSession(null);
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error("Erro ao parar o treino");
+      })
+      .finally(() => {
+        setLoadingStopWorkoutSession(false);
       });
   };
 
@@ -250,13 +270,25 @@ function WorkoutDetailsPage() {
                 Iniciar Treino
               </button>
             )}
-
-            <button
-              onClick={() => setIsModalDeleteWorkoutOpen(true)}
-              className="flex flex-1 flex-row items-center  md:w-auto w-full justify-center gap-4 text-white bg-red-500 hover:bg-red-600 transition-all p-2 rounded-lg"
-            >
-              Excluir Treino
-            </button>
+            {workoutSessionInProgress() ? (
+              <button
+                onClick={handleStopWorkoutSession}
+                className={`flex flex-1 flex-row items-center  md:w-auto w-full justify-center gap-4 text-white bg-red-500 hover:bg-red-600 transition-all p-2 rounded-lg ${
+                  loadingStopWorkoutSession
+                    ? "cursor-not-allowed opacity-75"
+                    : ""
+                }`}
+              >
+                Parar Treino
+              </button>
+            ) : (
+              <button
+                onClick={() => setIsModalDeleteWorkoutOpen(true)}
+                className={`flex flex-1 flex-row items-center  md:w-auto w-full justify-center gap-4 text-white bg-red-500 hover:bg-red-600 transition-all p-2 rounded-lg`}
+              >
+                Excluir Treino
+              </button>
+            )}
           </div>
         </div>
 
