@@ -1,5 +1,6 @@
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
 
 interface WeeklyTrainingVolumeProps {
@@ -9,21 +10,35 @@ interface WeeklyTrainingVolumeProps {
 export const WeeklyTrainingVolumeChart = ({
   value,
 }: WeeklyTrainingVolumeProps) => {
-  const weeklyTrainingVolumeChart = {
-    labels: Object.keys(value)?.map((date) => {
-      if (!date) return "";
-      const dayAbbr = format(parseISO(date), "EEE", { locale: ptBR });
-      return dayAbbr.charAt(0).toUpperCase() + dayAbbr.slice(1, 3);
-    }),
-    datasets: [
-      {
-        label: "Volume (kg)",
-        data: Object.values(value),
-        backgroundColor: "rgba(59, 130, 246, 0.8)",
-        borderRadius: 8,
-      },
-    ],
-  };
+  const [weeklyTrainingVolumeChart, setWeeklyTrainingVolumeChart] = useState<{
+    labels: string[];
+    datasets: {
+      label: string;
+      data: number[];
+      backgroundColor: string;
+      borderRadius: number;
+    }[];
+  }>({
+    labels: [],
+    datasets: [],
+  });
+
+  useEffect(() => {
+    setWeeklyTrainingVolumeChart({
+      labels: Object.keys(value).map((date) => {
+        const dayAbbr = format(parseISO(date), "EEE", { locale: ptBR });
+        return dayAbbr.charAt(0).toUpperCase() + dayAbbr.slice(1, 3);
+      }),
+      datasets: [
+        {
+          label: "Volume (kg)",
+          data: Object.values(value),
+          backgroundColor: "rgba(59, 130, 246, 0.8)",
+          borderRadius: 8,
+        },
+      ],
+    });
+  }, [value]);
 
   return (
     <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl shadow-lg">
