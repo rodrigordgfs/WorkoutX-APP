@@ -107,7 +107,6 @@ export const DashboardProvider = ({ children }: DashboardProviderProps) => {
               }, {} as Record<string, number>)
             : {}
         );
-
         setRecentsActivities(data.recentActivities);
       })
       .catch((error) => {
