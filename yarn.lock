@@ -378,6 +378,61 @@
   resolved "https://registry.npmjs.org/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.34.6.tgz"
   integrity sha512-0PVwmgzZ8+TZ9oGBmdZoQVXflbvuwzN/HRclujpl4N/q3i+y0lqLw8n1bXA8ru3sApDjlmONaNAuYr38y1Kr9w==
 
+"@sentry-internal/browser-utils@9.2.0":
+  version "9.2.0"
+  resolved "https://registry.npmjs.org/@sentry-internal/browser-utils/-/browser-utils-9.2.0.tgz"
+  integrity sha512-KulBtFSibPXN3sFtbikdskOokPpkEYf+VSexd0Emklo8iu/RcL4in+drsA2Z+dk+yDGEi7+TWBB7zghopuTa+g==
+  dependencies:
+    "@sentry/core" "9.2.0"
+
+"@sentry-internal/feedback@9.2.0":
+  version "9.2.0"
+  resolved "https://registry.npmjs.org/@sentry-internal/feedback/-/feedback-9.2.0.tgz"
+  integrity sha512-3rl2uBoXkz2N+OVzMkOQVK2MakC+U0lPh4FqBVOcAYiqovGnzobgpvdP5Um+lM/00oCtkJ1+8KjbW1ZnV1/cKQ==
+  dependencies:
+    "@sentry/core" "9.2.0"
+
+"@sentry-internal/replay-canvas@9.2.0":
+  version "9.2.0"
+  resolved "https://registry.npmjs.org/@sentry-internal/replay-canvas/-/replay-canvas-9.2.0.tgz"
+  integrity sha512-+q5dmEzMXs8/Fcl74mf8D8t3/W1pYPVse6jt0dNzo5o1z/LWgWY0LlImmlPU1QBIlUzB6VZkgfaKen8wZdcOVA==
+  dependencies:
+    "@sentry-internal/replay" "9.2.0"
+    "@sentry/core" "9.2.0"
+
+"@sentry-internal/replay@9.2.0":
+  version "9.2.0"
+  resolved "https://registry.npmjs.org/@sentry-internal/replay/-/replay-9.2.0.tgz"
+  integrity sha512-/7YS9BNPOSuuguT2/yS103vXmAKe13j+B0lreRgWPxUnfSsCQvmJ4UNuat61qJNl1MbJDCurG5eN94QwRqg6kA==
+  dependencies:
+    "@sentry-internal/browser-utils" "9.2.0"
+    "@sentry/core" "9.2.0"
+
+"@sentry/browser@9.2.0":
+  version "9.2.0"
+  resolved "https://registry.npmjs.org/@sentry/browser/-/browser-9.2.0.tgz"
+  integrity sha512-U4JpFq3eYrXmuTSzG+rUgNr37FSok0nJlcygVqrTesh8+wV48D8maEbiKJ0txjaJ2h1E5rK09zutSPSS3Bp4uA==
+  dependencies:
+    "@sentry-internal/browser-utils" "9.2.0"
+    "@sentry-internal/feedback" "9.2.0"
+    "@sentry-internal/replay" "9.2.0"
+    "@sentry-internal/replay-canvas" "9.2.0"
+    "@sentry/core" "9.2.0"
+
+"@sentry/core@9.2.0":
+  version "9.2.0"
+  resolved "https://registry.npmjs.org/@sentry/core/-/core-9.2.0.tgz"
+  integrity sha512-REnEuneWyv3DkZfr0ZCQOZRCkBxUuWMY7aJ7BwWU9t3CFRUIPO0ePiXb2eZJEkDtalJK+m9pSTDUbChtrzQmLA==
+
+"@sentry/react@^9.2.0":
+  version "9.2.0"
+  resolved "https://registry.npmjs.org/@sentry/react/-/react-9.2.0.tgz"
+  integrity sha512-acb/D/hU23d+5Ey06lwpec6U/dEgZRHoG75hq7v+Q54tbD/pObgNxpgwgI91NwreGJuFOPdGfq1cK0umXnyskQ==
+  dependencies:
+    "@sentry/browser" "9.2.0"
+    "@sentry/core" "9.2.0"
+    hoist-non-react-statics "^3.3.2"
+
 "@types/babel__core@^7.20.5":
   version "7.20.5"
   resolved "https://registry.npmjs.org/@types/babel__core/-/babel__core-7.20.5.tgz"
@@ -1243,6 +1298,13 @@ hasown@^2.0.2:
   dependencies:
     function-bind "^1.1.2"
 
+hoist-non-react-statics@^3.3.2:
+  version "3.3.2"
+  resolved "https://registry.npmjs.org/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz"
+  integrity sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==
+  dependencies:
+    react-is "^16.7.0"
+
 ignore@^5.2.0, ignore@^5.3.1:
   version "5.3.2"
   resolved "https://registry.npmjs.org/ignore/-/ignore-5.3.2.tgz"
@@ -1681,6 +1743,11 @@ react-chartjs-2@^5.3.0:
   dependencies:
     scheduler "^0.25.0"
 
+react-is@^16.7.0:
+  version "16.13.1"
+  resolved "https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz"
+  integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
+
 react-refresh@^0.14.2:
   version "0.14.2"
   resolved "https://registry.npmjs.org/react-refresh/-/react-refresh-0.14.2.tgz"
@@ -1710,7 +1777,7 @@ react-toastify@^11.0.3:
   dependencies:
     clsx "^2.1.1"
 
-"react@^16.11.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^18 || ^19", "react@^18.0.0 || ^19.0.0 || ^19.0.0-0", react@^19.0.0, react@>=18:
+"react@^16.11.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^16.14.0 || 17.x || 18.x || 19.x", "react@^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^18 || ^19", "react@^18.0.0 || ^19.0.0 || ^19.0.0-0", react@^19.0.0, react@>=18:
   version "19.0.0"
   resolved "https://registry.npmjs.org/react/-/react-19.0.0.tgz"
   integrity sha512-V8AVnmPIICiWpGfm6GLzCR/W5FXLchHop40W4nXBmdlEceh16rCN8O8LNWm5bh5XUX91fh7KpA+W0TgMKmgTpQ==

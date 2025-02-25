@@ -9,12 +9,29 @@ import { ToastContainer } from "react-toastify";
 import { WorkoutProvider } from "./context/WorkoutContext.tsx";
 import { UserProvider } from "./context/UserContext.tsx";
 import { DashboardProvider } from "./context/DashboardContext.tsx";
+import * as Sentry from "@sentry/react";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 if (!PUBLISHABLE_KEY) {
   throw new Error("Clerk - Missing Publishable Key");
 }
+
+Sentry.init({
+  dsn: "",
+  integrations: [
+    Sentry.browserTracingIntegration(),
+    Sentry.replayIntegration(),
+  ],
+  tracesSampleRate: 1.0,
+  tracePropagationTargets: [
+    "localhost",
+    /^https:\/\/workout-x\.vercel.app\/api/,
+  ],
+  // Session Replay
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
+});
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
