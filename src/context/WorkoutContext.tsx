@@ -1,6 +1,16 @@
+import { IWorkoutHistory } from "@/components/WorkoutHistoryPage/WorkoutHistoryCard";
 import { Visibility } from "@/pages/WorkoutRegister";
 import workoutService from "@/services/workout";
-import { createContext, FC, ReactNode, useContext, useState } from "react";
+import { useClerk } from "@clerk/clerk-react";
+import axios from "axios";
+import {
+  createContext,
+  FC,
+  ReactNode,
+  useCallback,
+  useContext,
+  useState,
+} from "react";
 import { toast } from "react-toastify";
 
 export interface Workout {
@@ -104,6 +114,9 @@ interface WorkoutContextType {
   existExercisesUncompleted: () => boolean | undefined;
   getUncompletedExercisesWithDetails: () => Exercise[] | undefined;
   getCompletedExercisesWithDetails: () => Exercise[] | undefined;
+  loadingWorkoutHistory: boolean;
+  fetchWorkoutHistory: () => void;
+  workoutHistory: IWorkoutHistory[];
 }
 
 const WorkoutContext = createContext<WorkoutContextType | undefined>(undefined);
@@ -113,6 +126,8 @@ interface WorkoutProviderProps {
 }
 
 export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
+  const { user } = useClerk();
+
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [workoutsLoaded, setWorkoutsLoaded] = useState(false);
   const [loadingWorkouts, setLoadingWorkouts] = useState(false);
@@ -123,6 +138,8 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
   const [workoutSession, setWorkoutSession] = useState<WorkoutSession | null>(
     null
   );
+  const [loadingWorkoutHistory, setLoadingWorkoutHistory] = useState(false);
+  const [workoutHistory, setWorkoutHistory] = useState<IWorkoutHistory[]>([]);
 
   const getUncompletedExercisesWithDetails = () => {
     return workoutSession?.exercises
@@ -271,6 +288,33 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
       });
   };
 
+  const fetchWorkoutHistory = useCallback(() => {
+    setLoadingWorkoutHistory(true);
+    axios
+      .get("/workout/history", {
+        baseURL: import.meta.env.VITE_API_BASE_URL,
+        params: {
+          userId: user?.id,
+        },
+      })
+      .then(({ data }) => {
+        setWorkoutHistory(data);
+        setLoadingWorkoutHistory(false);
+      })
+      .catch((error) => {
+        const title = error.response?.data?.message;
+        const errors: Record<string, { field: string; message: string }> =
+          error.response?.data?.errors;
+        if (errors) {
+          Object.values(errors).forEach((errorMessages) => {
+            toast.error(errorMessages.message);
+          });
+        } else {
+          toast.error(title || "Erro ao buscar o histórico de treinos");
+        }
+      });
+  }, [user?.id]);
+
   return (
     <WorkoutContext.Provider
       value={{
@@ -296,6 +340,9 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
         existExercisesUncompleted,
         getUncompletedExercisesWithDetails,
         getCompletedExercisesWithDetails,
+        loadingWorkoutHistory,
+        fetchWorkoutHistory,
+        workoutHistory,
       }}
     >
       {children}
