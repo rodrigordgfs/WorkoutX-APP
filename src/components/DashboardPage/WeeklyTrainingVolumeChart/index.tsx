@@ -24,20 +24,22 @@ export const WeeklyTrainingVolumeChart = ({
   });
 
   useEffect(() => {
-    setWeeklyTrainingVolumeChart({
-      labels: Object.keys(value).map((date) => {
-        const dayAbbr = format(parseISO(date), "EEE", { locale: ptBR });
-        return dayAbbr.charAt(0).toUpperCase() + dayAbbr.slice(1, 3);
-      }),
-      datasets: [
-        {
-          label: "Volume (kg)",
-          data: Object.values(value),
-          backgroundColor: "rgba(59, 130, 246, 0.8)",
-          borderRadius: 8,
-        },
-      ],
-    });
+    if (value && Object.keys(value).length > 0) {
+      setWeeklyTrainingVolumeChart({
+        labels: Object.keys(value).map((date) => {
+          const dayAbbr = format(parseISO(date), "EEE", { locale: ptBR });
+          return dayAbbr.charAt(0).toUpperCase() + dayAbbr.slice(1, 3);
+        }),
+        datasets: [
+          {
+            label: "Volume (kg)",
+            data: Object.values(value),
+            backgroundColor: "rgba(59, 130, 246, 0.8)",
+            borderRadius: 8,
+          },
+        ],
+      });
+    }
   }, [value]);
 
   return (
