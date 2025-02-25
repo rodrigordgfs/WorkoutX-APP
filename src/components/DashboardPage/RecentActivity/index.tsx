@@ -15,9 +15,15 @@ export const RecentActivity = ({ activities }: RecentActivityProps) => {
       </div>
 
       <div className="space-y-4">
-        {activities.map((workouSession, index) => (
-          <RecentActivityCard key={index} workoutSession={workouSession} />
-        ))}
+        {activities.length === 0 ? (
+          <p className="text-zinc-600 dark:text-zinc-400">
+            Nenhuma atividade recente disponível.
+          </p>
+        ) : (
+          activities.map((workouSession, index) => (
+            <RecentActivityCard key={index} workoutSession={workouSession} />
+          ))
+        )}
       </div>
     </div>
   );

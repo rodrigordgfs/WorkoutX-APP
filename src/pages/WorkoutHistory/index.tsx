@@ -5,6 +5,7 @@ import { FilterHistory } from "@/components/WorkoutHistoryPage/Filter";
 import { Loading } from "@/components/WorkoutHistoryPage/Loading";
 import { WorkoutHistoryCard } from "@/components/WorkoutHistoryPage/WorkoutHistoryCard";
 import { useWorkout } from "@/context/WorkoutContext";
+import WorkoutHistoryEmpty from "@/components/WorkoutHistoryPage/WorkoutHistoryEmpty";
 
 function getStatusColor(completionRate: string) {
   const rate = parseInt(completionRate);
@@ -37,16 +38,20 @@ export function WorkoutHistoryPage() {
     <div className="max-w-4xl mx-auto">
       <SectionTitle title="Histórico de Treinos" icon={Calendar} />
 
-      <FilterHistory
-        filterModalOpen={filterModalOpen}
-        search={searchTerm}
-        onSearchChange={setSearchTerm}
-        toogleFilterOpen={setFilterModalOpen}
-      />
+      {workoutHistory.length > 0 && (
+        <FilterHistory
+          filterModalOpen={filterModalOpen}
+          search={searchTerm}
+          onSearchChange={setSearchTerm}
+          toogleFilterOpen={setFilterModalOpen}
+        />
+      )}
 
       <div className="space-y-4">
         {loadingWorkoutHistory ? (
           <Loading />
+        ) : workoutHistory.length === 0 ? (
+          <WorkoutHistoryEmpty />
         ) : (
           workoutHistory.map((workout) => {
             const isExpanded = expandedWorkouts.includes(workout.id);
