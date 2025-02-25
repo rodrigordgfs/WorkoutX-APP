@@ -1,5 +1,3 @@
-import { format, parseISO } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
 
@@ -26,10 +24,7 @@ export const WeeklyTrainingVolumeChart = ({
   useEffect(() => {
     if (value && Object.keys(value).length > 0) {
       setWeeklyTrainingVolumeChart({
-        labels: Object.keys(value).map((date) => {
-          const dayAbbr = format(parseISO(date), "EEE", { locale: ptBR });
-          return dayAbbr.charAt(0).toUpperCase() + dayAbbr.slice(1, 3);
-        }),
+        labels: Object.keys(value),
         datasets: [
           {
             label: "Volume (kg)",

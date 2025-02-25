@@ -1,5 +1,7 @@
 import { useClerk } from "@clerk/clerk-react";
 import axios from "axios";
+import { format, parseISO } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import {
   createContext,
   ReactNode,
@@ -94,7 +96,15 @@ export const DashboardProvider = ({ children }: DashboardProviderProps) => {
             {}
           )
         );
-        setWeeklyTrainingVolume(data.volumeWorkoutExercises);
+        setWeeklyTrainingVolume(
+          Object.keys(data.volumeWorkoutExercises).reduce((acc, date) => {
+            const dayAbbr = format(parseISO(date), "EEE", { locale: ptBR });
+            const formattedDay =
+              dayAbbr.charAt(0).toUpperCase() + dayAbbr.slice(1, 3);
+            acc[formattedDay] = data.volumeWorkoutExercises[date];
+            return acc;
+          }, {} as Record<string, number>)
+        );
         setRecentsActivities(data.recentActivities);
       })
       .catch((error) => {
