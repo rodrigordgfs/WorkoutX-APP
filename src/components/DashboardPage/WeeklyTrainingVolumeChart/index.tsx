@@ -10,7 +10,8 @@ export const WeeklyTrainingVolumeChart = ({
   value,
 }: WeeklyTrainingVolumeProps) => {
   const weeklyTrainingVolumeChart = {
-    labels: Object.keys(value).map((date) => {
+    labels: Object.keys(value)?.map((date) => {
+      if (!date) return "";
       const dayAbbr = format(parseISO(date), "EEE", { locale: ptBR });
       return dayAbbr.charAt(0).toUpperCase() + dayAbbr.slice(1, 3);
     }),
