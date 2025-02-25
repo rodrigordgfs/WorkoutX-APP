@@ -39,6 +39,7 @@ Live Demo -> [https://workout-x.vercel.app/](https://workout-x.vercel.app/)
 - [x] Compartilhamento de treinos
 - [x] Copiar treinos de outros usuários atravéz da comunidade
 - [x] Comunidade
+- [x] Dashboard com métricas dos treinos 
 - [ ] Notificações e lembretes
 
 ## Suporte

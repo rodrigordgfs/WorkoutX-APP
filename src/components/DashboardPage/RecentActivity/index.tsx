@@ -1,6 +1,6 @@
-import { IRecentActivity } from "@/pages/Dashboard";
 import { Activity } from "lucide-react";
 import { RecentActivityCard } from "../RecentActivityCard";
+import { IRecentActivity } from "@/context/DashboardContext";
 
 interface RecentActivityProps {
   activities: IRecentActivity[];

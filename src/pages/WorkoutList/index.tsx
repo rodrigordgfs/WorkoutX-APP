@@ -1,10 +1,10 @@
-import { Link } from "react-router-dom";
 import { Dumbbell, Plus } from "lucide-react";
 import { useWorkout } from "@/context/WorkoutContext";
 import { useState } from "react";
 import WorkoutEmpty from "../../components/WorkoutEmpty";
 import WorkoutLoading from "../../components/WorkoutLoading";
 import WorkoutListItem from "@/components/WorkoutListItem";
+import { SectionTitle } from "@/components/Shared/SectionTitle";
 
 export function WorkoutsListPage() {
   const { workouts, isWorkoutsEmpty, loadingWorkouts } = useWorkout();
@@ -28,21 +28,14 @@ export function WorkoutsListPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-blue-100 dark:bg-blue-700 text-blue-600 dark:text-blue-200 rounded-lg">
-            <Dumbbell size={24} />
-          </div>
-          <h2 className="text-2xl font-bold">Meus Treinos</h2>
-        </div>
-        <Link
-          to="/workout/new"
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Plus size={20} />
-          Novo Treino
-        </Link>
-      </div>
+      <SectionTitle
+        icon={Dumbbell}
+        title="Meus Treinos"
+        goTo="/workout/new"
+        iconGoTo={Plus}
+        textGoTo="Novo Treino"
+      />
+
       <div className="grid gap-4">
         {workouts.map((wk) => {
           const isOpen = openWorkouts.includes(wk.id);
