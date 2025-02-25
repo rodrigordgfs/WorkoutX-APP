@@ -97,14 +97,17 @@ export const DashboardProvider = ({ children }: DashboardProviderProps) => {
           )
         );
         setWeeklyTrainingVolume(
-          Object.keys(data.volumeWorkoutExercises).reduce((acc, date) => {
-            const dayAbbr = format(parseISO(date), "EEE", { locale: ptBR });
-            const formattedDay =
-              dayAbbr.charAt(0).toUpperCase() + dayAbbr.slice(1, 3);
-            acc[formattedDay] = data.volumeWorkoutExercises[date];
-            return acc;
-          }, {} as Record<string, number>)
+          data.volumeWorkoutExercises
+            ? Object.keys(data.volumeWorkoutExercises).reduce((acc, date) => {
+                const dayAbbr = format(parseISO(date), "EEE", { locale: ptBR });
+                const formattedDay =
+                  dayAbbr.charAt(0).toUpperCase() + dayAbbr.slice(1, 3);
+                acc[formattedDay] = data.volumeWorkoutExercises[date];
+                return acc;
+              }, {} as Record<string, number>)
+            : {}
         );
+
         setRecentsActivities(data.recentActivities);
       })
       .catch((error) => {
