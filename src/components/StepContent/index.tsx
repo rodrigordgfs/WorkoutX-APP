@@ -50,18 +50,43 @@ export function StepContent({
       return (
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">1. Objetivo do Treino</h3>
-          <RadioGroup
-            name="objective"
-            options={[
-              "Ganho de massa muscular",
-              "Perda de gordura",
-              "Condicionamento físico",
-              "Força e resistência",
-              "Definição muscular",
-            ]}
-            value={formData.objective}
-            onChange={(value) => updateFormData("objective", value)}
-          />
+          <div className="space-y-4">
+            <div>
+              <p className="text-zinc-700 dark:text-zinc-200 font-medium mb-2">
+                Qual seu objetivo principal?
+              </p>
+              <RadioGroup
+                name="objective"
+                options={[
+                  "Ganho de massa muscular",
+                  "Perda de gordura",
+                  "Condicionamento físico",
+                  "Força e resistência",
+                  "Definição muscular",
+                ]}
+                value={formData.objective}
+                onChange={(value) => updateFormData("objective", value)}
+              />
+            </div>
+            <div>
+              <p className="text-zinc-700 dark:text-zinc-200 font-medium mb-2">
+                Qual parte do corpo deseja focar?
+              </p>
+              <RadioGroup
+                name="muscleGroup"
+                options={[
+                  "Peito (Peitorais)",
+                  "Costas (Dorsais)",
+                  "Ombros (Deltoides)",
+                  "Braços (Bíceps e Tríceps)",
+                  "Pernas (Inferiores)",
+                  "Core (Abdômen e Lombar)",
+                ]}
+                value={formData.muscleGroup}
+                onChange={(value) => updateFormData("muscleGroup", value)}
+              />
+            </div>
+          </div>
         </div>
       );
     case 2:
@@ -72,7 +97,7 @@ export function StepContent({
           </h3>
           <div className="space-y-4">
             <div>
-              <p className="text-zinc-700 dark:text-zinc-200 mb-2">
+              <p className="text-zinc-700 dark:text-zinc-200 font-medium mb-2">
                 Há quanto tempo você treina?
               </p>
               <RadioGroup
@@ -88,7 +113,7 @@ export function StepContent({
               />
             </div>
             <div>
-              <p className="text-zinc-700 dark:text-zinc-200 mb-2">
+              <p className="text-zinc-700 dark:text-zinc-200 font-medium mb-2">
                 Como você classificaria seu nível de experiência?
               </p>
               <RadioGroup
@@ -109,7 +134,7 @@ export function StepContent({
           </h3>
           <div className="space-y-4">
             <div>
-              <p className="text-zinc-700 dark:text-zinc-200 mb-2">
+              <p className="text-zinc-700 dark:text-zinc-200 font-medium mb-2">
                 Quantas vezes por semana pretende treinar?
               </p>
               <RadioGroup
@@ -120,7 +145,7 @@ export function StepContent({
               />
             </div>
             <div>
-              <p className="text-zinc-700 dark:text-zinc-200 mb-2">
+              <p className="text-zinc-700 dark:text-zinc-200 font-medium mb-2">
                 Quanto tempo disponível tem para cada treino?
               </p>
               <RadioGroup
@@ -144,7 +169,7 @@ export function StepContent({
           <h3 className="text-lg font-semibold">4. Equipamentos e Estrutura</h3>
           <div className="space-y-4">
             <div>
-              <p className="text-zinc-700 dark:text-zinc-200 mb-2">
+              <p className="text-zinc-700 dark:text-zinc-200 font-medium mb-2">
                 Onde você pretende treinar?
               </p>
               <RadioGroup
@@ -155,7 +180,7 @@ export function StepContent({
               />
             </div>
             <div>
-              <p className="text-zinc-700 dark:text-zinc-200 mb-2">
+              <p className="text-zinc-700 dark:text-zinc-200 font-medium mb-2">
                 Tem acesso a quais equipamentos?
               </p>
               {[
@@ -202,7 +227,7 @@ export function StepContent({
           </h3>
           <div className="space-y-4">
             <div>
-              <p className="text-zinc-700 dark:text-zinc-200 mb-2">
+              <p className="text-zinc-700 dark:text-zinc-200 font-medium mb-2">
                 Você tem alguma limitação física ou lesão que precisa ser
                 considerada?
               </p>
@@ -235,7 +260,7 @@ export function StepContent({
               </div>
             )}
             <div>
-              <p className="text-zinc-700 dark:text-zinc-200 mb-2">
+              <p className="text-zinc-700 dark:text-zinc-200 font-medium mb-2">
                 Gosta mais de treinos com:
               </p>
               <RadioGroup
@@ -261,7 +286,7 @@ export function StepContent({
           <h3 className="text-lg font-semibold">6. Hábitos e Estilo de Vida</h3>
           <div className="space-y-4">
             <div>
-              <p className="text-zinc-700 dark:text-zinc-200 mb-2">
+              <p className="text-zinc-700 dark:text-zinc-200 font-medium mb-2">
                 Como está sua alimentação?
               </p>
               <RadioGroup
@@ -276,7 +301,7 @@ export function StepContent({
               />
             </div>
             <div>
-              <p className="text-zinc-700 dark:text-zinc-200 mb-2">
+              <p className="text-zinc-700 dark:text-zinc-200 font-medium mb-2">
                 Como está sua qualidade de sono?
               </p>
               <RadioGroup

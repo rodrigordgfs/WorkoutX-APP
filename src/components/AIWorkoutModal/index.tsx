@@ -4,6 +4,7 @@ import { StepContent } from "../StepContent";
 
 export interface AIWorkoutFormData {
   objective: string;
+  muscleGroup: string;
   trainingTime: string;
   experienceLevel: string;
   frequency: string;
@@ -34,6 +35,7 @@ export function AIWorkoutModal({
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<AIWorkoutFormData>({
     objective: "",
+    muscleGroup: "",
     trainingTime: "",
     experienceLevel: "",
     frequency: "",
@@ -47,7 +49,42 @@ export function AIWorkoutModal({
     sleepQuality: "",
   });
 
+  const isStepValid = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          formData.objective.trim() !== "" && formData.muscleGroup.trim() !== ""
+        );
+      case 2:
+        return (
+          formData.trainingTime.trim() !== "" &&
+          formData.experienceLevel.trim() !== ""
+        );
+      case 3:
+        return (
+          formData.frequency.trim() !== "" && formData.duration.trim() !== ""
+        );
+      case 4:
+        return formData.equipment.length > 0 && formData.location.trim() !== "";
+      case 5:
+        return (
+          formData.hasPhysicalLimitation ||
+          formData.limitationDescription.trim() !== "" ||
+          formData.preferredTrainingStyle.trim() !== ""
+        );
+      case 6:
+        return (
+          formData.nutrition.trim() !== "" &&
+          formData.sleepQuality.trim() !== ""
+        );
+      default:
+        return false;
+    }
+  };
+
   const handleNext = async () => {
+    if (!isStepValid()) return;
+
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     } else {
@@ -114,9 +151,11 @@ export function AIWorkoutModal({
             </button>
             <button
               onClick={handleNext}
-              disabled={isLoading}
+              disabled={isLoading || !isStepValid()}
               className={`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors ${
-                isLoading ? "opacity-50 cursor-not-allowed" : ""
+                isLoading || !isStepValid()
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
               }`}
             >
               {currentStep === totalSteps ? (

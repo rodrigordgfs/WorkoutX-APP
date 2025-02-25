@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { User, Save, LoaderIcon } from "lucide-react";
 import { UserProfile, useUserProfile } from "@/context/UserContext";
+import { SectionTitle } from "@/components/Shared/SectionTitle";
 
 export type FitnessGoal =
   | "WEIGHT_LOSS"
@@ -101,12 +102,7 @@ export function ProfilePage() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-blue-100 dark:bg-blue-700 text-blue-600 dark:text-blue-200 rounded-lg">
-          <User size={24} />
-        </div>
-        <h2 className="text-2xl font-bold">Editar Perfil</h2>
-      </div>
+      <SectionTitle title="Editar Perfil" icon={User} />
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6">
