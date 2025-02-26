@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Users,
-} from "lucide-react";
+import { Users } from "lucide-react";
 import workoutService from "@/services/workout";
 import { toast } from "react-toastify";
 import { useWorkout, Workout } from "@/context/WorkoutContext";
@@ -13,6 +11,7 @@ import { SectionTitle } from "@/components/Shared/SectionTitle";
 import { FilterWorkout } from "@/components/ComunityPage/FilterWorkout";
 import { Loading } from "@/components/ComunityPage/Loading";
 import { ComunityCard } from "@/components/ComunityPage/ComunityCard";
+import CommunityEmpty from "@/components/ComunityPage/CommunityEmpty";
 
 export function CommunityPage() {
   const clerk = useClerk();
@@ -139,11 +138,15 @@ export function CommunityPage() {
     <div className="max-w-4xl mx-auto">
       <SectionTitle title="Comunidade" icon={Users} />
 
-      <FilterWorkout searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+      {workouts.length > 0 && (
+        <FilterWorkout searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+      )}
 
       <div className="grid gap-6">
         {loading ? (
           <Loading />
+        ) : workouts.length === 0 ? (
+          <CommunityEmpty />
         ) : (
           workouts.map((workout) => (
             <ComunityCard

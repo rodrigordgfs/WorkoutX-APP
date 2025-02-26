@@ -8,6 +8,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { ModalDoneExercise } from "../WorkoutDetailsPage/ModalDoneExercise";
 
 interface WordkoutDetailsProps {
   exercise: Exercise | null;
@@ -29,12 +30,17 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [loadingCompleteExercise, setLoadingCompleteExercise] = useState(false);
+  const [isModalDoneExerciseOpen, setIsModalDoneExerciseOpen] = useState(false);
 
   const workoutSessionExercise = workoutSession?.exercises.find(
     (ex) => ex.exercise.id === exercise?.id
   );
 
-  const handleCompleteExercise = () => {
+  const handleCompleteExercise = (
+    weight: number,
+    repetitions: number,
+    series: number
+  ) => {
     if (workoutSessionCompleted()) {
       toast.info("Treino já foi concluído");
       return;
@@ -44,10 +50,10 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
       .patch(
         `/workout/session/${workoutSession?.id}/exercise/${workoutSessionExercise?.id}/complete`,
         {
+          weight: String(weight),
+          repetitions: String(repetitions),
+          series: String(series),
           completed: !workoutSessionExercise?.completed,
-          weight: exercise?.weight,
-          repetitions: exercise?.repetitions,
-          series: exercise?.series,
         },
         {
           baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -135,10 +141,14 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
         </h2>
         {workoutSessionInProgress() && (
           <button
-            onClick={handleCompleteExercise}
-            disabled={loadingCompleteExercise}
+            onClick={() => setIsModalDoneExerciseOpen(true)}
+            disabled={
+              loadingCompleteExercise || workoutSessionExercise?.completed
+            }
             className={`py-2 px-4 rounded-lg text-white transition-all mb-2 md:mb-0 w-full md:w-auto ${
-              loadingCompleteExercise && "cursor-not-allowed opacity-75"
+              loadingCompleteExercise ||
+              (workoutSessionExercise?.completed &&
+                "cursor-not-allowed opacity-75")
             } ${
               workoutSessionExercise?.completed
                 ? "bg-green-500 hover:bg-green-600"
@@ -171,7 +181,9 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
       <div className="space-y-4">
         <div>
           <h3 className="text-lg font-semibold mb-2">Instruções:</h3>
-          <p className="text-zinc-600 dark:text-zinc-400">{exercise?.instructions}</p>
+          <p className="text-zinc-600 dark:text-zinc-400">
+            {exercise?.instructions}
+          </p>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4">
@@ -203,6 +215,16 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
         loading={isDeleting}
         title="Excluir Exercício"
         content="Tem certeza que deseja excluir esse exercício?"
+      />
+
+      <ModalDoneExercise
+        isOpen={isModalDoneExerciseOpen}
+        onClose={() => setIsModalDoneExerciseOpen(false)}
+        onConfirm={(weight, reps, series) => {
+          setIsModalDoneExerciseOpen(false);
+          handleCompleteExercise(weight, reps, series);
+        }}
+        title="Concluir Exercício"
       />
     </div>
   );

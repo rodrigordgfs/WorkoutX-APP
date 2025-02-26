@@ -19,7 +19,7 @@ export const StatusCard = ({
     <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl shadow-lg">
       <div className="flex items-center gap-4">
         <div
-          className={`p-3 bg-${color}-100 dark:bg-${color}-700 text-${color}-200 dark:text-${color}-200 rounded-lg`}
+          className={`p-3 bg-${color}-500 dark:bg-${color}-100 text-white dark:text-${color}-200 rounded-lg`}
         >
           <Icon size={24} />
         </div>

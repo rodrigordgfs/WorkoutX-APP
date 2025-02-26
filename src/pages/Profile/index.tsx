@@ -71,7 +71,6 @@ export function ProfilePage() {
       setUserProfile({
         id: profile.id ?? "",
         name: profile.name ?? "",
-        email: profile.email ?? "",
         avatar: profile.avatar ?? "",
         height: profile.height ?? 0,
         weight: profile.weight ?? 0,
@@ -127,17 +126,6 @@ export function ProfilePage() {
                 type="text"
                 value={userProfile.name}
                 onChange={(e) => handleChange("name", e.target.value)}
-                className="mt-1 px-4 py-2 bg-zinc-100 dark:bg-zinc-900 block w-full rounded-lg border-zinc-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                required
-              />
-            </label>
-
-            <label className="block">
-              <span className="text-zinc-700 dark:text-zinc-200">Email</span>
-              <input
-                type="email"
-                value={userProfile.email}
-                onChange={(e) => handleChange("email", e.target.value)}
                 className="mt-1 px-4 py-2 bg-zinc-100 dark:bg-zinc-900 block w-full rounded-lg border-zinc-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                 required
               />

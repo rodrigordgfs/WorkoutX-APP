@@ -63,6 +63,7 @@ export function DashboardPage() {
               title="Treinos este mês"
               value={workoutMonthAmmount}
               trend={`${workoutPercentageChange}% vs. mês anterior`}
+              color="blue"
             />
             <StatusCard
               icon={Calendar}
@@ -74,7 +75,7 @@ export function DashboardPage() {
               icon={Clock}
               title="Duração média"
               value={`${Number(averageWorkoutDuration).toFixed(0)}min`}
-              color="yellow"
+              color="pink"
             />
             <StatusCard
               icon={Trophy}

@@ -2,7 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import AuthenticatedLayout from "./layout/Authenticated";
 import WorkoutDetailsPage from "./pages/WorkoutDetails";
 import { LoginPage } from "./pages/Login";
-import { useAuth, useClerk } from "@clerk/clerk-react";
+import { useAuth } from "@clerk/clerk-react";
 import WorkoutRegisterPage from "./pages/WorkoutRegister";
 import LoadingPage from "./pages/Loading";
 import { useEffect } from "react";
@@ -18,31 +18,20 @@ function App() {
   const { isSignedIn, isLoaded } = useAuth();
   const { fetchProfile, userProfileLoaded } = useUserProfile();
   const { fetchWorkouts, workoutsLoaded } = useWorkout();
-  const { user } = useClerk();
 
   useEffect(() => {
     if (isSignedIn && !userProfileLoaded) {
-      fetchProfile(
-        user?.id,
-        user?.fullName,
-        user?.imageUrl,
-        user?.emailAddresses[0]?.emailAddress
-      );
+      fetchProfile();
     }
+  }, [fetchProfile, isSignedIn, userProfileLoaded]);
 
+  useEffect(() => {
     if (isSignedIn && !workoutsLoaded) {
-      fetchWorkouts(user?.id);
+      fetchWorkouts();
     }
-  }, [
-    isSignedIn,
-    fetchWorkouts,
-    workoutsLoaded,
-    user,
-    fetchProfile,
-    userProfileLoaded,
-  ]);
+  }, [isSignedIn, fetchWorkouts, workoutsLoaded]);
 
-  if (!isLoaded) {
+  if (!isLoaded || (!userProfileLoaded && isSignedIn)) {
     return <LoadingPage />;
   }
 

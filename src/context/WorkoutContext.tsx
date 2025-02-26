@@ -85,7 +85,7 @@ export interface WorkoutSession {
 
 interface WorkoutContextType {
   workouts: Workout[];
-  fetchWorkouts: (userId?: string | undefined) => void;
+  fetchWorkouts: () => void;
   workoutsLoaded: boolean;
   addWorkout: (
     name: string,
@@ -237,10 +237,10 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
     setWorkouts([...workouts, workout]);
   };
 
-  const fetchWorkouts = async (userId?: string | undefined) => {
+  const fetchWorkouts = async () => {
     setLoadingWorkouts(true);
     workoutService
-      .get({ userId })
+      .get({ userId: user?.id })
       .then(({ data }) => {
         setWorkouts(data);
         setWorkoutsLoaded(true);
