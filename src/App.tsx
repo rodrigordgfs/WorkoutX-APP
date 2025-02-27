@@ -13,6 +13,7 @@ import { useUserProfile } from "./context/UserContext";
 import { CommunityPage } from "./pages/Community";
 import { WorkoutHistoryPage } from "./pages/WorkoutHistory";
 import { DashboardPage } from "./pages/Dashboard";
+import { MuscleGroupsPage } from "./pages/MuscleGroups";
 
 function App() {
   const { isSignedIn, isLoaded } = useAuth();
@@ -46,6 +47,7 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/community" element={<CommunityPage />} />
           <Route path="/workout/history" element={<WorkoutHistoryPage />} />
+          <Route path="/muscle-group" element={<MuscleGroupsPage />} />
         </Route>
       ) : (
         <Route path="*" element={<Navigate to="/login" replace />} />

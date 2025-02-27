@@ -83,6 +83,13 @@ export interface WorkoutSession {
   exercises: ExerciseSession[];
 }
 
+interface IMuscleGroup {
+  id: string;
+  name: string;
+  image: string;
+  description: string;
+}
+
 interface WorkoutContextType {
   workouts: Workout[];
   fetchWorkouts: () => void;
@@ -117,6 +124,9 @@ interface WorkoutContextType {
   loadingWorkoutHistory: boolean;
   fetchWorkoutHistory: () => void;
   workoutHistory: IWorkoutHistory[];
+  muscleGroups: IMuscleGroup[];
+  getMuscleGroups: () => void;
+  loadingMuscleGroups: boolean;
 }
 
 const WorkoutContext = createContext<WorkoutContextType | undefined>(undefined);
@@ -140,6 +150,8 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
   );
   const [loadingWorkoutHistory, setLoadingWorkoutHistory] = useState(false);
   const [workoutHistory, setWorkoutHistory] = useState<IWorkoutHistory[]>([]);
+  const [muscleGroups, setMuscleGroups] = useState<IMuscleGroup[]>([]);
+  const [loadingMuscleGroups, setLoadingMuscleGroups] = useState(false);
 
   const getUncompletedExercisesWithDetails = () => {
     return workoutSession?.exercises
@@ -261,6 +273,24 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
       });
   };
 
+  const getMuscleGroups = useCallback(() => {
+    setLoadingMuscleGroups(true);
+    axios
+      .get("/muscle-group", {
+        baseURL: import.meta.env.VITE_API_BASE_URL,
+      })
+      .then(({ data }) => {
+        setMuscleGroups(data);
+        setLoadingMuscleGroups(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error(
+          error.response?.data?.message || "Erro ao buscar os grupos musculares"
+        );
+      });
+  }, []);
+
   const addWorkout = async (
     name: string,
     visibility: Visibility,
@@ -343,6 +373,9 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
         loadingWorkoutHistory,
         fetchWorkoutHistory,
         workoutHistory,
+        muscleGroups,
+        getMuscleGroups,
+        loadingMuscleGroups,
       }}
     >
       {children}
