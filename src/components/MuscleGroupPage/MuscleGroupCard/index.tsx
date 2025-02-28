@@ -23,6 +23,7 @@ export const MuscleGroupCard = ({
           src={image}
           alt={name}
           className="absolute inset-0 w-full h-full object-cover"
+          loading="lazy" 
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/100 via-black/75 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-6">
