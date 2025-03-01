@@ -2,7 +2,7 @@ import ExerciseCard from "@/components/ExerciseCard";
 import { Modal } from "@/components/Shared/Modal";
 import WorkoutDetails from "@/components/WorkoutDetails";
 import { IExerciseSession, useWorkout } from "@/context/WorkoutContext";
-import { useClerk } from "@clerk/clerk-react";
+import { useAuth, useClerk } from "@clerk/clerk-react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 function WorkoutDetailsPage() {
   const { id } = useParams();
   const { user } = useClerk();
+  const { getToken } = useAuth();
   const {
     workouts,
     setSelectedExercise,
@@ -60,7 +61,7 @@ function WorkoutDetailsPage() {
       });
   };
 
-  const handleStartWorkoutSession = () => {
+  const handleStartWorkoutSession = async () => {
     setLoadingStartWorkoutSession(true);
     axios
       .post(
@@ -71,6 +72,9 @@ function WorkoutDetailsPage() {
         },
         {
           baseURL: import.meta.env.VITE_API_BASE_URL,
+          headers: {
+            Authorization: `Bearer ${await getToken()}`,
+          },
         }
       )
       .then(({ data }) => {
@@ -101,11 +105,14 @@ function WorkoutDetailsPage() {
       });
   };
 
-  const handleStopWorkoutSession = () => {
+  const handleStopWorkoutSession = async () => {
     setLoadingStopWorkoutSession(true);
     axios
       .delete(`/workout/session/${workoutSession?.id}`, {
         baseURL: import.meta.env.VITE_API_BASE_URL,
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
       })
       .then(() => {
         setWorkoutSession(null);
@@ -127,7 +134,7 @@ function WorkoutDetailsPage() {
     }
   };
 
-  const postCompleteWorkoutSession = () => {
+  const postCompleteWorkoutSession = async () => {
     setLoadingCompleteWorkoutSession(true);
     axios
       .post(
@@ -135,6 +142,9 @@ function WorkoutDetailsPage() {
         {},
         {
           baseURL: import.meta.env.VITE_API_BASE_URL,
+          headers: {
+            Authorization: `Bearer ${await getToken()}`,
+          },
         }
       )
       .then(({ data }) => {
@@ -174,13 +184,16 @@ function WorkoutDetailsPage() {
   }, [workouts, id, setSelectedExercise, setSelectedWorkout]);
 
   useEffect(() => {
-    const fetchWorkoutSession = () => {
+    const fetchWorkoutSession = async () => {
       axios
         .get("/workout/session", {
           params: {
             workoutId: id,
           },
           baseURL: import.meta.env.VITE_API_BASE_URL,
+          headers: {
+            Authorization: `Bearer ${await getToken()}`,
+          },
         })
         .then(({ data }) => {
           setWorkoutSession(null);

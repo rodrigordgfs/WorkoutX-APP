@@ -6,6 +6,7 @@ interface IRecentActivityCardProps {
       name: string;
     };
     exerciseCount: number;
+    endedAt: string;
     duration: number;
   };
 }
@@ -23,7 +24,7 @@ export const RecentActivityCard = ({
           <h4 className="font-medium">{workoutSession.workout.name}</h4>
           <p className="text-sm text-zinc-600 dark:text-zinc-300">
             {workoutSession.exerciseCount} exercícios •{" "}
-            {workoutSession.duration
+            {workoutSession.duration > 0 || workoutSession.endedAt
               ? `${workoutSession.duration} minutos`
               : "Em andamento"}
           </p>
@@ -32,12 +33,14 @@ export const RecentActivityCard = ({
       <div className="flex items-center gap-2">
         <span
           className={`px-3 py-1 rounded-full text-sm ${
-            workoutSession.duration
+            workoutSession.duration > 0 || workoutSession.endedAt
               ? "bg-green-100 text-green-700"
               : "bg-yellow-100 text-yellow-700"
           }`}
         >
-          {workoutSession.duration ? "Concluído" : "Em andamento"}
+          {workoutSession.duration > 0 || workoutSession.endedAt
+            ? "Concluído"
+            : "Em andamento"}
         </span>
       </div>
     </div>

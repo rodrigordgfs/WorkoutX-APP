@@ -39,6 +39,7 @@ export interface IRecentActivity {
     name: string;
   };
   exerciseCount: number;
+  endedAt: string;
   duration: number;
 }
 
