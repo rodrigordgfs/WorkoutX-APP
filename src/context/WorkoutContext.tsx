@@ -58,9 +58,9 @@ export interface IExercise {
   weight: string;
   restTime: string;
   videoUrl: string;
-  imageUrl: string;
+  imageUrl?: string;
   instructions: string;
-  muscleGroup: IMuscleGroup;
+  muscleGroup?: IMuscleGroup;
 }
 
 export interface IMuscleGroup {
@@ -284,11 +284,14 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
       });
   };
 
-  const getMuscleGroups = useCallback(() => {
+  const getMuscleGroups = useCallback(async () => {
     setLoadingMuscleGroups(true);
     axios
       .get("/muscle-group", {
         baseURL: import.meta.env.VITE_API_BASE_URL,
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
       })
       .then(({ data }) => {
         setMuscleGroups(data);
@@ -300,7 +303,7 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
           error.response?.data?.message || "Erro ao buscar os grupos musculares"
         );
       });
-  }, []);
+  }, [getToken]);
 
   const addWorkout = async (
     name: string,

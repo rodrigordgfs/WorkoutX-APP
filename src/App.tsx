@@ -3,7 +3,6 @@ import AuthenticatedLayout from "./layout/Authenticated";
 import WorkoutDetailsPage from "./pages/WorkoutDetails";
 import { LoginPage } from "./pages/Login";
 import { useAuth } from "@clerk/clerk-react";
-import WorkoutRegisterPage from "./pages/WorkoutRegister";
 import LoadingPage from "./pages/Loading";
 import { useEffect } from "react";
 import { useWorkout } from "./context/WorkoutContext";
@@ -15,7 +14,8 @@ import { WorkoutHistoryPage } from "./pages/WorkoutHistory";
 import { DashboardPage } from "./pages/Dashboard";
 import { MuscleGroupsPage } from "./pages/MuscleGroups";
 import { ExercisesPage } from "./pages/Exercises";
-import MuscleGroupRegisterPage from "./pages/MuscleGroupRegister";
+import { WorkoutRegisterPage } from "./pages/WorkoutRegister";
+import { MuscleGroupRegisterPage } from "./pages/MuscleGroupRegister";
 
 function App() {
   const { isSignedIn, isLoaded } = useAuth();

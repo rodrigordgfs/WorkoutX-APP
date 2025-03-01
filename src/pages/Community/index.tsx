@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { Users } from "lucide-react";
-import workoutService from "@/services/workout";
 import { toast } from "react-toastify";
 import { useWorkout, IWorkout } from "@/context/WorkoutContext";
 import axios from "axios";
-import { useClerk } from "@clerk/clerk-react";
+import { useAuth, useClerk } from "@clerk/clerk-react";
 import { Modal } from "@/components/Shared/Modal";
 import { useNavigate } from "react-router-dom";
 import { SectionTitle } from "@/components/Shared/SectionTitle";
@@ -15,6 +14,7 @@ import CommunityEmpty from "@/components/ComunityPage/CommunityEmpty";
 
 export function CommunityPage() {
   const clerk = useClerk();
+  const { getToken } = useAuth();
   const { appendWorkout } = useWorkout();
   const navigate = useNavigate();
 
@@ -69,8 +69,16 @@ export function CommunityPage() {
 
   const fetchPublicWorkouts = () => {
     setLoading(true);
-    workoutService
-      .get({ visibility: "PUBLIC" })
+    axios
+      .get("/workout", {
+        baseURL: import.meta.env.VITE_API_BASE_URL,
+        params: {
+          visibility: "PUBLIC",
+        },
+        headers: {
+          Authorization: `Bearer ${getToken}`,
+        },
+      })
       .then(({ data }) => {
         setWorkouts(data);
         setLoading(false);
@@ -104,6 +112,9 @@ export function CommunityPage() {
           {},
           {
             baseURL: import.meta.env.VITE_API_BASE_URL,
+            headers: {
+              Authorization: `Bearer ${getToken}`,
+            },
           }
         )
         .catch((error) => {

@@ -25,9 +25,9 @@ export function MuscleGroupsPage() {
               <MuscleGroupCard
                 key={group.id}
                 id={group.id}
-                image={group.image}
+                image={group.image || ""}
                 name={group.name}
-                description={group.description}
+                description={group.description || ""}
               />
             ))}
       </div>
