@@ -15,10 +15,11 @@ import { WorkoutHistoryPage } from "./pages/WorkoutHistory";
 import { DashboardPage } from "./pages/Dashboard";
 import { MuscleGroupsPage } from "./pages/MuscleGroups";
 import { ExercisesPage } from "./pages/Exercises";
+import MuscleGroupRegisterPage from "./pages/MuscleGroupRegister";
 
 function App() {
   const { isSignedIn, isLoaded } = useAuth();
-  const { fetchProfile, userProfileLoaded } = useUserProfile();
+  const { fetchProfile, userProfileLoaded, isAdmin } = useUserProfile();
   const { fetchWorkouts, workoutsLoaded } = useWorkout();
 
   useEffect(() => {
@@ -50,6 +51,18 @@ function App() {
           <Route path="/workout/history" element={<WorkoutHistoryPage />} />
           <Route path="/muscle-group" element={<MuscleGroupsPage />} />
           <Route path="/muscle-group/:id" element={<ExercisesPage />} />
+          {isAdmin && (
+            <Route
+              path="/muscle-group/register"
+              element={<MuscleGroupRegisterPage />}
+            />
+          )}
+          {isAdmin && (
+            <Route
+              path="/muscle-group/register/:id"
+              element={<MuscleGroupRegisterPage />}
+            />
+          )}
         </Route>
       ) : (
         <Route path="*" element={<Navigate to="/login" replace />} />
