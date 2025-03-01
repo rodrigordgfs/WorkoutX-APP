@@ -1,9 +1,9 @@
-import { Workout } from "@/context/WorkoutContext";
+import { IWorkout } from "@/context/WorkoutContext";
 import { ChevronDown, ChevronRight, ChevronUp, Dumbbell, Repeat, Timer, Weight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface WorkoutListItemProps {
-    workout: Workout;
+    workout: IWorkout;
     isOpen: boolean;
     onToggle: (workoutId: string) => void;
 }

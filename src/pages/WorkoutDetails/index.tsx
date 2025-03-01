@@ -1,7 +1,7 @@
 import ExerciseCard from "@/components/ExerciseCard";
 import { Modal } from "@/components/Shared/Modal";
 import WorkoutDetails from "@/components/WorkoutDetails";
-import { ExerciseSession, useWorkout } from "@/context/WorkoutContext";
+import { IExerciseSession, useWorkout } from "@/context/WorkoutContext";
 import { useClerk } from "@clerk/clerk-react";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -78,7 +78,7 @@ function WorkoutDetailsPage() {
           id: data.id,
           startedAt: data.startedAt,
           endedAt: data.endedAt,
-          exercises: data.exercises.map((exercise: ExerciseSession) => ({
+          exercises: data.exercises.map((exercise: IExerciseSession) => ({
             id: exercise.id,
             series: exercise.series,
             repetitions: exercise.repetitions,
@@ -142,7 +142,7 @@ function WorkoutDetailsPage() {
           id: data.id,
           startedAt: data.startedAt,
           endedAt: data.endedAt,
-          exercises: data.exercises.map((exercise: ExerciseSession) => ({
+          exercises: data.exercises.map((exercise: IExerciseSession) => ({
             id: exercise.id,
             series: exercise.series,
             repetitions: exercise.repetitions,
@@ -189,7 +189,7 @@ function WorkoutDetailsPage() {
               id: data.id,
               startedAt: data.startedAt,
               endedAt: data.endedAt,
-              exercises: data.exercises.map((exercise: ExerciseSession) => ({
+              exercises: data.exercises.map((exercise: IExerciseSession) => ({
                 id: exercise.id,
                 series: exercise.series,
                 repetitions: exercise.repetitions,

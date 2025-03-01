@@ -1,6 +1,6 @@
 import {
-  Exercise,
-  ExerciseSession,
+  IExercise,
+  IExerciseSession,
   useWorkout,
 } from "@/context/WorkoutContext";
 import { Modal } from "../Shared/Modal";
@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 import { ModalDoneExercise } from "../WorkoutDetailsPage/ModalDoneExercise";
 
 interface WordkoutDetailsProps {
-  exercise: Exercise | null;
+  exercise: IExercise | null;
 }
 
 const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
@@ -64,7 +64,7 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
           id: data.id,
           startedAt: data.startedAt,
           endedAt: data.endedAt,
-          exercises: data.exercises.map((exercise: ExerciseSession) => ({
+          exercises: data.exercises.map((exercise: IExerciseSession) => ({
             id: exercise.id,
             series: exercise.series,
             repetitions: exercise.repetitions,

@@ -1,5 +1,5 @@
-import authService from "@/services/auth";
-import { useClerk } from "@clerk/clerk-react";
+import { useAuth, useClerk } from "@clerk/clerk-react";
+import axios from "axios";
 import { createContext, ReactNode, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -31,6 +31,7 @@ interface UserProviderProps {
 
 export const UserProvider = ({ children }: UserProviderProps) => {
   const { user } = useClerk();
+  const { getToken } = useAuth();
   const navigate = useNavigate();
 
   const [profile, setProfile] = useState<UserProfile>({
@@ -50,8 +51,17 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     const userId = user?.id;
     const name = user?.fullName;
     const avatar = user?.imageUrl;
-    authService
-      .post({ userId, name, avatar })
+    axios
+      .post(
+        "/auth",
+        { userId, name, avatar },
+        {
+          baseURL: import.meta.env.VITE_API_BASE_URL,
+          headers: {
+            Authorization: `Bearer ${await getToken()}`,
+          },
+        }
+      )
       .then(({ data }) => {
         setProfile(data);
         setUserProfileLoaded(true);
@@ -63,10 +73,15 @@ export const UserProvider = ({ children }: UserProviderProps) => {
       });
   };
 
-  const updateProfile = (profile: UserProfile) => {
+  const updateProfile = async (profile: UserProfile) => {
     setSavingProfile(true);
-    authService
-      .patch(`/${profile.id}`, profile)
+    axios
+      .patch(`/auth/${profile.id}`, profile, {
+        baseURL: import.meta.env.VITE_API_BASE_URL,
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
+      })
       .then(({ data }) => {
         setProfile(data);
         toast.success("Perfil atualizado com sucesso");

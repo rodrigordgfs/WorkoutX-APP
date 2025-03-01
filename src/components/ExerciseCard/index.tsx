@@ -1,8 +1,8 @@
-import { Exercise } from "@/context/WorkoutContext";
+import { IExercise } from "@/context/WorkoutContext";
 import { Repeat, Timer, Weight } from "lucide-react";
 
 interface ExerciseCardProps {
-  exercise: Exercise;
+  exercise: IExercise;
   isActive: boolean;
   onSelect: () => void;
 }

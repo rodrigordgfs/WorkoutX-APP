@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Users } from "lucide-react";
 import workoutService from "@/services/workout";
 import { toast } from "react-toastify";
-import { useWorkout, Workout } from "@/context/WorkoutContext";
+import { useWorkout, IWorkout } from "@/context/WorkoutContext";
 import axios from "axios";
 import { useClerk } from "@clerk/clerk-react";
 import { Modal } from "@/components/Shared/Modal";
@@ -20,7 +20,7 @@ export function CommunityPage() {
 
   const [userId] = useState(clerk.user?.id ?? "");
   const [searchTerm, setSearchTerm] = useState("");
-  const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [workouts, setWorkouts] = useState<IWorkout[]>([]);
   const [loadingLikes, setLoadingLikes] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -90,7 +90,7 @@ export function CommunityPage() {
       });
   };
 
-  const isLiked = (workout: Workout) => {
+  const isLiked = (workout: IWorkout) => {
     return workout.likes.some((like) => like.userId === userId);
   };
 

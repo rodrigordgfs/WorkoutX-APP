@@ -1,7 +1,5 @@
-import { IWorkoutHistory } from "@/components/WorkoutHistoryPage/WorkoutHistoryCard";
 import { Visibility } from "@/pages/WorkoutRegister";
-import workoutService from "@/services/workout";
-import { useClerk } from "@clerk/clerk-react";
+import { useAuth, useClerk } from "@clerk/clerk-react";
 import axios from "axios";
 import {
   createContext,
@@ -13,28 +11,28 @@ import {
 } from "react";
 import { toast } from "react-toastify";
 
-export interface Workout {
+export interface IWorkout {
   id: string;
   name: string;
-  user: User;
+  user: IUser;
   visibility: Visibility;
-  exercises: Exercise[];
-  likes: WorkoutLikes[];
+  exercises: IExercise[];
+  likes: IWorkoutLikes[];
 }
 
-export interface User {
+export interface IUser {
   id: string;
   name: string;
   avatar: string;
 }
 
-export interface WorkoutStats {
+export interface IWorkoutStats {
   totalExercises: number;
   completedExercises: number;
   completionRate: string;
 }
 
-export interface WorkoutHistory {
+export interface IWorkoutHistory {
   id: string;
   startedAt: string;
   endedAt: string | null;
@@ -44,15 +42,15 @@ export interface WorkoutHistory {
     visibility: string;
     createdAt: string;
   };
-  exercises: Exercise[];
-  stats: WorkoutStats;
+  exercises: IExercise[];
+  stats: IWorkoutStats;
 }
 
-export interface WorkoutLikes {
+export interface IWorkoutLikes {
   userId: string;
 }
 
-export interface Exercise {
+export interface IExercise {
   id?: string | undefined;
   name: string;
   series: string;
@@ -60,10 +58,20 @@ export interface Exercise {
   weight: string;
   restTime: string;
   videoUrl: string;
+  imageUrl: string;
   instructions: string;
+  muscleGroup: IMuscleGroup;
 }
 
-export interface ExerciseSession {
+export interface IMuscleGroup {
+  id: string;
+  name: string;
+  image: string | undefined;
+  description: string | undefined;
+  exercises: IExercise[] | undefined;
+}
+
+export interface IExerciseSession {
   id: string;
   series: string;
   repetitions: string;
@@ -75,58 +83,50 @@ export interface ExerciseSession {
     name: string;
   };
 }
-
-export interface WorkoutSession {
+export interface IWorkoutSession {
   id: string;
   startedAt: string;
   endedAt: string | null;
-  exercises: ExerciseSession[];
-}
-
-interface IMuscleGroup {
-  id: string;
-  name: string;
-  image: string;
-  description: string;
+  exercises: IExerciseSession[];
 }
 
 interface WorkoutContextType {
-  workouts: Workout[];
-  fetchWorkouts: () => void;
+  workouts: IWorkout[];
   workoutsLoaded: boolean;
+  loadingWorkouts: boolean;
+  selectedExercise: IExercise | null;
+  selectedWorkout: IWorkout | null;
+  workoutSession: IWorkoutSession | null;
+  loadingWorkoutHistory: boolean;
+  workoutHistory: IWorkoutHistory[];
+  muscleGroups: IMuscleGroup[];
+  loadingMuscleGroups: boolean;
+  fetchWorkouts: () => void;
   addWorkout: (
     name: string,
     visibility: Visibility,
     userId: string,
-    exercises: Exercise[]
+    exercises: IExercise[]
   ) => Promise<void>;
-  appendWorkout: (workout: Workout) => void;
+  appendWorkout: (workout: IWorkout) => void;
   isWorkoutsEmpty: () => boolean;
-  loadingWorkouts: boolean;
-  selectedExercise: Exercise | null;
-  setSelectedExercise: (exercise: Exercise | null) => void;
-  setSelectedWorkout: (workout: Workout | null) => void;
-  selectedWorkout: Workout | null;
+  setSelectedExercise: (exercise: IExercise | null) => void;
+  setSelectedWorkout: (workout: IWorkout | null) => void;
   deleteExercise: (exerciseId: string) => void;
   deleteWorkout: (workoutId: string) => void;
   isLastExerciseInWorkout: (
-    workout: Workout | undefined,
+    workout: IWorkout | undefined,
     exerciseId: string
   ) => boolean;
-  getWorkoutByExerciseId: (exerciseId: string) => Workout | undefined;
-  workoutSession: WorkoutSession | null;
-  setWorkoutSession: (workoutSession: WorkoutSession | null) => void;
+  getWorkoutByExerciseId: (exerciseId: string) => IWorkout | undefined;
+  setWorkoutSession: (workoutSession: IWorkoutSession | null) => void;
   workoutSessionInProgress: () => boolean;
   workoutSessionCompleted: () => boolean;
   existExercisesUncompleted: () => boolean | undefined;
-  getUncompletedExercisesWithDetails: () => Exercise[] | undefined;
-  getCompletedExercisesWithDetails: () => Exercise[] | undefined;
-  loadingWorkoutHistory: boolean;
+  getUncompletedExercisesWithDetails: () => IExercise[] | undefined;
+  getCompletedExercisesWithDetails: () => IExercise[] | undefined;
   fetchWorkoutHistory: () => void;
-  workoutHistory: IWorkoutHistory[];
-  muscleGroups: IMuscleGroup[];
   getMuscleGroups: () => void;
-  loadingMuscleGroups: boolean;
 }
 
 const WorkoutContext = createContext<WorkoutContextType | undefined>(undefined);
@@ -137,15 +137,16 @@ interface WorkoutProviderProps {
 
 export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
   const { user } = useClerk();
+  const { getToken } = useAuth();
 
-  const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [workouts, setWorkouts] = useState<IWorkout[]>([]);
   const [workoutsLoaded, setWorkoutsLoaded] = useState(false);
   const [loadingWorkouts, setLoadingWorkouts] = useState(false);
-  const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
-  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(
+  const [selectedWorkout, setSelectedWorkout] = useState<IWorkout | null>(null);
+  const [selectedExercise, setSelectedExercise] = useState<IExercise | null>(
     null
   );
-  const [workoutSession, setWorkoutSession] = useState<WorkoutSession | null>(
+  const [workoutSession, setWorkoutSession] = useState<IWorkoutSession | null>(
     null
   );
   const [loadingWorkoutHistory, setLoadingWorkoutHistory] = useState(false);
@@ -210,7 +211,7 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
   };
 
   const isLastExerciseInWorkout = (
-    workout: Workout | undefined,
+    workout: IWorkout | undefined,
     exerciseId: string
   ) => {
     return (
@@ -245,14 +246,24 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
     return workouts.length === 0;
   };
 
-  const appendWorkout = (workout: Workout) => {
+  const appendWorkout = (workout: IWorkout) => {
     setWorkouts([...workouts, workout]);
   };
 
   const fetchWorkouts = async () => {
     setLoadingWorkouts(true);
-    workoutService
-      .get({ userId: user?.id })
+    axios
+      .get("/workout", {
+        baseURL: import.meta.env.VITE_API_BASE_URL,
+        params: {
+          userId: user?.id,
+          exercises: true,
+          likes: true,
+        },
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
+      })
       .then(({ data }) => {
         setWorkouts(data);
         setWorkoutsLoaded(true);
@@ -295,10 +306,24 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
     name: string,
     visibility: Visibility,
     userId: string,
-    exercises: Exercise[]
+    exercises: IExercise[]
   ) => {
-    return workoutService
-      .post({ name, userId, visibility, exercises })
+    return axios
+      .post(
+        "/workout",
+        {
+          name,
+          visibility,
+          userId,
+          exercises,
+        },
+        {
+          baseURL: import.meta.env.VITE_API_BASE_URL,
+          headers: {
+            Authorization: `Bearer ${await getToken()}`,
+          },
+        }
+      )
       .then(({ data }) => {
         setWorkouts([...workouts, data]);
         toast.success("Treino cadastrado com sucesso");
@@ -318,13 +343,16 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
       });
   };
 
-  const fetchWorkoutHistory = useCallback(() => {
+  const fetchWorkoutHistory = useCallback(async () => {
     setLoadingWorkoutHistory(true);
     axios
       .get("/workout/history", {
         baseURL: import.meta.env.VITE_API_BASE_URL,
         params: {
           userId: user?.id,
+        },
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
         },
       })
       .then(({ data }) => {

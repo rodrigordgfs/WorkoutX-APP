@@ -1,12 +1,12 @@
-import { Workout } from "@/context/WorkoutContext";
+import { IWorkout } from "@/context/WorkoutContext";
 import { useClerk } from "@clerk/clerk-react";
 import { Dumbbell, Heart, Repeat, Share2, Timer, Weight } from "lucide-react";
 
 interface ComunityCardProps {
-  workout: Workout;
+  workout: IWorkout;
   loadingLikes: Set<string>;
   toogleLike: (workoutId: string) => void;
-  isLiked: (workout: Workout) => boolean;
+  isLiked: (workout: IWorkout) => boolean;
   handleOpenModal: (workoutId: string) => void;
 }
 

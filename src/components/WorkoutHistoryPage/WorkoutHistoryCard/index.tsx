@@ -1,4 +1,4 @@
-import { WorkoutStats } from "@/context/WorkoutContext";
+import { IWorkoutStats } from "@/context/WorkoutContext";
 import { intervalToDuration } from "date-fns";
 import {
   CheckCircle2,
@@ -36,7 +36,7 @@ export interface IWorkoutHistory {
     createdAt: string;
   };
   exercises: IExercise[];
-  stats: WorkoutStats;
+  stats: IWorkoutStats;
 }
 
 export const WorkoutHistoryCard = ({
