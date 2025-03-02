@@ -67,7 +67,7 @@ export function CommunityPage() {
     setWorkoutSelectedID(null);
   };
 
-  const fetchPublicWorkouts = () => {
+  const fetchPublicWorkouts = async () => {
     setLoading(true);
     axios
       .get("/workout", {
@@ -76,7 +76,7 @@ export function CommunityPage() {
           visibility: "PUBLIC",
         },
         headers: {
-          Authorization: `Bearer ${getToken}`,
+          Authorization: `Bearer ${await getToken()}`,
         },
       })
       .then(({ data }) => {
@@ -93,7 +93,8 @@ export function CommunityPage() {
             toast.error(errorMessages.message);
           });
         } else {
-          toast.error(title || "Erro ao cadastrar treino");
+          console.log(error);
+          toast.error(title || "Erro ao buscar os treinos da comunidade");
         }
       });
   };
