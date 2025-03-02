@@ -49,6 +49,19 @@ export interface IWorkoutHistory {
 export interface IWorkoutLikes {
   userId: string;
 }
+export interface IWorkoutHistory {
+  id: string;
+  startedAt: string;
+  endedAt: string | null;
+  duration: string | number;
+  workout: {
+    name: string;
+    visibility: string;
+    createdAt: string;
+  };
+  exercises: IExercise[];
+  stats: IWorkoutStats;
+}
 
 export interface IExercise {
   id?: string | undefined;
@@ -58,9 +71,10 @@ export interface IExercise {
   weight: string;
   restTime: string;
   videoUrl: string;
-  imageUrl: string;
+  imageUrl?: string;
   instructions: string;
-  muscleGroup: IMuscleGroup;
+  muscleGroup?: IMuscleGroup;
+  completed?: boolean;
 }
 
 export interface IMuscleGroup {
@@ -88,6 +102,13 @@ export interface IWorkoutSession {
   startedAt: string;
   endedAt: string | null;
   exercises: IExerciseSession[];
+}
+
+export interface IFilterHistory {
+  name: string;
+  period: string;
+  status: string;
+  order: string;
 }
 
 interface WorkoutContextType {
@@ -125,7 +146,7 @@ interface WorkoutContextType {
   existExercisesUncompleted: () => boolean | undefined;
   getUncompletedExercisesWithDetails: () => IExercise[] | undefined;
   getCompletedExercisesWithDetails: () => IExercise[] | undefined;
-  fetchWorkoutHistory: () => void;
+  fetchWorkoutHistory: (filter?: IFilterHistory) => void;
   getMuscleGroups: () => void;
 }
 
@@ -284,11 +305,14 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
       });
   };
 
-  const getMuscleGroups = useCallback(() => {
+  const getMuscleGroups = useCallback(async () => {
     setLoadingMuscleGroups(true);
     axios
       .get("/muscle-group", {
         baseURL: import.meta.env.VITE_API_BASE_URL,
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
       })
       .then(({ data }) => {
         setMuscleGroups(data);
@@ -300,7 +324,7 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
           error.response?.data?.message || "Erro ao buscar os grupos musculares"
         );
       });
-  }, []);
+  }, [getToken]);
 
   const addWorkout = async (
     name: string,
@@ -343,35 +367,44 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
       });
   };
 
-  const fetchWorkoutHistory = useCallback(async () => {
-    setLoadingWorkoutHistory(true);
-    axios
-      .get("/workout/history", {
-        baseURL: import.meta.env.VITE_API_BASE_URL,
-        params: {
-          userId: user?.id,
-        },
-        headers: {
-          Authorization: `Bearer ${await getToken()}`,
-        },
-      })
-      .then(({ data }) => {
-        setWorkoutHistory(data);
-        setLoadingWorkoutHistory(false);
-      })
-      .catch((error) => {
-        const title = error.response?.data?.message;
-        const errors: Record<string, { field: string; message: string }> =
-          error.response?.data?.errors;
-        if (errors) {
-          Object.values(errors).forEach((errorMessages) => {
-            toast.error(errorMessages.message);
-          });
-        } else {
-          toast.error(title || "Erro ao buscar o histórico de treinos");
-        }
-      });
-  }, [user?.id]);
+  const fetchWorkoutHistory = useCallback(
+    async (filter?: IFilterHistory) => {
+      console.log("filter", filter);
+
+      setLoadingWorkoutHistory(true);
+      axios
+        .get("/workout/history", {
+          baseURL: import.meta.env.VITE_API_BASE_URL,
+          params: {
+            userId: user?.id,
+            name: filter?.name,
+            period: filter?.period,
+            status: filter?.status,
+            order: filter?.order,
+          },
+          headers: {
+            Authorization: `Bearer ${await getToken()}`,
+          },
+        })
+        .then(({ data }) => {
+          setWorkoutHistory(data);
+          setLoadingWorkoutHistory(false);
+        })
+        .catch((error) => {
+          const title = error.response?.data?.message;
+          const errors: Record<string, { field: string; message: string }> =
+            error.response?.data?.errors;
+          if (errors) {
+            Object.values(errors).forEach((errorMessages) => {
+              toast.error(errorMessages.message);
+            });
+          } else {
+            toast.error(title || "Erro ao buscar o histórico de treinos");
+          }
+        });
+    },
+    [user?.id]
+  );
 
   return (
     <WorkoutContext.Provider

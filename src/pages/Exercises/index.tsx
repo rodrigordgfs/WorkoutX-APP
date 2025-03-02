@@ -6,19 +6,9 @@ import { LoadingPage } from "@/components/ExercisesPage/Loading";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { ExerciseCard } from "@/components/ExercisesPage/ExerciseCard";
-
-interface IExercise {
-  id: string;
-  muscleGroupId: string;
-  name: string;
-  series: string;
-  repetitions: string;
-  weight: string;
-  restTime: string;
-  instruction: string;
-  imageUrl: string;
-  videoUrl: string;
-}
+import { useAuth } from "@clerk/clerk-react";
+import { IExercise } from "@/context/WorkoutContext";
+import ExercisesEmpty from "@/components/ExercisesPage/ExercisesEmpty";
 
 interface IMuscleGroup {
   id: string;
@@ -28,6 +18,8 @@ interface IMuscleGroup {
 }
 
 export function ExercisesPage() {
+  const { getToken } = useAuth();
+
   const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
   const [muscleGroup, setMuscleGroup] = useState<IMuscleGroup | null>(null);
@@ -37,6 +29,9 @@ export function ExercisesPage() {
     axios
       .get(`/muscle-group/${id}`, {
         baseURL: import.meta.env.VITE_API_BASE_URL,
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
       })
       .then(({ data }) => {
         setMuscleGroup(data);
@@ -49,7 +44,7 @@ export function ExercisesPage() {
             "Erro ao buscar os dados do grupo muscular"
         );
       });
-  }, [id]);
+  }, [id, getToken]);
 
   useEffect(() => {
     fetchMuscleGroup();
@@ -62,24 +57,30 @@ export function ExercisesPage() {
         title={`Exercícios: ${muscleGroup?.name}`}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {loading
-          ? Array.from({ length: 3 }).map((_, index) => (
-              <LoadingPage key={index} />
-            ))
-          : muscleGroup?.exercises.map((exercise) => (
-              <ExerciseCard
-                key={exercise.id}
-                instruction={exercise.instruction}
-                image={exercise.imageUrl}
-                name={exercise.name}
-                repetitions={exercise.repetitions}
-                restTime={exercise.restTime}
-                series={exercise.series}
-                weight={exercise.weight}
-              />
-            ))}
-      </div>
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <LoadingPage key={index} />
+          ))}
+        </div>
+      ) : muscleGroup?.exercises.length === 0 ? (
+        <ExercisesEmpty />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {muscleGroup?.exercises.map((exercise) => (
+            <ExerciseCard
+              key={exercise.id}
+              instruction={exercise?.instructions}
+              image={exercise?.imageUrl}
+              name={exercise.name}
+              repetitions={exercise.repetitions}
+              restTime={exercise.restTime}
+              series={exercise.series}
+              weight={exercise.weight}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

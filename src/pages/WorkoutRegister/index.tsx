@@ -1,11 +1,11 @@
-import { useClerk } from "@clerk/clerk-react";
+import { useAuth, useClerk } from "@clerk/clerk-react";
 import { LoaderIcon, Plus, PlusIcon, Sparkles, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { useWorkout } from "@/context/WorkoutContext";
+import { IExercise, useWorkout } from "@/context/WorkoutContext";
 import { AIWorkoutFormData, AIWorkoutModal } from "@/components/AIWorkoutModal";
 import { toast } from "react-toastify";
-import workoutAIService from "@/services/workoutAi";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export type Visibility = "PUBLIC" | "PRIVATE";
 
@@ -14,17 +14,7 @@ export const VisibilityLabels: Record<Visibility, string> = {
   PRIVATE: "Privado",
 };
 
-interface Exercise {
-  name: string;
-  series: string;
-  repetitions: string;
-  weight: string;
-  restTime: string;
-  videoUrl: string;
-  instructions: string;
-}
-
-const initialExercise: Exercise = {
+const initialExercise: IExercise = {
   name: "",
   series: "",
   repetitions: "",
@@ -34,14 +24,15 @@ const initialExercise: Exercise = {
   instructions: "",
 };
 
-const WorkoutRegisterPage = () => {
+export const WorkoutRegisterPage = () => {
   const clerk = useClerk();
+  const { getToken } = useAuth();
   const { addWorkout, appendWorkout } = useWorkout();
   const navigate = useNavigate();
 
   const [workoutName, setWorkoutName] = useState("");
   const [visibility, setVisibility] = useState<Visibility>("PUBLIC");
-  const [exercises, setExercises] = useState<Exercise[]>([
+  const [exercises, setExercises] = useState<IExercise[]>([
     { ...initialExercise },
   ]);
   const [loading, setLoading] = useState(false);
@@ -51,36 +42,52 @@ const WorkoutRegisterPage = () => {
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
-  const handleGenerateWorkout = async (form: AIWorkoutFormData) => {
-    await new Promise<void>((resolve) => {
-      workoutAIService
-        .post({
+  const postWorkoutAi = async (
+    form: AIWorkoutFormData,
+    resolve: () => void
+  ) => {
+    axios
+      .post(
+        "/workout/ai",
+        {
           userId,
           ...form,
-        })
-        .then(({ data }) => {
-          setIsModalOpen(false);
-          toast.success("Treino gerado com sucesso!");
-          appendWorkout(data);
-          navigate(`/workout/${data.id}`);
-        })
-        .catch((error) => {
-          const title = error.response?.data?.message;
-          const errors: Record<string, { field: string; message: string }> =
-            error.response?.data?.errors;
+        },
+        {
+          baseURL: import.meta.env.VITE_API_BASE_URL,
+          headers: {
+            Authorization: `Bearer ${await getToken()}`,
+          },
+        }
+      )
+      .then(({ data }) => {
+        setIsModalOpen(false);
+        toast.success("Treino gerado com sucesso!");
+        appendWorkout(data);
+        navigate(`/workout/${data.id}`);
+      })
+      .catch((error) => {
+        const title = error.response?.data?.message;
+        const errors: Record<string, { field: string; message: string }> =
+          error.response?.data?.errors;
 
-          if (errors) {
-            Object.values(errors).forEach((errorMessages) => {
-              toast.error(errorMessages.message);
-            });
-          } else {
-            console.log(error);
-            toast.error(title || "Erro ao cadastrar treino");
-          }
-        })
-        .finally(() => {
-          resolve();
-        });
+        if (errors) {
+          Object.values(errors).forEach((errorMessages) => {
+            toast.error(errorMessages.message);
+          });
+        } else {
+          console.log(error);
+          toast.error(title || "Erro ao cadastrar treino");
+        }
+      })
+      .finally(() => {
+        resolve();
+      });
+  };
+
+  const handleGenerateWorkout = async (form: AIWorkoutFormData) => {
+    await new Promise<void>((resolve) => {
+      postWorkoutAi(form, resolve);
     });
   };
 
@@ -94,7 +101,7 @@ const WorkoutRegisterPage = () => {
 
   const updateExercise = (
     index: number,
-    field: keyof Exercise,
+    field: keyof IExercise,
     value: string | number
   ) => {
     const updatedExercises = exercises.map((exercise, i) => {
@@ -348,5 +355,3 @@ const WorkoutRegisterPage = () => {
     </div>
   );
 };
-
-export default WorkoutRegisterPage;

@@ -19,7 +19,6 @@ export function WorkoutHistoryPage() {
     useWorkout();
 
   const [expandedWorkouts, setExpandedWorkouts] = useState<string[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
   const [filterModalOpen, setFilterModalOpen] = useState(false);
 
   useEffect(() => {
@@ -38,14 +37,13 @@ export function WorkoutHistoryPage() {
     <div className="max-w-4xl mx-auto">
       <SectionTitle title="Histórico de Treinos" icon={Calendar} />
 
-      {workoutHistory.length > 0 && (
-        <FilterHistory
-          filterModalOpen={filterModalOpen}
-          search={searchTerm}
-          onSearchChange={setSearchTerm}
-          toogleFilterOpen={setFilterModalOpen}
-        />
-      )}
+      <FilterHistory
+        filterModalOpen={filterModalOpen}
+        onFilter={(filter) => {
+          fetchWorkoutHistory(filter);
+        }}
+        toogleFilterOpen={setFilterModalOpen}
+      />
 
       <div className="space-y-4">
         {loadingWorkoutHistory ? (
@@ -53,20 +51,22 @@ export function WorkoutHistoryPage() {
         ) : workoutHistory.length === 0 ? (
           <WorkoutHistoryEmpty />
         ) : (
-          workoutHistory.map((workout) => {
-            const isExpanded = expandedWorkouts.includes(workout.id);
-            const statusColor = getStatusColor(workout.stats.completionRate);
+          <>
+            {workoutHistory.map((workout) => {
+              const isExpanded = expandedWorkouts.includes(workout.id);
+              const statusColor = getStatusColor(workout.stats.completionRate);
 
-            return (
-              <WorkoutHistoryCard
-                key={workout.id}
-                workout={workout}
-                isExpanded={isExpanded}
-                statusColor={statusColor}
-                toogleWorkout={toggleWorkout}
-              />
-            );
-          })
+              return (
+                <WorkoutHistoryCard
+                  key={workout.id}
+                  workout={workout}
+                  isExpanded={isExpanded}
+                  statusColor={statusColor}
+                  toogleWorkout={toggleWorkout}
+                />
+              );
+            })}
+          </>
         )}
       </div>
     </div>
