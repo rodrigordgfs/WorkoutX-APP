@@ -1,4 +1,4 @@
-import { WorkoutStats } from "@/context/WorkoutContext";
+import { IWorkoutHistory } from "@/context/WorkoutContext";
 import { intervalToDuration } from "date-fns";
 import {
   CheckCircle2,
@@ -13,30 +13,6 @@ interface WorkoutHistoryCardProps {
   statusColor: string;
   isExpanded: boolean;
   toogleWorkout: (workoutId: string) => void;
-}
-
-interface IExercise {
-  id: string;
-  name: string;
-  series: string;
-  repetitions: string;
-  weight: string;
-  restTime: string;
-  completed: boolean;
-}
-
-export interface IWorkoutHistory {
-  id: string;
-  startedAt: string;
-  endedAt: string | null;
-  duration: string | number;
-  workout: {
-    name: string;
-    visibility: string;
-    createdAt: string;
-  };
-  exercises: IExercise[];
-  stats: WorkoutStats;
 }
 
 export const WorkoutHistoryCard = ({

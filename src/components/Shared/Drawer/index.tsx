@@ -18,7 +18,7 @@ interface DrawerProps {
 }
 
 export function Drawer({ isOpen, onClose }: DrawerProps) {
-  const { profile } = useUserProfile();
+  const { profile, isAdmin } = useUserProfile();
   const { signOut } = useClerk();
 
   const handleLogout = async () => {
@@ -67,7 +67,9 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
             </div>
             <div>
               <h2 className="font-semibold text-white">{profile.name}</h2>
-              <p className="text-sm text-blue-200 dark:text-blue-300">Membro</p>
+              <p className="text-sm text-blue-200 dark:text-blue-300">
+                {isAdmin ? "Administrador" : "Usuário"}
+              </p>
             </div>
           </div>
         </header>
@@ -86,6 +88,9 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
                 </span>
               </Link>
             </li>
+
+            <div className="h-px bg-zinc-200 dark:bg-zinc-700 my-4" />
+
             <li>
               <Link
                 to="/workout"
@@ -122,6 +127,38 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
                 </span>
               </Link>
             </li>
+
+            <li>
+              <Link
+                to="/muscle-group"
+                className="flex items-center gap-3 p-3 hover:bg-blue-50 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                onClick={onClose}
+              >
+                <Dumbbell className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <span className="text-zinc-900 dark:text-zinc-100">
+                  Grupos Musculares
+                </span>
+              </Link>
+            </li>
+
+            {isAdmin && (
+              <>
+                <div className="h-px bg-zinc-200 dark:bg-zinc-700 my-4" />
+
+                <li>
+                  <Link
+                    to="/muscle-group/register"
+                    className="flex items-center gap-3 p-3 hover:bg-blue-50 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                    onClick={onClose}
+                  >
+                    <Plus className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    <span className="text-zinc-900 dark:text-zinc-100">
+                      Cadastrar Grupos Musculares
+                    </span>
+                  </Link>
+                </li>
+              </>
+            )}
 
             <div className="h-px bg-zinc-200 dark:bg-zinc-700 my-4" />
 

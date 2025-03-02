@@ -1,6 +1,6 @@
 import {
-  Exercise,
-  ExerciseSession,
+  IExercise,
+  IExerciseSession,
   useWorkout,
 } from "@/context/WorkoutContext";
 import { Modal } from "../Shared/Modal";
@@ -9,9 +9,10 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ModalDoneExercise } from "../WorkoutDetailsPage/ModalDoneExercise";
+import { useAuth } from "@clerk/clerk-react";
 
 interface WordkoutDetailsProps {
-  exercise: Exercise | null;
+  exercise: IExercise | null;
 }
 
 const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
@@ -26,6 +27,7 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
     workoutSessionInProgress,
     setWorkoutSession,
   } = useWorkout();
+  const { getToken } = useAuth();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -36,7 +38,7 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
     (ex) => ex.exercise.id === exercise?.id
   );
 
-  const handleCompleteExercise = (
+  const handleCompleteExercise = async (
     weight: number,
     repetitions: number,
     series: number
@@ -57,6 +59,9 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
         },
         {
           baseURL: import.meta.env.VITE_API_BASE_URL,
+          headers: {
+            Authorization: `Bearer ${await getToken()}`,
+          },
         }
       )
       .then(({ data }) => {
@@ -64,7 +69,7 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
           id: data.id,
           startedAt: data.startedAt,
           endedAt: data.endedAt,
-          exercises: data.exercises.map((exercise: ExerciseSession) => ({
+          exercises: data.exercises.map((exercise: IExerciseSession) => ({
             id: exercise.id,
             series: exercise.series,
             repetitions: exercise.repetitions,

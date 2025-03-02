@@ -5,7 +5,7 @@ interface StatusCardProps {
   title: string;
   value: string | number | null | undefined;
   trend?: string;
-  color?: "blue" | "green" | "yellow" | "purple" | "pink";
+  color?: string | "blue";
 }
 
 export const StatusCard = ({

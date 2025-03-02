@@ -1,6 +1,6 @@
-import authService from "@/services/auth";
-import { useClerk } from "@clerk/clerk-react";
-import { createContext, ReactNode, useContext, useState } from "react";
+import { useAuth, useClerk } from "@clerk/clerk-react";
+import axios from "axios";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -21,6 +21,7 @@ interface UserContextType {
   fetchProfile: () => void;
   userProfileLoaded: boolean;
   savingProfile: boolean;
+  isAdmin?: boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -31,6 +32,7 @@ interface UserProviderProps {
 
 export const UserProvider = ({ children }: UserProviderProps) => {
   const { user } = useClerk();
+  const { getToken } = useAuth();
   const navigate = useNavigate();
 
   const [profile, setProfile] = useState<UserProfile>({
@@ -45,13 +47,29 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   });
   const [userProfileLoaded, setUserProfileLoaded] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (user?.publicMetadata?.permission === "admin") {
+      setIsAdmin(true);
+    }
+  }, [user]);
 
   const fetchProfile = async () => {
     const userId = user?.id;
     const name = user?.fullName;
     const avatar = user?.imageUrl;
-    authService
-      .post({ userId, name, avatar })
+    axios
+      .post(
+        "/auth",
+        { userId, name, avatar },
+        {
+          baseURL: import.meta.env.VITE_API_BASE_URL,
+          headers: {
+            Authorization: `Bearer ${await getToken()}`,
+          },
+        }
+      )
       .then(({ data }) => {
         setProfile(data);
         setUserProfileLoaded(true);
@@ -63,10 +81,15 @@ export const UserProvider = ({ children }: UserProviderProps) => {
       });
   };
 
-  const updateProfile = (profile: UserProfile) => {
+  const updateProfile = async (profile: UserProfile) => {
     setSavingProfile(true);
-    authService
-      .patch(`/${profile.id}`, profile)
+    axios
+      .patch(`/auth/${profile.id}`, profile, {
+        baseURL: import.meta.env.VITE_API_BASE_URL,
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
+      })
       .then(({ data }) => {
         setProfile(data);
         toast.success("Perfil atualizado com sucesso");
@@ -88,6 +111,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         fetchProfile,
         userProfileLoaded,
         savingProfile,
+        isAdmin,
       }}
     >
       {children}

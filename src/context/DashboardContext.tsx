@@ -1,4 +1,4 @@
-import { useClerk } from "@clerk/clerk-react";
+import { useAuth, useClerk } from "@clerk/clerk-react";
 import axios from "axios";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -39,6 +39,7 @@ export interface IRecentActivity {
     name: string;
   };
   exerciseCount: number;
+  endedAt: string;
   duration: number;
 }
 
@@ -52,6 +53,8 @@ export interface IWorkoutExercicesAmmount {
 
 export const DashboardProvider = ({ children }: DashboardProviderProps) => {
   const { user } = useClerk();
+  const { getToken } = useAuth();
+
   const [workoutMonthAmmount, setWorkoutMonthAmmount] = useState<number>(0);
   const [workoutPercentageChange, setWorkoutPercentageChange] =
     useState<number>(0);
@@ -71,12 +74,15 @@ export const DashboardProvider = ({ children }: DashboardProviderProps) => {
     Record<string, number>
   >({});
 
-  const fetchWorkoutDashboard = useCallback(() => {
+  const fetchWorkoutDashboard = useCallback(async () => {
     setLoading(true);
     axios
       .get("/workout/dashboard", {
         baseURL: import.meta.env.VITE_API_BASE_URL,
         params: { userId: user?.id },
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
       })
       .then(({ data }) => {
         setWorkoutMonthAmmount(data.workoutMonthAmmount);
@@ -119,7 +125,7 @@ export const DashboardProvider = ({ children }: DashboardProviderProps) => {
       .finally(() => {
         setLoading(false);
       });
-  }, [user?.id]);
+  }, [user?.id, getToken]);
 
   return (
     <DashboardContext.Provider

@@ -19,6 +19,15 @@ export function LoginPage() {
             </p>
           </div>
 
+          <SignedOut>
+              <SignInButton forceRedirectUrl="/">
+                <button className="group w-full flex items-center justify-center gap-2 py-4 px-6 mt-8 border-2 border-blue-600 rounded-xl text-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 hover:border-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-all duration-200 shadow-lg shadow-blue-600/25">
+                  Entrar agora
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </SignInButton>
+            </SignedOut>
+
           <div className="mt-12">
             <div className="space-y-4">
               <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-blue-100 shadow-xl shadow-blue-100/20">
@@ -63,15 +72,6 @@ export function LoginPage() {
                 </div>
               </div>
             </div>
-
-            <SignedOut>
-              <SignInButton forceRedirectUrl="/">
-                <button className="group w-full flex items-center justify-center gap-2 py-4 px-6 mt-8 border-2 border-blue-600 rounded-xl text-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 hover:border-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-all duration-200 shadow-lg shadow-blue-600/25">
-                  Entrar agora
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </button>
-              </SignInButton>
-            </SignedOut>
           </div>
         </div>
       </div>

@@ -24,6 +24,12 @@ export function ModalDoneExercise({
     return null;
   }
 
+  const resetCounters = () => {
+    setWeight(20);
+    setReps(12);
+    setSeries(4);
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
       <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-hidden">
@@ -110,7 +116,10 @@ export function ModalDoneExercise({
             Cancelar
           </button>
           <button
-            onClick={() => onConfirm(weight, reps, series)}
+            onClick={() => {
+              onConfirm(weight, reps, series)
+              resetCounters()
+            }}
             disabled={loading}
             className={`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors ${
               loading ? "opacity-50 cursor-not-allowed" : ""

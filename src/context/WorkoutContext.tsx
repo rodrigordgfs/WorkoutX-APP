@@ -1,7 +1,5 @@
-import { IWorkoutHistory } from "@/components/WorkoutHistoryPage/WorkoutHistoryCard";
 import { Visibility } from "@/pages/WorkoutRegister";
-import workoutService from "@/services/workout";
-import { useClerk } from "@clerk/clerk-react";
+import { useAuth, useClerk } from "@clerk/clerk-react";
 import axios from "axios";
 import {
   createContext,
@@ -13,28 +11,28 @@ import {
 } from "react";
 import { toast } from "react-toastify";
 
-export interface Workout {
+export interface IWorkout {
   id: string;
   name: string;
-  user: User;
+  user: IUser;
   visibility: Visibility;
-  exercises: Exercise[];
-  likes: WorkoutLikes[];
+  exercises: IExercise[];
+  likes: IWorkoutLikes[];
 }
 
-export interface User {
+export interface IUser {
   id: string;
   name: string;
   avatar: string;
 }
 
-export interface WorkoutStats {
+export interface IWorkoutStats {
   totalExercises: number;
   completedExercises: number;
   completionRate: string;
 }
 
-export interface WorkoutHistory {
+export interface IWorkoutHistory {
   id: string;
   startedAt: string;
   endedAt: string | null;
@@ -44,15 +42,28 @@ export interface WorkoutHistory {
     visibility: string;
     createdAt: string;
   };
-  exercises: Exercise[];
-  stats: WorkoutStats;
+  exercises: IExercise[];
+  stats: IWorkoutStats;
 }
 
-export interface WorkoutLikes {
+export interface IWorkoutLikes {
   userId: string;
 }
+export interface IWorkoutHistory {
+  id: string;
+  startedAt: string;
+  endedAt: string | null;
+  duration: string | number;
+  workout: {
+    name: string;
+    visibility: string;
+    createdAt: string;
+  };
+  exercises: IExercise[];
+  stats: IWorkoutStats;
+}
 
-export interface Exercise {
+export interface IExercise {
   id?: string | undefined;
   name: string;
   series: string;
@@ -60,10 +71,21 @@ export interface Exercise {
   weight: string;
   restTime: string;
   videoUrl: string;
+  imageUrl?: string;
   instructions: string;
+  muscleGroup?: IMuscleGroup;
+  completed?: boolean;
 }
 
-export interface ExerciseSession {
+export interface IMuscleGroup {
+  id: string;
+  name: string;
+  image: string | undefined;
+  description: string | undefined;
+  exercises: IExercise[] | undefined;
+}
+
+export interface IExerciseSession {
   id: string;
   series: string;
   repetitions: string;
@@ -75,48 +97,57 @@ export interface ExerciseSession {
     name: string;
   };
 }
-
-export interface WorkoutSession {
+export interface IWorkoutSession {
   id: string;
   startedAt: string;
   endedAt: string | null;
-  exercises: ExerciseSession[];
+  exercises: IExerciseSession[];
+}
+
+export interface IFilterHistory {
+  name: string;
+  period: string;
+  status: string;
+  order: string;
 }
 
 interface WorkoutContextType {
-  workouts: Workout[];
-  fetchWorkouts: () => void;
+  workouts: IWorkout[];
   workoutsLoaded: boolean;
+  loadingWorkouts: boolean;
+  selectedExercise: IExercise | null;
+  selectedWorkout: IWorkout | null;
+  workoutSession: IWorkoutSession | null;
+  loadingWorkoutHistory: boolean;
+  workoutHistory: IWorkoutHistory[];
+  muscleGroups: IMuscleGroup[];
+  loadingMuscleGroups: boolean;
+  fetchWorkouts: () => void;
   addWorkout: (
     name: string,
     visibility: Visibility,
     userId: string,
-    exercises: Exercise[]
+    exercises: IExercise[]
   ) => Promise<void>;
-  appendWorkout: (workout: Workout) => void;
+  appendWorkout: (workout: IWorkout) => void;
   isWorkoutsEmpty: () => boolean;
-  loadingWorkouts: boolean;
-  selectedExercise: Exercise | null;
-  setSelectedExercise: (exercise: Exercise | null) => void;
-  setSelectedWorkout: (workout: Workout | null) => void;
-  selectedWorkout: Workout | null;
+  setSelectedExercise: (exercise: IExercise | null) => void;
+  setSelectedWorkout: (workout: IWorkout | null) => void;
   deleteExercise: (exerciseId: string) => void;
   deleteWorkout: (workoutId: string) => void;
   isLastExerciseInWorkout: (
-    workout: Workout | undefined,
+    workout: IWorkout | undefined,
     exerciseId: string
   ) => boolean;
-  getWorkoutByExerciseId: (exerciseId: string) => Workout | undefined;
-  workoutSession: WorkoutSession | null;
-  setWorkoutSession: (workoutSession: WorkoutSession | null) => void;
+  getWorkoutByExerciseId: (exerciseId: string) => IWorkout | undefined;
+  setWorkoutSession: (workoutSession: IWorkoutSession | null) => void;
   workoutSessionInProgress: () => boolean;
   workoutSessionCompleted: () => boolean;
   existExercisesUncompleted: () => boolean | undefined;
-  getUncompletedExercisesWithDetails: () => Exercise[] | undefined;
-  getCompletedExercisesWithDetails: () => Exercise[] | undefined;
-  loadingWorkoutHistory: boolean;
-  fetchWorkoutHistory: () => void;
-  workoutHistory: IWorkoutHistory[];
+  getUncompletedExercisesWithDetails: () => IExercise[] | undefined;
+  getCompletedExercisesWithDetails: () => IExercise[] | undefined;
+  fetchWorkoutHistory: (filter?: IFilterHistory) => void;
+  getMuscleGroups: () => void;
 }
 
 const WorkoutContext = createContext<WorkoutContextType | undefined>(undefined);
@@ -127,19 +158,22 @@ interface WorkoutProviderProps {
 
 export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
   const { user } = useClerk();
+  const { getToken } = useAuth();
 
-  const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [workouts, setWorkouts] = useState<IWorkout[]>([]);
   const [workoutsLoaded, setWorkoutsLoaded] = useState(false);
   const [loadingWorkouts, setLoadingWorkouts] = useState(false);
-  const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
-  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(
+  const [selectedWorkout, setSelectedWorkout] = useState<IWorkout | null>(null);
+  const [selectedExercise, setSelectedExercise] = useState<IExercise | null>(
     null
   );
-  const [workoutSession, setWorkoutSession] = useState<WorkoutSession | null>(
+  const [workoutSession, setWorkoutSession] = useState<IWorkoutSession | null>(
     null
   );
   const [loadingWorkoutHistory, setLoadingWorkoutHistory] = useState(false);
   const [workoutHistory, setWorkoutHistory] = useState<IWorkoutHistory[]>([]);
+  const [muscleGroups, setMuscleGroups] = useState<IMuscleGroup[]>([]);
+  const [loadingMuscleGroups, setLoadingMuscleGroups] = useState(false);
 
   const getUncompletedExercisesWithDetails = () => {
     return workoutSession?.exercises
@@ -198,7 +232,7 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
   };
 
   const isLastExerciseInWorkout = (
-    workout: Workout | undefined,
+    workout: IWorkout | undefined,
     exerciseId: string
   ) => {
     return (
@@ -233,14 +267,24 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
     return workouts.length === 0;
   };
 
-  const appendWorkout = (workout: Workout) => {
+  const appendWorkout = (workout: IWorkout) => {
     setWorkouts([...workouts, workout]);
   };
 
   const fetchWorkouts = async () => {
     setLoadingWorkouts(true);
-    workoutService
-      .get({ userId: user?.id })
+    axios
+      .get("/workout", {
+        baseURL: import.meta.env.VITE_API_BASE_URL,
+        params: {
+          userId: user?.id,
+          exercises: true,
+          likes: true,
+        },
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
+      })
       .then(({ data }) => {
         setWorkouts(data);
         setWorkoutsLoaded(true);
@@ -261,14 +305,49 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
       });
   };
 
+  const getMuscleGroups = useCallback(async () => {
+    setLoadingMuscleGroups(true);
+    axios
+      .get("/muscle-group", {
+        baseURL: import.meta.env.VITE_API_BASE_URL,
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
+      })
+      .then(({ data }) => {
+        setMuscleGroups(data);
+        setLoadingMuscleGroups(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error(
+          error.response?.data?.message || "Erro ao buscar os grupos musculares"
+        );
+      });
+  }, [getToken]);
+
   const addWorkout = async (
     name: string,
     visibility: Visibility,
     userId: string,
-    exercises: Exercise[]
+    exercises: IExercise[]
   ) => {
-    return workoutService
-      .post({ name, userId, visibility, exercises })
+    return axios
+      .post(
+        "/workout",
+        {
+          name,
+          visibility,
+          userId,
+          exercises,
+        },
+        {
+          baseURL: import.meta.env.VITE_API_BASE_URL,
+          headers: {
+            Authorization: `Bearer ${await getToken()}`,
+          },
+        }
+      )
       .then(({ data }) => {
         setWorkouts([...workouts, data]);
         toast.success("Treino cadastrado com sucesso");
@@ -288,32 +367,44 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
       });
   };
 
-  const fetchWorkoutHistory = useCallback(() => {
-    setLoadingWorkoutHistory(true);
-    axios
-      .get("/workout/history", {
-        baseURL: import.meta.env.VITE_API_BASE_URL,
-        params: {
-          userId: user?.id,
-        },
-      })
-      .then(({ data }) => {
-        setWorkoutHistory(data);
-        setLoadingWorkoutHistory(false);
-      })
-      .catch((error) => {
-        const title = error.response?.data?.message;
-        const errors: Record<string, { field: string; message: string }> =
-          error.response?.data?.errors;
-        if (errors) {
-          Object.values(errors).forEach((errorMessages) => {
-            toast.error(errorMessages.message);
-          });
-        } else {
-          toast.error(title || "Erro ao buscar o histórico de treinos");
-        }
-      });
-  }, [user?.id]);
+  const fetchWorkoutHistory = useCallback(
+    async (filter?: IFilterHistory) => {
+      console.log("filter", filter);
+
+      setLoadingWorkoutHistory(true);
+      axios
+        .get("/workout/history", {
+          baseURL: import.meta.env.VITE_API_BASE_URL,
+          params: {
+            userId: user?.id,
+            name: filter?.name,
+            period: filter?.period,
+            status: filter?.status,
+            order: filter?.order,
+          },
+          headers: {
+            Authorization: `Bearer ${await getToken()}`,
+          },
+        })
+        .then(({ data }) => {
+          setWorkoutHistory(data);
+          setLoadingWorkoutHistory(false);
+        })
+        .catch((error) => {
+          const title = error.response?.data?.message;
+          const errors: Record<string, { field: string; message: string }> =
+            error.response?.data?.errors;
+          if (errors) {
+            Object.values(errors).forEach((errorMessages) => {
+              toast.error(errorMessages.message);
+            });
+          } else {
+            toast.error(title || "Erro ao buscar o histórico de treinos");
+          }
+        });
+    },
+    [user?.id]
+  );
 
   return (
     <WorkoutContext.Provider
@@ -343,6 +434,9 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
         loadingWorkoutHistory,
         fetchWorkoutHistory,
         workoutHistory,
+        muscleGroups,
+        getMuscleGroups,
+        loadingMuscleGroups,
       }}
     >
       {children}
