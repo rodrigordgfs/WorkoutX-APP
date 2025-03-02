@@ -4,13 +4,34 @@ import { Loading } from "@/components/MuscleGroupPage/Loading";
 import { MuscleGroupCard } from "@/components/MuscleGroupPage/MuscleGroupCard";
 import { useWorkout } from "@/context/WorkoutContext";
 import { SectionTitle } from "@/components/Shared/SectionTitle";
+import { useAuth } from "@clerk/clerk-react";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 export function MuscleGroupsPage() {
+  const { getToken } = useAuth();
   const { getMuscleGroups, muscleGroups, loadingMuscleGroups } = useWorkout();
 
   useEffect(() => {
     getMuscleGroups();
   }, [getMuscleGroups]);
+
+  const handleDeleteMuscleGroup = async (id: string) => {
+    axios
+      .delete(`/muscle-group/${id}`, {
+        baseURL: import.meta.env.VITE_API_BASE_URL,
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
+      })
+      .then(() => {
+        getMuscleGroups();
+      })
+      .catch((error) => {
+        toast.error("Falha ao deletar grupo muscular!");
+        console.error("Failed to delete muscle group", error);
+      });
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
@@ -28,6 +49,7 @@ export function MuscleGroupsPage() {
                 image={group.image || ""}
                 name={group.name}
                 description={group.description || ""}
+                onDelete={handleDeleteMuscleGroup}
               />
             ))}
       </div>
