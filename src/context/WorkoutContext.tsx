@@ -80,9 +80,9 @@ export interface IExercise {
 export interface IMuscleGroup {
   id: string;
   name: string;
-  image: string | undefined;
-  description: string | undefined;
-  exercises: IExercise[] | undefined;
+  image?: string | undefined;
+  description?: string | undefined;
+  exercises?: IExercise[] | undefined;
 }
 
 export interface IExerciseSession {
