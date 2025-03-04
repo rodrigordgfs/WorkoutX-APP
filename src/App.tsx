@@ -16,6 +16,7 @@ import { MuscleGroupsPage } from "./pages/MuscleGroups";
 import { ExercisesPage } from "./pages/Exercises";
 import { WorkoutRegisterPage } from "./pages/WorkoutRegister";
 import { MuscleGroupRegisterPage } from "./pages/MuscleGroupRegister";
+import { ExerciseRegisterPage } from "./pages/ExercisesRegister";
 
 function App() {
   const { isSignedIn, isLoaded } = useAuth();
@@ -61,6 +62,12 @@ function App() {
             <Route
               path="/muscle-group/register/:id"
               element={<MuscleGroupRegisterPage />}
+            />
+          )}
+          {isAdmin && (
+            <Route
+              path="/exercises/register/"
+              element={<ExerciseRegisterPage />}
             />
           )}
         </Route>

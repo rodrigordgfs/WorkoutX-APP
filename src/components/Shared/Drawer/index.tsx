@@ -157,6 +157,19 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
                     </span>
                   </Link>
                 </li>
+
+                <li>
+                  <Link
+                    to="/exercises/register"
+                    className="flex items-center gap-3 p-3 hover:bg-blue-50 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                    onClick={onClose}
+                  >
+                    <Plus className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    <span className="text-zinc-900 dark:text-zinc-100">
+                      Cadastrar Exercícios
+                    </span>
+                  </Link>
+                </li>
               </>
             )}
 

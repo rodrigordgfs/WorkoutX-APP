@@ -84,15 +84,13 @@ function WorkoutDetailsPage() {
           endedAt: data.endedAt,
           exercises: data.exercises.map((exercise: IExerciseSession) => ({
             id: exercise.id,
+            exerciseId: exercise.exerciseId,
             series: exercise.series,
             repetitions: exercise.repetitions,
             weight: exercise.weight,
             restTime: exercise.restTime,
             completed: exercise.completed,
-            exercise: {
-              id: exercise.exercise.id,
-              name: exercise.exercise.name,
-            },
+            name: exercise.name,
           })),
         });
       })
@@ -136,6 +134,8 @@ function WorkoutDetailsPage() {
 
   const postCompleteWorkoutSession = async () => {
     setLoadingCompleteWorkoutSession(true);
+    console.log("workoutSession", workoutSession);
+
     axios
       .post(
         `/workout/session/${workoutSession?.id}/complete`,
@@ -159,10 +159,8 @@ function WorkoutDetailsPage() {
             weight: exercise.weight,
             restTime: exercise.restTime,
             completed: exercise.completed,
-            exercise: {
-              id: exercise.exercise.id,
-              name: exercise.exercise.name,
-            },
+            exerciseId: exercise.exerciseId,
+            name: exercise.name,
           })),
         });
       })
@@ -182,6 +180,11 @@ function WorkoutDetailsPage() {
       setSelectedExercise(workout.exercises[0]);
     }
   }, [workouts, id, setSelectedExercise, setSelectedWorkout]);
+
+  // useEffect(() => {
+  //   console.log('workoutSession', workoutSession);
+
+  // }, [workoutSession, setWorkoutSession]);
 
   useEffect(() => {
     const fetchWorkoutSession = async () => {
@@ -209,10 +212,8 @@ function WorkoutDetailsPage() {
                 weight: exercise.weight,
                 restTime: exercise.restTime,
                 completed: exercise.completed,
-                exercise: {
-                  id: exercise.exercise.id,
-                  name: exercise.exercise.name,
-                },
+                exerciseId: exercise.exerciseId,
+                name: exercise.name,
               })),
             });
           }
@@ -223,7 +224,15 @@ function WorkoutDetailsPage() {
     };
 
     fetchWorkoutSession();
-  }, [id, setWorkoutSession]);
+  }, [id, setWorkoutSession, getToken]);
+
+  useEffect(() => {
+    console.log("selectedWorkout", selectedWorkout);
+  }, [selectedWorkout]);
+
+  useEffect(() => {
+    console.log("workoutSession", workoutSession);
+  }, [workoutSession]);
 
   if (!selectedWorkout) {
     return (
