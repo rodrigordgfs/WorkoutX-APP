@@ -59,30 +59,38 @@ export function DashboardPage() {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <StatusCard
-              icon={Activity}
               title="Treinos este mês"
               value={workoutMonthAmmount}
               trend={`${workoutPercentageChange}% vs. mês anterior`}
-              color="blue"
-            />
+            >
+              <div className="p-3 bg-blue-500 dark:bg-blue-600 text-white dark:text-blue-200 rounded-lg">
+                <Activity size={24} />
+              </div>
+            </StatusCard>
             <StatusCard
-              icon={Calendar}
               title="Sequência atual"
               value={`${consecutiveWorkoutDays} dias`}
-              color="green"
-            />
+            >
+              <div className="p-3 bg-green-500 dark:bg-green-600 text-white dark:text-green-200 rounded-lg">
+                <Calendar size={24} />
+              </div>
+            </StatusCard>
             <StatusCard
-              icon={Clock}
               title="Duração média"
               value={`${Number(averageWorkoutDuration).toFixed(0)}min`}
-              color="pink"
-            />
+            >
+              <div className="p-3 bg-pink-500 dark:bg-pink-600 text-white dark:text-pink-200 rounded-lg">
+                <Clock size={24} />
+              </div>
+            </StatusCard>
             <StatusCard
-              icon={Trophy}
               title="Taxa de conclusão"
               value={`${Number(completionRate).toFixed(0)}%`}
-              color="purple"
-            />
+            >
+              <div className="p-3 bg-purple-500 dark:bg-purple-600 text-white dark:text-purple-200 rounded-lg">
+                <Trophy size={24} />
+              </div>
+            </StatusCard>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">

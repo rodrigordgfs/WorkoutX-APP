@@ -1,28 +1,22 @@
-import { LucideIcon, TrendingUp } from "lucide-react";
+import { TrendingUp } from "lucide-react";
 
 interface StatusCardProps {
-  icon: LucideIcon;
+  children?: React.ReactNode;
   title: string;
   value: string | number | null | undefined;
   trend?: string;
-  color?: string | "blue";
 }
 
 export const StatusCard = ({
-  icon: Icon,
+  children,
   title,
   value,
-  color,
   trend,
 }: StatusCardProps) => {
   return (
-    <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl shadow-lg">
+    <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl shadow-lg flex items-center">
       <div className="flex items-center gap-4">
-        <div
-          className={`p-3 bg-${color}-500 dark:bg-${color}-100 text-white dark:text-${color}-200 rounded-lg`}
-        >
-          <Icon size={24} />
-        </div>
+        {children}
         <div>
           <p className="text-sm text-zinc-900 dark:text-zinc-200">{title}</p>
           <p className="text-2xl font-bold text-zinc-800 dark:text-zinc-300">

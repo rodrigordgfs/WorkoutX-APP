@@ -4,6 +4,9 @@ import { useState } from "react";
 interface ModalProps {
   isOpen: boolean;
   loading?: boolean;
+  weightExercise: number;
+  repetitionsExercise: number;
+  seriesExercise: number;
   onClose: () => void;
   onConfirm: (weight: number, reps: number, series: number) => void;
   title: string;
@@ -12,22 +15,19 @@ interface ModalProps {
 export function ModalDoneExercise({
   loading,
   isOpen,
+  weightExercise,
+  repetitionsExercise,
+  seriesExercise,
   onClose,
   onConfirm,
   title,
 }: ModalProps) {
-  const [weight, setWeight] = useState(20);
-  const [reps, setReps] = useState(12);
-  const [series, setSeries] = useState(4);
+  const [weight, setWeight] = useState(weightExercise);
+  const [reps, setReps] = useState(repetitionsExercise);
+  const [series, setSeries] = useState(seriesExercise);
 
   if (!isOpen) {
     return null;
-  }
-
-  const resetCounters = () => {
-    setWeight(20);
-    setReps(12);
-    setSeries(4);
   }
 
   return (
@@ -116,10 +116,7 @@ export function ModalDoneExercise({
             Cancelar
           </button>
           <button
-            onClick={() => {
-              onConfirm(weight, reps, series)
-              resetCounters()
-            }}
+            onClick={() => onConfirm(weight, reps, series)}
             disabled={loading}
             className={`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors ${
               loading ? "opacity-50 cursor-not-allowed" : ""

@@ -230,6 +230,9 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
       <ModalDoneExercise
         isOpen={isModalDoneExerciseOpen}
         onClose={() => setIsModalDoneExerciseOpen(false)}
+        weightExercise={Number(exercise?.weight)}
+        repetitionsExercise={Number(exercise?.repetitions)}
+        seriesExercise={Number(exercise?.series)}
         onConfirm={(weight, reps, series) => {
           setIsModalDoneExerciseOpen(false);
           handleCompleteExercise(weight, reps, series);
