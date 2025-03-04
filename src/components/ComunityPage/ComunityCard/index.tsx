@@ -50,7 +50,7 @@ export const ComunityCard = ({
               ) : (
                 <div
                   className={`flex items-center gap-1 ${
-                    workout.likes.some((like) => like.userId === user?.id)
+                    workout?.likes?.some((like) => like.userId === user?.id)
                       ? "text-blue-500"
                       : "text-zinc-500 hover:text-blue-500"
                   } transition-colors`}
@@ -60,7 +60,7 @@ export const ComunityCard = ({
                   ) : (
                     <Heart size={20} />
                   )}
-                  <span>{workout.likes.length}</span>
+                  <span>{workout?.likes?.length}</span>
                 </div>
               )}
             </button>
@@ -73,14 +73,14 @@ export const ComunityCard = ({
         <div className="flex items-center gap-4 text-sm text-zinc-600 dark:text-zinc-300 mb-4">
           <div className="flex items-center gap-1">
             <Dumbbell size={16} className="text-blue-500" />
-            <span>{workout.exercises.length} exercícios</span>
+            <span>{workout?.exercises?.length} exercícios</span>
           </div>
         </div>
       </div>
 
       <div className="border-t border-zinc-100">
         <div className="grid divide-y divide-zinc-100">
-          {workout.exercises.map((exercise) => (
+          {workout?.exercises?.map((exercise) => (
             <div
               key={exercise.id}
               className="p-4 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"

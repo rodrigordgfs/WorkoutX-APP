@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Users } from "lucide-react";
 import { toast } from "react-toastify";
 import { useWorkout, IWorkout } from "@/context/WorkoutContext";
@@ -28,10 +28,6 @@ export function CommunityPage() {
   const [workoutSelectedID, setWorkoutSelectedID] = useState<string | null>(
     null
   );
-
-  useEffect(() => {
-    fetchPublicWorkouts();
-  }, []);
 
   const handleCopyExercise = async () => {
     setIsCopying(true);
@@ -67,13 +63,15 @@ export function CommunityPage() {
     setWorkoutSelectedID(null);
   };
 
-  const fetchPublicWorkouts = async () => {
+  const fetchPublicWorkouts = useCallback(async () => {
     setLoading(true);
     axios
       .get("/workout", {
         baseURL: import.meta.env.VITE_API_BASE_URL,
         params: {
           visibility: "PUBLIC",
+          exercises: true,
+          likes: true,
         },
         headers: {
           Authorization: `Bearer ${await getToken()}`,
@@ -97,10 +95,14 @@ export function CommunityPage() {
           toast.error(title || "Erro ao buscar os treinos da comunidade");
         }
       });
-  };
+  }, [getToken]);
+
+  useEffect(() => {
+    fetchPublicWorkouts();
+  }, [fetchPublicWorkouts]);
 
   const isLiked = (workout: IWorkout) => {
-    return workout.likes.some((like) => like.userId === userId);
+    return workout?.likes?.some((like) => like.userId === userId);
   };
 
   const toogleLike = async (id: string) => {
@@ -114,20 +116,26 @@ export function CommunityPage() {
           {
             baseURL: import.meta.env.VITE_API_BASE_URL,
             headers: {
-              Authorization: `Bearer ${getToken}`,
+              Authorization: `Bearer ${await getToken()}`,
             },
           }
         )
+        .then(() => {
+          toast.success("Treino curtido com sucesso");
+        })
         .catch((error) => {
+          console.log(error);
           toast.error(error.response?.data?.message || "Erro ao curtir treino");
         });
 
       setWorkouts((prevWorkouts) =>
         prevWorkouts.map((workout) => {
           if (workout.id === id) {
-            const liked = workout.likes.some((like) => like.userId === userId);
+            const liked = workout?.likes?.some(
+              (like) => like.userId === userId
+            );
             const updatedLikes = liked
-              ? workout.likes.filter((like) => like.userId !== userId)
+              ? workout?.likes?.filter((like) => like.userId !== userId)
               : [...workout.likes, { userId }];
 
             return { ...workout, likes: updatedLikes };

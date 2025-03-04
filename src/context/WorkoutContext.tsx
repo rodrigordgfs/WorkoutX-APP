@@ -65,6 +65,7 @@ export interface IWorkoutHistory {
 
 export interface IExercise {
   id?: string | undefined;
+  exerciseId?: string | undefined;
   name: string;
   series: string;
   repetitions: string;
@@ -87,15 +88,13 @@ export interface IMuscleGroup {
 
 export interface IExerciseSession {
   id: string;
+  exerciseId: string;
   series: string;
   repetitions: string;
   weight: string;
   restTime: string;
   completed: boolean;
-  exercise: {
-    id: string;
-    name: string;
-  };
+  name: string;
 }
 export interface IWorkoutSession {
   id: string;
@@ -181,12 +180,12 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
       .map((exerciseSession) => {
         const workout = workouts.find((workout) =>
           workout.exercises.some(
-            (exercise) => exercise.id === exerciseSession.exercise.id
+            (exercise) => exercise.exerciseId === exerciseSession.exerciseId
           )
         );
 
         const exercise = workout?.exercises.find(
-          (exercise) => exercise.id === exerciseSession.exercise.id
+          (exercise) => exercise.exerciseId === exerciseSession.exerciseId
         );
 
         return exercise;
@@ -200,12 +199,12 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
       .map((exerciseSession) => {
         const workout = workouts.find((workout) =>
           workout.exercises.some(
-            (exercise) => exercise.id === exerciseSession.exercise.id
+            (exercise) => exercise.exerciseId === exerciseSession.exerciseId
           )
         );
 
         const exercise = workout?.exercises.find(
-          (exercise) => exercise.id === exerciseSession.exercise.id
+          (exercise) => exercise.exerciseId === exerciseSession.exerciseId
         );
 
         return exercise;
@@ -227,7 +226,7 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
 
   const getWorkoutByExerciseId = (exerciseId: string) => {
     return workouts.find((workout) =>
-      workout.exercises.some((exercise) => exercise.id === exerciseId)
+      workout.exercises.some((exercise) => exercise.exerciseId === exerciseId)
     );
   };
 
@@ -236,14 +235,15 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
     exerciseId: string
   ) => {
     return (
-      workout?.exercises.length === 1 && workout?.exercises[0].id === exerciseId
+      workout?.exercises.length === 1 &&
+      workout?.exercises[0].exerciseId === exerciseId
     );
   };
 
   const deleteExercise = async (exerciseId: string) => {
     const updatedWorkouts = workouts.map((workout) => {
       const updatedExercises = workout.exercises.filter(
-        (exercise) => exercise.id !== exerciseId
+        (exercise) => exercise.exerciseId !== exerciseId
       );
       return { ...workout, exercises: updatedExercises };
     });
@@ -403,7 +403,7 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
           }
         });
     },
-    [user?.id]
+    [user?.id, getToken]
   );
 
   return (

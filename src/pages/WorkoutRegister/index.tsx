@@ -146,10 +146,10 @@ export function WorkoutRegisterPage() {
           userId: user?.id,
           exercises: selectedExercises.map((e) => ({
             id: e.exercise.id,
-            series: e.series,
-            repetitions: e.repetitions,
-            weight: e.weight,
-            restTime: e.restTime,
+            series: String(e.series),
+            repetitions: String(e.repetitions),
+            weight: String(e.weight),
+            restTime: String(e.restTime),
           })),
         },
         {

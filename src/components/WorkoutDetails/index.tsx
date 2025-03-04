@@ -35,7 +35,7 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
   const [isModalDoneExerciseOpen, setIsModalDoneExerciseOpen] = useState(false);
 
   const workoutSessionExercise = workoutSession?.exercises.find(
-    (ex) => ex.exercise.id === exercise?.id
+    (ex) => ex.exerciseId === exercise?.exerciseId
   );
 
   const handleCompleteExercise = async (
@@ -65,6 +65,7 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
         }
       )
       .then(({ data }) => {
+        toast.success("Exercício concluído com sucesso");
         setWorkoutSession({
           id: data.id,
           startedAt: data.startedAt,
@@ -76,10 +77,8 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
             weight: exercise.weight,
             restTime: exercise.restTime,
             completed: exercise.completed,
-            exercise: {
-              id: exercise.exercise.id,
-              name: exercise.exercise.name,
-            },
+            exerciseId: exercise.exerciseId,
+            name: exercise.name,
           })),
         });
       })
@@ -202,6 +201,12 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
             <h4 className="font-semibold dark:text-white">Repetições</h4>
             <p className="text-2xl font-bold text-blue-600 dark:text-blue-300">
               {exercise?.repetitions}
+            </p>
+          </div>
+          <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg text-center flex-1">
+            <h4 className="font-semibold dark:text-white">Peso</h4>
+            <p className="text-2xl font-bold text-blue-600 dark:text-blue-300">
+              {exercise?.weight}kg
             </p>
           </div>
           <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg text-center flex-1">
