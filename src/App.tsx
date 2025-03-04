@@ -51,7 +51,7 @@ function App() {
           <Route path="/community" element={<CommunityPage />} />
           <Route path="/workout/history" element={<WorkoutHistoryPage />} />
           <Route path="/muscle-group" element={<MuscleGroupsPage />} />
-          <Route path="/muscle-group/:id" element={<ExercisesPage />} />
+          <Route path="/exercises" element={<ExercisesPage />} />
           {isAdmin && (
             <Route
               path="/muscle-group/register"

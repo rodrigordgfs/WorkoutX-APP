@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useUserProfile } from "@/context/UserContext";
 import { Ellipsis } from "lucide-react";
@@ -19,6 +19,7 @@ export const MuscleGroupCard = ({
   onDelete,
 }: MuscleGroupCardProps) => {
   const { isAdmin } = useUserProfile();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleDelete = (e: React.MouseEvent) => {
@@ -27,9 +28,16 @@ export const MuscleGroupCard = ({
     onDelete(id);
   };
 
+  const handleGoToExercises = (e: React.MouseEvent) => {
+    e.preventDefault();
+    navigate(`/exercises?muscleGroupId=${id}`);
+  };
+
   return (
-    <Link
-      to={`/muscle-group/${id}`}
+    <div
+      onClick={(event: React.MouseEvent<HTMLDivElement>) =>
+        handleGoToExercises(event)
+      }
       className="group relative overflow-hidden rounded-xl shadow-lg transition-transform hover:scale-105"
     >
       <div className="aspect-square relative">
@@ -71,6 +79,6 @@ export const MuscleGroupCard = ({
           <p className="text-white/80 text-sm">{description}</p>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };

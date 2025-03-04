@@ -141,6 +141,19 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
               </Link>
             </li>
 
+            <li>
+              <Link
+                to="/exercises"
+                className="flex items-center gap-3 p-3 hover:bg-blue-50 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                onClick={onClose}
+              >
+                <Dumbbell className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <span className="text-zinc-900 dark:text-zinc-100">
+                  Exercícios
+                </span>
+              </Link>
+            </li>
+
             {isAdmin && (
               <>
                 <div className="h-px bg-zinc-200 dark:bg-zinc-700 my-4" />

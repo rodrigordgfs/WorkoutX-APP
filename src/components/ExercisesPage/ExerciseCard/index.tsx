@@ -1,4 +1,4 @@
-import { Play, Repeat, Timer, Weight } from "lucide-react";
+import { Repeat, Timer, Weight } from "lucide-react";
 
 interface ExerciseCardProps {
   image?: string;
@@ -28,12 +28,6 @@ export const ExerciseCard = ({
           className="w-full h-60 object-cover"
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-          <button className="bg-blue-600 text-white px-6 py-2 rounded-lg flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-            <Play size={20} />
-            Iniciar
-          </button>
-        </div>
       </div>
 
       <div className="p-6">
