@@ -1,55 +1,69 @@
-![Logo](https://workoutx-bucket.s3.us-east-2.amazonaws.com/app/banner.png)
-
 # WorkoutX
 
-**WorkoutX** é um aplicativo de treino desenvolvido em React para ajudar você a organizar e acompanhar seus treinos na academia. Com ele, você pode cadastrar seus treinos, definir séries, repetições, pesos e tempos de descanso, além de visualizar vídeos e instruções para cada exercício.
+![Logo](public/banner.png)
 
-## Screenshots
-
-![App Screenshot](./public/workout-screen.png)
+**WorkoutX** é um aplicativo web desenvolvido em React para auxiliar você a organizar, planejar e acompanhar seus treinos de forma eficiente. Gerencie seus exercícios, defina suas séries, repetições, cargas e tempos de descanso, além de ter acesso a vídeos e instruções detalhadas para a execução correta de cada movimento.
 
 ## Demonstração
 
-Live Demo -> [https://workout-x.vercel.app/](https://workout-x.vercel.app/)
+Experimente o WorkoutX agora mesmo: [https://workoutx.site](https://workoutx.site)
 
-## Stack utilizada
+## Screenshots
 
-**Front-end:** React, TailwindCSS, ContextAPI, React Router, Clerk Auth, Axios, React Toastify
+![App Screenshot](public/workout-screen.png)
 
-**Back-end:** Node, Fastify, Prisma
+## Tecnologias Utilizadas
 
-**Database:** PostgreSQL
+*   **Front-end:**
+    *   [React](https://react.dev/): Biblioteca JavaScript para construção de interfaces de usuário.
+    *   [Tailwind CSS](https://tailwindcss.com/): Framework CSS utilitário para estilização rápida e consistente.
+    *   [Context API](https://react.dev/learn/passing-data-deeply-with-context): Gerenciamento de estado global da aplicação.
+    *   [React Router](https://reactrouter.com/): Biblioteca para navegação entre as páginas.
+    *   [Clerk Auth](https://clerk.com/): Autenticação de usuários.
+    *   [Axios](https://axios-http.com/): Cliente HTTP para realizar requisições à API.
+    *   [React Toastify](https://react-toastify.js.org/): Biblioteca para exibição de notificações.
+    *   [Lucide React](https://lucide.dev/icons): Biblioteca de ícones.
+    *   [Chart.js](https://www.chartjs.org/): Biblioteca para criação de gráficos.
+*   **Back-end:**
+    *   Node.js
+    *   Fastify
+    *   Prisma
+*   **Banco de Dados:**
+    *   PostgreSQL
 
 ## Funcionalidades
 
-- Cadastro e gerenciamento de treinos
-- Organização dos exercícios com séries, repetições e pesos
-- Suporte a vídeos e instruções para cada exercício
-- Interface intuitiva e responsiva
-- Sincronização com a nuvem para acessar seus treinos de qualquer lugar
+*   **Cadastro e gerenciamento de treinos:** Crie e personalize seus treinos de forma simples e intuitiva.
+*   **Organização detalhada dos exercícios:** Defina séries, repetições, pesos e tempos de descanso para cada exercício.
+*   **Vídeos e instruções:** Acesse vídeos e descrições detalhadas para garantir a execução correta dos exercícios.
+*   **Interface intuitiva e responsiva:** Utilize o aplicativo em qualquer dispositivo, com uma experiência de usuário otimizada.
+*   **Sincronização na nuvem:** Acesse seus treinos de qualquer lugar, com sincronização automática na nuvem.
+*   **Geração de treinos com IA:** Crie treinos personalizados com o auxílio da inteligência artificial.
+*   **Comunidade:** Compartilhe seus treinos com outros usuários e inspire-se com os treinos da comunidade.
+*   **Dashboard:** Acompanhe seu progresso com gráficos e estatísticas.
 
 ## Melhorias
 
-- [x] Cadastro de treinos
-- [x] Detalhes do treino
-- [x] Listagem de treinos
-- [x] Perfil de usuário
-- [x] Gerar treinos com IA
-- [x] Excluir exercícios
-- [x] Compartilhamento de treinos
-- [x] Copiar treinos de outros usuários atravéz da comunidade
-- [x] Comunidade
-- [x] Dashboard com métricas dos treinos 
-- [ ] Notificações e lembretes
+*   [x] Cadastro de treinos
+*   [x] Detalhes do treino
+*   [x] Listagem de treinos
+*   [x] Perfil de usuário
+*   [x] Geração de treinos com IA
+*   [x] Exclusão de exercícios
+*   [x] Compartilhamento de treinos
+*   [x] Cópia de treinos de outros usuários através da comunidade
+*   [x] Comunidade
+*   [x] Dashboard com métricas dos treinos
+*   [ ] Notificações e lembretes
 
 ## Suporte
 
-Para suporte, mande um email para shinodalabs@gmail.com.
+Encontrou algum problema ou tem alguma sugestão? Envie um e-mail para shinodalabs@gmail.com.
 
 ## Autores
 
-- [@rodrigordgfs](https://www.github.com/rodrigordgfs)
+*   [Rodrigo Ferreira](https://www.github.com/rodrigordgfs)
 
 ## Feedback
 
-Se você tiver algum feedback, por favor nos deixe saber por meio de shinodalabs@gmail.com
+Sua opinião é muito importante para nós! Compartilhe suas sugestões e ideias através de shinodalabs@gmail.com.

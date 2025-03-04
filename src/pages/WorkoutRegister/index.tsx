@@ -9,7 +9,7 @@ import {
   Search,
 } from "lucide-react";
 import { AIWorkoutFormData, AIWorkoutModal } from "@/components/AIWorkoutModal";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useAuth, useClerk } from "@clerk/clerk-react";
 import { toast } from "react-toastify";
 import { IMuscleGroup, useWorkout } from "@/context/WorkoutContext";
@@ -192,10 +192,50 @@ export function WorkoutRegisterPage() {
     setExpandedExercises([]);
   };
 
-  const handleAIGenerate = async (formData: AIWorkoutFormData) => {
-    console.log("AI Form Data:", formData);
-    // Here you would typically call your AI API
-    setIsAIModalOpen(false);
+  const handleAIGenerate = async (form: AIWorkoutFormData) => {
+    await new Promise<void>((resolve) => {
+      (async () => {
+        try {
+          const { data } = await axios.post(
+            "/workout/ai",
+            {
+              userId: user?.id,
+              ...form,
+            },
+            {
+              baseURL: import.meta.env.VITE_API_BASE_URL,
+              headers: {
+                Authorization: `Bearer ${await getToken()}`,
+              },
+            }
+          );
+
+          console.log(data);
+          setIsAIModalOpen(false);
+          toast.success("Treino gerado com sucesso!");
+        } catch (error) {
+          if (error instanceof AxiosError) {
+            const title = error.response?.data?.message;
+            const errors: Record<string, { field: string; message: string }> =
+              error.response?.data?.errors || {};
+
+            Object.values(errors).forEach((errorMessages) => {
+              toast.error(errorMessages.message);
+            });
+
+            if (!errors) {
+              console.error(error);
+              toast.error(title || "Erro ao criar o treino com IA");
+            }
+          } else {
+            console.error(error);
+            toast.error("Erro desconhecido ao criar o treino com IA");
+          }
+        } finally {
+          resolve();
+        }
+      })();
+    });
   };
 
   // Group exercises by muscle group
@@ -574,7 +614,10 @@ export function WorkoutRegisterPage() {
       <AIWorkoutModal
         isOpen={isAIModalOpen}
         onClose={() => setIsAIModalOpen(false)}
-        onGenerate={handleAIGenerate}
+        onGenerate={async (form) => {
+          await handleAIGenerate(form);
+          fetchWorkouts();
+        }}
       />
     </div>
   );
