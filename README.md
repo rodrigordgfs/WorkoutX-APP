@@ -1,4 +1,4 @@
-![Logo](./public/banner.png)
+![Logo](https://workoutx-bucket.s3.us-east-2.amazonaws.com/app/banner.png)
 
 # WorkoutX
 
