@@ -18,8 +18,7 @@ export function ModalReportBug({ isOpen, onClose }: ModalProps) {
   const [description, setDescription] = useState("");
   const [imageUpload, setImageUpload] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [image, takeScreenshot] = useScreenshot();
+  const [, takeScreenshot] = useScreenshot();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
