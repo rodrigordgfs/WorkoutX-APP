@@ -15,12 +15,14 @@
     "axios": "^1.7.9",
     "chart.js": "^4.4.8",
     "date-fns": "^4.1.0",
+    "html2canvas": "^1.4.1",
     "lucide-react": "^0.475.0",
     "react": "^19.0.0",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.5",
-    "react-toastify": "^11.0.3"
+    "react-toastify": "^11.0.3",
+    "use-react-screenshot": "^4.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",

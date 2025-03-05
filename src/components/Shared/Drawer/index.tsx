@@ -9,8 +9,11 @@ import {
   LogOut,
   Calendar,
   LayoutDashboard,
+  Bug,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { ModalReportBug } from "../ModalReportBug";
+import { useEffect, useState } from "react";
 
 interface DrawerProps {
   isOpen: boolean;
@@ -20,6 +23,7 @@ interface DrawerProps {
 export function Drawer({ isOpen, onClose }: DrawerProps) {
   const { profile, isAdmin } = useUserProfile();
   const { signOut } = useClerk();
+  const [isModalReportBugOpen, setIsModalReportBugOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -28,6 +32,12 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
       console.error("Failed to sign out", error);
     }
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      onClose();
+    }
+  }, [isModalReportBugOpen]);
 
   return (
     <>
@@ -217,6 +227,20 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
 
             <li>
               <button
+                onClick={() => setIsModalReportBugOpen(true)}
+                className="flex items-center gap-3 p-3 hover:bg-blue-50 dark:hover:bg-zinc-800 rounded-lg transition-colors w-full text-left"
+              >
+                <Bug className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <span className="text-zinc-900 dark:text-zinc-100">
+                  Reportar Bug
+                </span>
+              </button>
+            </li>
+
+            <div className="h-px bg-zinc-200 dark:bg-zinc-700 my-4" />
+
+            <li>
+              <button
                 className="flex items-center gap-3 p-3 hover:bg-blue-50 dark:hover:bg-zinc-800 rounded-lg transition-colors w-full text-left"
                 onClick={handleLogout}
               >
@@ -227,6 +251,11 @@ export function Drawer({ isOpen, onClose }: DrawerProps) {
           </ul>
         </nav>
       </aside>
+
+      <ModalReportBug
+        isOpen={isModalReportBugOpen}
+        onClose={() => setIsModalReportBugOpen(false)}
+      />
     </>
   );
 }
