@@ -18,7 +18,7 @@ export const Filter = ({
 
   return (
     <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-4 mb-6">
-      <div className="flex gap-4">
+      <div className="flex gap-4 flex-col md:flex-row">
         <div className="relative flex-1">
           <input
             type="text"
@@ -29,17 +29,21 @@ export const Filter = ({
           />
           <Search className="absolute left-3 top-2.5 text-zinc-400" size={20} />
         </div>
+        <div className="flex gap-2 items-center">
         <Button
           onClick={() => onFilter(text || "")}
           text="Pesquisar"
           icon={Search}
+          customClass={"md:w-auto w-full"}
         />
         <Button
           onClick={() => toogleFilterOpen(!filterModalOpen)}
           text="Filtros"
           icon={FilterIcon}
           variant="secondary"
+          customClass={"md:w-auto w-full"}
         />
+        </div>
       </div>
 
       {filterModalOpen && (
