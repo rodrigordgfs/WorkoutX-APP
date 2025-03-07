@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ModalDoneExercise } from "../WorkoutDetailsPage/ModalDoneExercise";
 import { useAuth } from "@clerk/clerk-react";
+import { Button } from "../Shared/Button";
 
 interface WordkoutDetailsProps {
   exercise: IExercise | null;
@@ -66,7 +67,7 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
       )
       .then(({ data }) => {
         toast.success("Exercício concluído com sucesso");
-        
+
         setWorkoutSession({
           id: data.id,
           startedAt: data.startedAt,
@@ -145,31 +146,18 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
           Exercício: {exercise?.name}
         </h2>
         {workoutSessionInProgress() && (
-          <button
+          <Button
             onClick={() => setIsModalDoneExerciseOpen(true)}
             disabled={
               loadingCompleteExercise || workoutSessionExercise?.completed
             }
-            className={`py-2 px-4 rounded-lg text-white transition-all mb-2 md:mb-0 w-full md:w-auto ${
-              loadingCompleteExercise ||
-              (workoutSessionExercise?.completed &&
-                "cursor-not-allowed opacity-75")
-            } ${
+            variant={workoutSessionExercise?.completed ? "success" : "primary"}
+            text={
               workoutSessionExercise?.completed
-                ? "bg-green-500 hover:bg-green-600"
-                : "bg-blue-500 hover:bg-blue-600"
-            }`}
-          >
-            {workoutSessionExercise?.completed ? (
-              <div className="flex items-center justify-center gap-2">
-                Exercício Concluído
-              </div>
-            ) : (
-              <div className="flex items-center justify-center gap-2">
-                Concluir Exercício
-              </div>
-            )}
-          </button>
+                ? "Exercício Concluído"
+                : "Concluir Exercício"
+            }
+          />
         )}
       </div>
 

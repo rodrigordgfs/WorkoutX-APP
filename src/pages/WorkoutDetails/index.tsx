@@ -1,4 +1,5 @@
 import ExerciseCard from "@/components/ExerciseCard";
+import { Button } from "@/components/Shared/Button";
 import { Modal } from "@/components/Shared/Modal";
 import WorkoutDetails from "@/components/WorkoutDetails";
 import { IExerciseSession, useWorkout } from "@/context/WorkoutContext";
@@ -295,50 +296,55 @@ function WorkoutDetailsPage() {
 
           <div className="flex md:flex-row flex-col items-center gap-2">
             {workoutSessionCompleted() ? (
-              <button className="flex flex-row flex-1 md:w-auto w-full items-center justify-center gap-4 text-white bg-zinc-500 hover:bg-zinc-600 cursor-not-allowed transition-all rounded-md p-2">
-                Treino Concluído
-              </button>
+              <Button text="Treino Concluído" variant="secondary" fullWidth />
+              // <button className="flex flex-row flex-1 md:w-auto w-full items-center justify-center gap-4 text-white bg-zinc-500 hover:bg-zinc-600 cursor-not-allowed transition-all rounded-md p-2">
+              //   Treino Concluído
+              // </button>
             ) : workoutSessionInProgress() ? (
-              <button
-                onClick={handleCompleteWorkoutSession}
-                className={`flex flex-row flex-1 md:w-auto w-full items-center justify-center gap-4 text-white bg-green-500 hover:bg-green-600 transition-all rounded-md p-2 ${
-                  loadingCompleteWorkoutSession
-                    ? "cursor-not-allowed opacity-75"
-                    : ""
-                }`}
-              >
-                Concluir Treino
-              </button>
+              <Button text="Concluir Treino" onClick={handleCompleteWorkoutSession} loading={loadingCompleteWorkoutSession} fullWidth />
+              // <button
+              //   onClick={handleCompleteWorkoutSession}
+              //   className={`flex flex-row flex-1 md:w-auto w-full items-center justify-center gap-4 text-white bg-green-500 hover:bg-green-600 transition-all rounded-md p-2 ${
+              //     loadingCompleteWorkoutSession
+              //       ? "cursor-not-allowed opacity-75"
+              //       : ""
+              //   }`}
+              // >
+              //   Concluir Treino
+              // </button>
             ) : (
-              <button
-                onClick={handleStartWorkoutSession}
-                className={`flex flex-row items-center justify-center md:w-auto w-full flex-1 gap-4 text-white bg-blue-500 hover:bg-blue-600 transition-all rounded-md p-2 ${
-                  loadingStartWorkoutSession
-                    ? "cursor-not-allowed opacity-75"
-                    : ""
-                }`}
-              >
-                Iniciar Treino
-              </button>
+              <Button text="Iniciar Treino" onClick={handleStartWorkoutSession} loading={loadingStartWorkoutSession} fullWidth />
+              // <button
+              //   onClick={handleStartWorkoutSession}
+              //   className={`flex flex-row items-center justify-center md:w-auto w-full flex-1 gap-4 text-white bg-blue-500 hover:bg-blue-600 transition-all rounded-md p-2 ${
+              //     loadingStartWorkoutSession
+              //       ? "cursor-not-allowed opacity-75"
+              //       : ""
+              //   }`}
+              // >
+              //   Iniciar Treino
+              // </button>
             )}
             {workoutSessionInProgress() ? (
-              <button
-                onClick={handleStopWorkoutSession}
-                className={`flex flex-1 flex-row items-center  md:w-auto w-full justify-center gap-4 text-white bg-red-500 hover:bg-red-600 transition-all p-2 rounded-lg ${
-                  loadingStopWorkoutSession
-                    ? "cursor-not-allowed opacity-75"
-                    : ""
-                }`}
-              >
-                Parar Treino
-              </button>
+              <Button text="Parar Treino" variant="danger" onClick={handleStopWorkoutSession} loading={loadingStopWorkoutSession} fullWidth />
+              // <button
+              //   onClick={handleStopWorkoutSession}
+              //   className={`flex flex-1 flex-row items-center  md:w-auto w-full justify-center gap-4 text-white bg-red-500 hover:bg-red-600 transition-all p-2 rounded-lg ${
+              //     loadingStopWorkoutSession
+              //       ? "cursor-not-allowed opacity-75"
+              //       : ""
+              //   }`}
+              // >
+              //   Parar Treino
+              // </button>
             ) : (
-              <button
-                onClick={() => setIsModalDeleteWorkoutOpen(true)}
-                className={`flex flex-1 flex-row items-center  md:w-auto w-full justify-center gap-4 text-white bg-red-500 hover:bg-red-600 transition-all p-2 rounded-lg`}
-              >
-                Excluir Treino
-              </button>
+              <Button text="Excluir Treino" variant="danger" onClick={() => setIsModalDeleteWorkoutOpen(true)} fullWidth />
+              // <button
+              //   onClick={() => setIsModalDeleteWorkoutOpen(true)}
+              //   className={`flex flex-1 flex-row items-center  md:w-auto w-full justify-center gap-4 text-white bg-red-500 hover:bg-red-600 transition-all p-2 rounded-lg`}
+              // >
+              //   Excluir Treino
+              // </button>
             )}
           </div>
         </div>

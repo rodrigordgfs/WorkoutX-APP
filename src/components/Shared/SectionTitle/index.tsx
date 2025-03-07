@@ -1,5 +1,6 @@
 import { LucideIcon } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { Button } from "../Button";
 
 interface TitleProps {
   icon: LucideIcon;
@@ -16,6 +17,7 @@ export const SectionTitle = ({
   textGoTo,
   goTo,
 }: TitleProps) => {
+  const navigate = useNavigate();
   return (
     <div className="flex justify-between items-center mb-6">
       <div className="flex items-center gap-3 mb-6">
@@ -25,13 +27,14 @@ export const SectionTitle = ({
         <h2 className="text-2xl font-bold">{title}</h2>
       </div>
       {goTo && (
-        <Link
-          to={goTo}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          {IconGoTo && <IconGoTo size={20} />}
-          {textGoTo}
-        </Link>
+        <Button
+          text={textGoTo ?? ""}
+          icon={IconGoTo}
+          onClick={() => {
+            navigate(goTo);
+          }}
+          variant="primary"
+        />
       )}
     </div>
   );

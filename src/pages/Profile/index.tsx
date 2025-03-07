@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { User, Save, LoaderIcon } from "lucide-react";
+import { User, Save } from "lucide-react";
 import { UserProfile, useUserProfile } from "@/context/UserContext";
 import { SectionTitle } from "@/components/Shared/SectionTitle";
+import { Button } from "@/components/Shared/Button";
 
 export type FitnessGoal =
   | "WEIGHT_LOSS"
@@ -219,22 +220,7 @@ export function ProfilePage() {
           </div>
         </div>
 
-        <button
-          type="submit"
-          className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-        >
-          {savingProfile ? (
-            <div className="flex items-center gap-2">
-              <LoaderIcon size={20} className="animate-spin mr-2" />
-              Salvando
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Save size={20} />
-              Salvar Alterações
-            </div>
-          )}
-        </button>
+        <Button type="submit" text="Salvar Alterações" icon={Save} loading={savingProfile} />
       </form>
     </div>
   );
