@@ -23,7 +23,7 @@ export const Button = ({
   disabled,
   customClass = "", // Define um valor padrão para customClass
 }: ButtonProps) => {
-  const baseClasses = "px-6 py-3 rounded-md transition-all flex items-center gap-2 justify-center";
+  const baseClasses = "px-6 py-2 rounded-md transition-all flex items-center gap-2 justify-center";
   const primaryClasses = "bg-blue-600 text-white hover:bg-blue-700";
   const secondaryClasses = "bg-zinc-600 text-white hover:bg-zinc-700";
   const dangerClasses = "bg-red-600 text-white hover:bg-red-700";
