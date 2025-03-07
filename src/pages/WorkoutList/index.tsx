@@ -18,14 +18,6 @@ export function WorkoutsListPage() {
     );
   };
 
-  if (loadingWorkouts) {
-    return <WorkoutLoading />;
-  }
-
-  if (isWorkoutsEmpty()) {
-    return <WorkoutEmpty />;
-  }
-
   return (
     <div className="max-w-4xl mx-auto">
       <SectionTitle
@@ -35,6 +27,10 @@ export function WorkoutsListPage() {
         iconGoTo={Plus}
         textGoTo="Novo Treino"
       />
+
+      {loadingWorkouts && <WorkoutLoading />}
+
+      {isWorkoutsEmpty() && <WorkoutEmpty />}
 
       <div className="grid gap-4">
         {workouts.map((wk) => {
