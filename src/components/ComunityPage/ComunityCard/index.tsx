@@ -1,6 +1,7 @@
+import { Button } from "@/components/Shared/Button";
 import { IWorkout } from "@/context/WorkoutContext";
 import { useClerk } from "@clerk/clerk-react";
-import { Dumbbell, Heart, Repeat, Share2, Timer, Weight } from "lucide-react";
+import { Copy, Dumbbell, Heart, Repeat, Share2, Timer, Weight } from "lucide-react";
 
 interface ComunityCardProps {
   workout: IWorkout;
@@ -116,12 +117,12 @@ export const ComunityCard = ({
       </div>
 
       <div className="p-4 bg-zinc-50 dark:bg-zinc-800 border-t border-zinc-100">
-        <button
+        <Button
           onClick={() => handleOpenModal(workout.id)}
-          className="block w-full py-2 px-4 bg-blue-600 text-white text-center rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Copiar Treino
-        </button>
+          text="Copiar Treino"
+          icon={Copy}
+          fullWidth
+        />
       </div>
     </div>
   );

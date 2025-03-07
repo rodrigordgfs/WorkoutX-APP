@@ -1,10 +1,11 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { PlusIcon, LoaderIcon, ImageIcon } from "lucide-react";
+import { PlusIcon, ImageIcon } from "lucide-react";
 import { SectionTitle } from "@/components/Shared/SectionTitle";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "@clerk/clerk-react";
 import { IMuscleGroup } from "@/context/WorkoutContext";
+import { Button } from "@/components/Shared/Button";
 
 export const ExerciseRegisterPage = () => {
   const { getToken } = useAuth();
@@ -258,19 +259,14 @@ export const ExerciseRegisterPage = () => {
             </label>
           </div>
         </div>
-        <button
+
+        <Button
+          text="Cadastrar Exercício"
+          icon={PlusIcon}
+          loading={loading}
           type="submit"
-          className={`flex items-center gap-2 px-4 py-2 bg-blue-500 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-800 transition-colors ${
-            loading && "opacity-75"
-          }`}
-          disabled={loading}
-        >
-          {loading ? (
-            <LoaderIcon size={20} className="animate-spin" />
-          ) : (
-            "Salvar Exercício"
-          )}
-        </button>
+          fullWidth
+        />
       </form>
     </div>
   );

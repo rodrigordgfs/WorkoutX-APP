@@ -1,9 +1,10 @@
 import { FormEvent, useState } from "react";
-import { PlusIcon, LoaderIcon, ImageIcon } from "lucide-react";
+import { PlusIcon, ImageIcon } from "lucide-react";
 import { SectionTitle } from "@/components/Shared/SectionTitle";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "@clerk/clerk-react";
+import { Button } from "@/components/Shared/Button";
 
 export const MuscleGroupRegisterPage = () => {
   const { getToken } = useAuth();
@@ -130,22 +131,13 @@ export const MuscleGroupRegisterPage = () => {
           </div>
         </div>
 
-        <button
+        <Button
+          loading={loading}
+          text="Cadastrar Grupo Muscular"
           type="submit"
-          className={`flex items-center gap-2 px-4 py-2 bg-blue-500 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-800 transition-colors ${
-            loading && "opacity-75"
-          }`}
-          disabled={loading}
-        >
-          {loading ? (
-            <div className="flex items-center gap-2">
-              <LoaderIcon size={20} className="animate-spin mr-2" />
-              Salvando
-            </div>
-          ) : (
-            "Salvar Grupo Muscular"
-          )}
-        </button>
+          icon={PlusIcon}
+          fullWidth
+        />
       </form>
     </div>
   );

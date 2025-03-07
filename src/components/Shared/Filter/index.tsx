@@ -1,5 +1,6 @@
 import { FilterIcon, Search } from "lucide-react";
 import { ReactNode, useState } from "react";
+import { Button } from "../Button";
 interface FilterHistoryProps {
   filterModalOpen: boolean;
   children: ReactNode;
@@ -28,20 +29,17 @@ export const Filter = ({
           />
           <Search className="absolute left-3 top-2.5 text-zinc-400" size={20} />
         </div>
-        <button
+        <Button
           onClick={() => onFilter(text || "")}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center gap-2"
-        >
-          <Search size={20} />
-          Pesquisar
-        </button>
-        <button
+          text="Pesquisar"
+          icon={Search}
+        />
+        <Button
           onClick={() => toogleFilterOpen(!filterModalOpen)}
-          className="px-4 py-2 bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-200 rounded-lg hover:bg-zinc-200 flex items-center gap-2"
-        >
-          <FilterIcon size={20} />
-          Filtros
-        </button>
+          text="Filtros"
+          icon={FilterIcon}
+          variant="secondary"
+        />
       </div>
 
       {filterModalOpen && (

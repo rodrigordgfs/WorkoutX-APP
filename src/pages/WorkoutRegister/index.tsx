@@ -7,12 +7,14 @@ import {
   ChevronUp,
   Dumbbell,
   Search,
+  Save,
 } from "lucide-react";
 import { AIWorkoutFormData, AIWorkoutModal } from "@/components/AIWorkoutModal";
 import axios, { AxiosError } from "axios";
 import { useAuth, useClerk } from "@clerk/clerk-react";
 import { toast } from "react-toastify";
 import { IMuscleGroup, useWorkout } from "@/context/WorkoutContext";
+import { Button } from "@/components/Shared/Button";
 
 export type Visibility = "PUBLIC" | "PRIVATE";
 
@@ -266,13 +268,12 @@ export function WorkoutRegisterPage() {
           </div>
           <h2 className="text-2xl font-bold">Cadastro de Treino</h2>
         </div>
-        <button
+        <Button
+          customClass="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
           onClick={() => setIsAIModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-colors shadow-md"
-        >
-          <Sparkles size={20} />
-          Gerar com IA
-        </button>
+          icon={Sparkles}
+          text="Gerar com IA"
+        />
       </div>
 
       {loading ? (
@@ -597,15 +598,14 @@ export function WorkoutRegisterPage() {
                 )}
               </div>
 
-              <button
+              <Button
                 type="submit"
                 disabled={selectedExercises.length === 0 || savingWorkout}
-                className={`w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                  savingWorkout ? "cursor-wait opacity-75" : ""
-                }`}
-              >
-                Salvar Treino
-              </button>
+                loading={savingWorkout}
+                icon={Save}
+                text="Salvar Treino"
+                fullWidth
+              />
             </div>
           </div>
         </form>

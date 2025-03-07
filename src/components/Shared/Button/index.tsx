@@ -9,6 +9,7 @@ interface ButtonProps {
   onClick?: () => void;
   fullWidth?: boolean;
   disabled?: boolean;
+  customClass?: string; // Adiciona a propriedade customClass
 }
 
 export const Button = ({
@@ -20,6 +21,7 @@ export const Button = ({
   variant = "primary",
   fullWidth = false,
   disabled,
+  customClass = "", // Define um valor padrão para customClass
 }: ButtonProps) => {
   const baseClasses = "px-6 py-3 rounded-md transition-all flex items-center gap-2";
   const primaryClasses = "bg-blue-600 text-white hover:bg-blue-700";
@@ -43,7 +45,7 @@ export const Button = ({
       type={type}
       disabled={loading || disabled}
       onClick={onClick}
-      className={`${baseClasses} ${variantClasses} ${widthClass} ${
+      className={`${baseClasses} ${variantClasses} ${widthClass} ${customClass} ${
         loading || disabled ? "opacity-50 cursor-not-allowed" : ""
       }`}
     >

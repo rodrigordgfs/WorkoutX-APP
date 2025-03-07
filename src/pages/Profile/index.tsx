@@ -220,7 +220,7 @@ export function ProfilePage() {
           </div>
         </div>
 
-        <Button type="submit" text="Salvar Alterações" icon={Save} loading={savingProfile} />
+        <Button type="submit" fullWidth text="Salvar Alterações" icon={Save} loading={savingProfile} />
       </form>
     </div>
   );
