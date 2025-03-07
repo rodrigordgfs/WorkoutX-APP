@@ -7,6 +7,7 @@ import { SectionTitle } from "@/components/Shared/SectionTitle";
 import { useAuth } from "@clerk/clerk-react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import MuscleGroupEmpty from "@/components/MuscleGroupPage/MuscleGroupEmpty";
 
 export function MuscleGroupsPage() {
   const { getToken } = useAuth();
@@ -37,12 +38,18 @@ export function MuscleGroupsPage() {
     <div className="max-w-7xl mx-auto px-4 py-6">
       <SectionTitle icon={Dumbbell} title="Grupos Musculares" />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {loadingMuscleGroups
-          ? Array(4)
-              .fill(0)
-              .map((_, i) => <Loading key={i} />)
-          : muscleGroups.map((group) => (
+      {loadingMuscleGroups ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {Array(4)
+            .fill(0)
+            .map((_, i) => (
+              <Loading key={i} />
+            ))}
+        </div>
+      ) : muscleGroups.length > 0 ? (
+        <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {muscleGroups.map((group) => (
               <MuscleGroupCard
                 key={group.id}
                 id={group.id}
@@ -52,7 +59,11 @@ export function MuscleGroupsPage() {
                 onDelete={handleDeleteMuscleGroup}
               />
             ))}
-      </div>
+          </div>
+        </div>
+      ) : (
+        <MuscleGroupEmpty />
+      )}
     </div>
   );
 }

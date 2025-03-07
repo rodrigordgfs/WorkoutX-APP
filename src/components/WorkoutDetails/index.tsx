@@ -66,6 +66,7 @@ const WorkoutDetails = ({ exercise }: WordkoutDetailsProps) => {
       )
       .then(({ data }) => {
         toast.success("Exercício concluído com sucesso");
+        
         setWorkoutSession({
           id: data.id,
           startedAt: data.startedAt,

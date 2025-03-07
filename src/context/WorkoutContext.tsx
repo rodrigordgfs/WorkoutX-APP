@@ -174,42 +174,40 @@ export const WorkoutProvider: FC<WorkoutProviderProps> = ({ children }) => {
   const [muscleGroups, setMuscleGroups] = useState<IMuscleGroup[]>([]);
   const [loadingMuscleGroups, setLoadingMuscleGroups] = useState(false);
 
-  const getUncompletedExercisesWithDetails = () => {
+  const getUncompletedExercisesWithDetails = (): IExercise[] | undefined => {
     return workoutSession?.exercises
       .filter((exerciseSession) => !exerciseSession.completed)
       .map((exerciseSession) => {
-        const workout = workouts.find((workout) =>
-          workout.exercises.some(
+        const exercise = workouts
+          .flatMap((workout) => workout.exercises)
+          .find(
             (exercise) => exercise.exerciseId === exerciseSession.exerciseId
-          )
-        );
+          );
 
-        const exercise = workout?.exercises.find(
-          (exercise) => exercise.exerciseId === exerciseSession.exerciseId
-        );
-
-        return exercise;
-      })
-      .filter((exercise) => exercise !== undefined);
+        return {
+          ...exerciseSession,
+          ...exercise,
+          muscleGroup: exercise?.muscleGroup,
+        } as IExercise;
+      });
   };
 
-  const getCompletedExercisesWithDetails = () => {
+  const getCompletedExercisesWithDetails = (): IExercise[] | undefined => {
     return workoutSession?.exercises
       .filter((exerciseSession) => exerciseSession.completed)
       .map((exerciseSession) => {
-        const workout = workouts.find((workout) =>
-          workout.exercises.some(
+        const exercise = workouts
+          .flatMap((workout) => workout.exercises)
+          .find(
             (exercise) => exercise.exerciseId === exerciseSession.exerciseId
-          )
-        );
+          );
 
-        const exercise = workout?.exercises.find(
-          (exercise) => exercise.exerciseId === exerciseSession.exerciseId
-        );
-
-        return exercise;
-      })
-      .filter((exercise) => exercise !== undefined);
+        return {
+          ...exerciseSession,
+          ...exercise,
+          muscleGroup: exercise?.muscleGroup,
+        } as IExercise;
+      });
   };
 
   const workoutSessionInProgress = () => {
