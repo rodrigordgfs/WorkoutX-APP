@@ -1,4 +1,4 @@
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { PlusIcon } from "lucide-react";
 import { SectionTitle } from "@/components/Shared/SectionTitle";
 import axios from "axios";
@@ -7,195 +7,178 @@ import { useAuth } from "@clerk/clerk-react";
 import { IMuscleGroup } from "@/context/WorkoutContext";
 import { Button } from "@/components/Shared/Button";
 import { Input } from "@/components/Shared/Input";
-import { Select } from "@/components/Shared/Select/inde";
 import { TextArea } from "@/components/Shared/TextArea";
 import { ImageSelector } from "@/components/Shared/ImageSelector";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Select } from "@/components/Shared/Select";
+
+const schema = z.object({
+  name: z.string().min(1, "Nome é obrigatório"),
+  muscleGroupId: z.string().min(1, "Grupo Muscular é obrigatório"),
+  series: z.preprocess(
+    (val) => String(val),
+    z.string().min(1, "Séries é obrigatório")
+  ),
+  repetitions: z.preprocess(
+    (val) => String(val),
+    z.string().min(1, "Repetições é obrigatório")
+  ),
+  weight: z.preprocess(
+    (val) => String(val),
+    z.string().min(1, "Peso é obrigatório")
+  ),
+  restTime: z.preprocess(
+    (val) => String(val),
+    z.string().min(1, "Tempo de Descanso é obrigatório")
+  ),
+  videoUrl: z.string().url("Link do Vídeo deve ser uma URL válida"),
+  instructions: z.string().min(1, "Instruções são obrigatórias"),
+  image: z.string().min(1, "A imagem é obrigatória"),
+});
+
+type FormData = z.infer<typeof schema>;
 
 export const ExerciseRegisterPage = () => {
   const { getToken } = useAuth();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    watch,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  });
 
-  const [name, setName] = useState("");
-  const [muscleGroup, setMuscleGroup] = useState<IMuscleGroup>();
-  const [muscleGroups, setMuscleGroups] = useState<IMuscleGroup[] | []>([]);
-  const [series, setSeries] = useState("4");
-  const [repetitions, setRepetitions] = useState("12");
-  const [weight, setWeight] = useState("10");
-  const [restTime, setRestTime] = useState("60");
-  const [instructions, setInstructions] = useState("");
-  const [videoLink, setVideoLink] = useState("");
-  const [image, setImage] = useState<string | null>(null);
+  const [muscleGroups, setMuscleGroups] = useState<IMuscleGroup[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchMuscleGroups = useCallback(async () => {
-    axios
-      .get("/muscle-group", {
+    try {
+      const { data } = await axios.get("/muscle-group", {
         baseURL: import.meta.env.VITE_API_BASE_URL,
         headers: {
           Authorization: `Bearer ${await getToken()}`,
         },
-      })
-      .then(({ data }) => {
-        setMuscleGroups(data);
-      })
-      .catch(() => {
-        toast.error("Falha ao carregar grupos musculares!");
       });
+      setMuscleGroups(data);
+    } catch {
+      toast.error("Falha ao carregar grupos musculares!");
+    }
   }, [getToken]);
 
   useEffect(() => {
     fetchMuscleGroups();
   }, [fetchMuscleGroups]);
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const onSubmit: SubmitHandler<FormData> = async (data) => {
     setLoading(true);
-
-    console.log(muscleGroup);
-
-    axios
-      .post(
+    try {
+      await axios.post(
         "/exercise",
         {
-          name,
-          muscleGroupId: muscleGroup?.id,
-          series,
-          repetitions,
-          weight,
-          restTime,
-          instructions,
-          videoUrl: videoLink,
-          image,
+          ...data,
+          videoUrl: data.videoUrl,
         },
         {
           baseURL: import.meta.env.VITE_API_BASE_URL,
           headers: {
             Authorization: `Bearer ${await getToken()}`,
-            contentType: "application/json",
+            "Content-Type": "application/json",
           },
         }
-      )
-      .then(() => {
-        clearFields();
-        toast.success("Exercício cadastrado com sucesso!");
-      })
-      .catch(() => {
-        toast.error("Falha ao cadastrar exercício!");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      );
+      reset();
+      toast.success("Exercício cadastrado com sucesso!");
+    } catch {
+      toast.error("Falha ao cadastrar exercício!");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const clearFields = () => {
-    setName("");
-    setMuscleGroup(undefined);
-    setSeries("4");
-    setRepetitions("12");
-    setWeight("10");
-    setRestTime("60");
-    setInstructions("");
-    setVideoLink("");
-    setImage(null);
-  };
+  useEffect(() => {
+    console.log(errors);
+  }, [errors]);
 
   return (
     <div className="max-w-4xl mx-auto">
       <SectionTitle title="Cadastrar Exercício" icon={PlusIcon} />
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="bg-white dark:bg-zinc-800 rounded-lg p-6 shadow-lg flex flex-col md:flex-row gap-10">
           <div className="flex flex-1 flex-col space-y-4">
             <Input
-              name="Nome"
+              title="Nome"
               placeholder="Ex: Supino Reto"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
               disabled={loading}
+              error={errors.name?.message}
+              {...register("name")}
             />
             <Select
-              name="Grupo Muscular"
-              value={muscleGroup?.id || ""}
-              onChange={(e) =>
-                setMuscleGroup(
-                  muscleGroups.find((group) => group.id === e.target.value)
-                )
-              }
-              options={muscleGroups}
+              title="Grupo Muscular"
+              options={muscleGroups.map((mg) => ({ id: mg.id, name: mg.name }))}
               disabled={loading}
-              required
+              error={errors.muscleGroupId?.message}
+              {...register("muscleGroupId")}
             />
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex flex-1">
-                <Input
-                  name="Séries"
-                  placeholder="4"
-                  type="number"
-                  value={series}
-                  onChange={(e) => setSeries(e.target.value)}
-                  disabled={loading}
-                  required
-                />
-              </div>
-              <div className="flex flex-1">
-                <Input
-                  name="Repetições"
-                  placeholder="12"
-                  type="number"
-                  value={repetitions}
-                  onChange={(e) => setRepetitions(e.target.value)}
-                  disabled={loading}
-                  required
-                />
-              </div>
+            <div className="flex gap-4">
+              <Input
+                title="Séries"
+                type="number"
+                disabled={loading}
+                error={errors.series?.message}
+                {...register("series")}
+              />
+              <Input
+                title="Repetições"
+                type="number"
+                disabled={loading}
+                error={errors.repetitions?.message}
+                {...register("repetitions")}
+              />
             </div>
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex flex-1">
-                <Input
-                  name="Peso"
-                  placeholder="10"
-                  type="number"
-                  value={weight}
-                  onChange={(e) => setWeight(e.target.value)}
-                  disabled={loading}
-                  required
-                />
-              </div>
-              <div className="flex flex-1">
-                <Input
-                  name="Tempo de Descanço"
-                  placeholder="60"
-                  type="number"
-                  value={restTime}
-                  onChange={(e) => setRestTime(e.target.value)}
-                  disabled={loading}
-                  required
-                />
-              </div>
+            <div className="flex gap-4">
+              <Input
+                title="Peso"
+                type="number"
+                disabled={loading}
+                error={errors.weight?.message}
+                {...register("weight")}
+              />
+              <Input
+                title="Tempo de Descanso"
+                type="number"
+                disabled={loading}
+                error={errors.restTime?.message}
+                {...register("restTime")}
+              />
             </div>
             <Input
-              name="Link do Video"
+              title="Link do Vídeo"
               placeholder="Ex: https://www.youtube.com/watch?v=video"
-              value={videoLink}
-              onChange={(e) => setVideoLink(e.target.value)}
               disabled={loading}
-              required
+              error={errors.videoUrl?.message}
+              {...register("videoUrl")}
             />
             <TextArea
-              name="Instruções"
-              value={instructions}
-              onChange={(e) => setInstructions(e.target.value)}
-              required
+              title="Instruções"
               rows={4}
-              placeholder="Ex: Músculos do peitoral maior e menor"
+              placeholder="Descreva as instruções"
               disabled={loading}
+              error={errors.instructions?.message}
+              {...register("instructions")}
             />
           </div>
           <ImageSelector
-            name="Selecione a imagem"
-            image={image || null}
-            onImageChange={(image) => {
-              setImage(image);
-            }}
+            title="Selecione a imagem"
+            image={watch("image")}
+            onChange={(image) =>
+              setValue("image", image || "", { shouldValidate: true })
+            }
+            error={errors.image?.message}
           />
         </div>
         <Button

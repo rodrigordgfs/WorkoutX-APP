@@ -2,24 +2,26 @@ import { ImageIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface ImageSelectorProps {
-  name: string;
+  title: string;
   image?: string | null;
   accept?: string;
-  onImageChange: (image: string) => void;
+  error?: string;
+  onChange: (image: string | null) => void;
 }
 
 export const ImageSelector = ({
-  name,
-  onImageChange,
+  title,
+  onChange,
   image,
   accept = "image/png, image/jpeg, image/webp",
+  error,
 }: ImageSelectorProps) => {
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    image || null
+  );
 
   useEffect(() => {
-    if (!image) {
-      setImagePreview(null);
-    }
+    setImagePreview(image || null);
   }, [image]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,14 +31,14 @@ export const ImageSelector = ({
     const reader = new FileReader();
     reader.onloadend = () => {
       setImagePreview(URL.createObjectURL(file));
-      onImageChange(reader.result as string);
+      onChange(reader.result as string);
     };
     reader.readAsDataURL(file);
   };
 
   return (
     <div className="flex flex-col">
-      <span className="text-zinc-700 dark:text-zinc-200 mb-2">{name}</span>
+      <span className="text-zinc-700 dark:text-zinc-200 mb-2">{title}</span>
       <label className="relative cursor-pointer">
         <input
           type="file"
@@ -44,7 +46,11 @@ export const ImageSelector = ({
           onChange={handleImageChange}
           className="hidden"
         />
-        <div className="w-full md:w-48 h-48 bg-zinc-200 dark:bg-zinc-700 rounded-lg flex items-center justify-center overflow-hidden shadow-md">
+        <div
+          className={`w-full md:w-48 h-48 bg-zinc-200 dark:bg-zinc-700 rounded-lg flex items-center justify-center overflow-hidden shadow-md border border-dashed ${
+            error ? "border-red-500" : "border-zinc-400 dark:border-zinc-600"
+          }`}
+        >
           {imagePreview ? (
             <img
               src={imagePreview}
@@ -56,6 +62,11 @@ export const ImageSelector = ({
           )}
         </div>
       </label>
+      {error && (
+        <span className="text-red-500 dark:text-red-400 text-sm mt-1">
+          {error}
+        </span>
+      )}
     </div>
   );
 };
