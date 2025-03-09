@@ -192,7 +192,7 @@ export const ExerciseRegisterPage = () => {
           </div>
           <ImageSelector
             name="Selecione a imagem"
-            image={image || ""}
+            image={image || null}
             onImageChange={(image) => {
               setImage(image);
             }}

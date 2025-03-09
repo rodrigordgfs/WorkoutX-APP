@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 interface ImageSelectorProps {
   name: string;
-  image?: string;
+  image?: string | null;
   accept?: string;
   onImageChange: (image: string) => void;
 }
