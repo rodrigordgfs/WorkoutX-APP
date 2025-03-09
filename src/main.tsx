@@ -18,7 +18,7 @@ if (!PUBLISHABLE_KEY) {
 }
 
 Sentry.init({
-  dsn: "",
+  dsn: import.meta.env.VITE_DNS_SENTRY,
   integrations: [
     Sentry.browserTracingIntegration(),
     Sentry.replayIntegration(),
