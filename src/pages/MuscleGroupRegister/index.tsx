@@ -1,40 +1,48 @@
-import { FormEvent, useState } from "react";
-import { PlusIcon, ImageIcon } from "lucide-react";
+import { useState } from "react";
+import { PlusIcon } from "lucide-react";
 import { SectionTitle } from "@/components/Shared/SectionTitle";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "@clerk/clerk-react";
 import { Button } from "@/components/Shared/Button";
+import { Input } from "@/components/Shared/Input";
+import { TextArea } from "@/components/Shared/TextArea";
+import { ImageSelector } from "@/components/Shared/ImageSelector";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const schema = z.object({
+  name: z.string().min(1, "Nome é obrigatório"),
+  description: z.string().min(1, "Descrição é obrigatória"),
+  image: z.string().min(1, "A imagem é obrigatória"),
+});
+
+type FormData = z.infer<typeof schema>;
 
 export const MuscleGroupRegisterPage = () => {
   const { getToken } = useAuth();
 
-  const [name, setName] = useState("");
-  const [image, setImage] = useState<string | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [description, setDescription] = useState("");
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    watch,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  });
+
   const [loading, setLoading] = useState(false);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImage(reader.result as string);
-      setImagePreview(URL.createObjectURL(file)); // Pré-visualização
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const onSubmit: SubmitHandler<FormData> = async (data) => {
     setLoading(true);
 
     axios
       .post(
         "/muscle-group",
-        { name, image, description },
+        { ...data },
         {
           baseURL: import.meta.env.VITE_API_BASE_URL,
           headers: {
@@ -44,7 +52,7 @@ export const MuscleGroupRegisterPage = () => {
         }
       )
       .then(() => {
-        clearFields();
+        reset();
         toast.success("Grupo muscular cadastrado com sucesso!");
       })
       .catch((error) => {
@@ -56,79 +64,39 @@ export const MuscleGroupRegisterPage = () => {
       });
   };
 
-  const clearFields = () => {
-    setName("");
-    setImage(null);
-    setImagePreview(null);
-    setDescription("");
-  };
-
   return (
     <div className="max-w-4xl mx-auto">
       <SectionTitle title="Cadastrar Grupo Muscular" icon={PlusIcon} />
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="bg-white dark:bg-zinc-800 rounded-lg p-6 shadow-lg flex flex-col md:flex-row gap-10">
-          {/* Campos de Nome e Descrição */}
           <div className="flex flex-1 flex-col space-y-4">
-            <label className="block">
-              <span className="text-zinc-700 dark:text-zinc-200">Nome</span>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="mt-1 px-4 py-2 bg-zinc-100 dark:bg-zinc-900 block w-full rounded-md border-zinc-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                placeholder="Ex: Peito"
-                required
-                disabled={loading}
-              />
-            </label>
+            <Input
+              title="Nome"
+              placeholder="Ex: Peito"
+              disabled={loading}
+              error={errors.name?.message}
+              {...register("name")}
+            />
 
-            <label className="block">
-              <span className="text-zinc-700 dark:text-zinc-200">
-                Descrição
-              </span>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="mt-1 px-4 py-2 bg-zinc-100 dark:bg-zinc-900 block w-full rounded-md border-zinc-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                rows={4}
-                placeholder="Ex: Músculos do peitoral maior e menor"
-                required
-                disabled={loading}
-              />
-            </label>
+            <TextArea
+              title="Descrição"
+              placeholder="Ex: Músculos do peitoral maior e menor"
+              disabled={loading}
+              rows={4}
+              error={errors.description?.message}
+              {...register("description")}
+            />
           </div>
 
-          {/* Upload de Imagem */}
-          <div className="flex flex-col justify-center">
-            <span className="text-zinc-700 dark:text-zinc-200 mb-2">
-              Selecione a imagem
-            </span>
-
-            <label className="relative cursor-pointer">
-              <input
-                type="file"
-                accept="image/png, image/jpeg"
-                onChange={handleImageChange}
-                className="hidden"
-              />
-              <div className="w-48 h-48 bg-zinc-200 dark:bg-zinc-700 rounded-lg flex items-center justify-center overflow-hidden shadow-md">
-                {imagePreview ? (
-                  <img
-                    src={imagePreview}
-                    alt="Pré-visualização"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <ImageIcon
-                    size={48}
-                    className="text-zinc-500 dark:text-zinc-300"
-                  />
-                )}
-              </div>
-            </label>
-          </div>
+          <ImageSelector
+            image={watch("image")}
+            onChange={(image) =>
+              setValue("image", image || "", { shouldValidate: true })
+            }
+            title="Selecione a imagem"
+            error={errors.image?.message}
+          />
         </div>
 
         <Button

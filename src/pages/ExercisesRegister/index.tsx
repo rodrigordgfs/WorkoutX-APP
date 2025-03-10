@@ -107,6 +107,7 @@ export const ExerciseRegisterPage = () => {
   return (
     <div className="max-w-4xl mx-auto">
       <SectionTitle title="Cadastrar Exercício" icon={PlusIcon} />
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="bg-white dark:bg-zinc-800 rounded-lg p-6 shadow-lg flex flex-col md:flex-row gap-10">
           <div className="flex flex-1 flex-col space-y-4">
