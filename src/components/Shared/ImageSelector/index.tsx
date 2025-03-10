@@ -48,7 +48,7 @@ export const ImageSelector = ({
         />
         <div
           className={`w-full md:w-48 h-48 bg-zinc-200 dark:bg-zinc-700 rounded-lg flex items-center justify-center overflow-hidden shadow-md border border-dashed ${
-            error ? "border-red-500" : "border-zinc-400 dark:border-zinc-600"
+            error ? "border-red-500 ring ring-red-500" : "border-zinc-400 dark:border-zinc-600"
           }`}
         >
           {imagePreview ? (
