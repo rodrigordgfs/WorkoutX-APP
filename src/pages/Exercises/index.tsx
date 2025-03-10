@@ -62,7 +62,9 @@ export function ExercisesPage() {
     async (params: { name?: string; muscleGroup?: string }) => {
       setLoading(true);
 
-      const queryParams: Record<string, string | boolean> = { muscleGroup: true };
+      const queryParams: Record<string, string | boolean> = {
+        muscleGroup: true,
+      };
       if (muscleGroupId) queryParams.muscleGroupId = muscleGroupId;
       if (params.muscleGroup) queryParams.muscleGroupId = params.muscleGroup;
       if (params.name) queryParams.name = params.name;
@@ -121,10 +123,8 @@ export function ExercisesPage() {
             <LoadingPage key={index} />
           ))}
         </div>
-      ) : exercises.length === 0 ? (
-        <ExercisesEmpty />
       ) : (
-        <div className="flex flex-col">
+        <>
           <Filter
             filterModalOpen={filterModalOpen}
             onFilter={(text: string) => {
@@ -152,22 +152,27 @@ export function ExercisesPage() {
               </select>
             </div>
           </Filter>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {exercises.map((exercise) => (
-              <ExerciseCard
-                key={exercise.id}
-                name={exercise.name}
-                repetitions={exercise.repetitions}
-                restTime={exercise.restTime}
-                series={exercise.series}
-                weight={exercise.weight}
-                image={exercise.imageUrl}
-                instruction={exercise.instructions}
-              />
-            ))}
-          </div>
-        </div>
+          {exercises.length === 0 ? (
+            <ExercisesEmpty />
+          ) : (
+            <div className="flex flex-col">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {exercises.map((exercise) => (
+                  <ExerciseCard
+                    key={exercise.id}
+                    name={exercise.name}
+                    repetitions={exercise.repetitions}
+                    restTime={exercise.restTime}
+                    series={exercise.series}
+                    weight={exercise.weight}
+                    image={exercise.imageUrl}
+                    instruction={exercise.instructions}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
