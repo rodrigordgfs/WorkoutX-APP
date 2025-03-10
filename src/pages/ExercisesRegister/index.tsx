@@ -124,7 +124,7 @@ export const ExerciseRegisterPage = () => {
               error={errors.muscleGroupId?.message}
               {...register("muscleGroupId")}
             />
-            <div className="flex gap-4">
+            <div className="flex flex-col md:flex-row gap-4">
               <Input
                 title="Séries"
                 type="number"
@@ -140,7 +140,7 @@ export const ExerciseRegisterPage = () => {
                 {...register("repetitions")}
               />
             </div>
-            <div className="flex gap-4">
+            <div className="flex flex-col md:flex-row gap-4">
               <Input
                 title="Peso"
                 type="number"
