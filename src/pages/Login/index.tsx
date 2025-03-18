@@ -95,8 +95,8 @@ export function LoginPage() {
             </p>
             <div className="mt-12 flex items-center justify-center gap-8">
               <div className="text-center">
-                <div className="text-4xl font-bold">10k+</div>
-                <div className="text-sm opacity-80">Usuários ativos</div>
+                <div className="text-4xl font-bold">150+</div>
+                <div className="text-sm opacity-80">Exercícios</div>
               </div>
               <div className="h-12 w-px bg-white/20" />
               <div className="text-center">
