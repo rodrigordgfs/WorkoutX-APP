@@ -15,6 +15,7 @@ import { useAuth, useClerk } from "@clerk/clerk-react";
 import { toast } from "react-toastify";
 import { IMuscleGroup, useWorkout } from "@/context/WorkoutContext";
 import { Button } from "@/components/Shared/Button";
+import { ModalImage } from "@/components/Shared/ModalImage";
 
 export type Visibility = "PUBLIC" | "PRIVATE";
 
@@ -64,6 +65,7 @@ export function WorkoutRegisterPage() {
     []
   );
   const [savingWorkout, setSavingWorkout] = useState(false);
+  const [exercise, setExercise] = useState<ExerciseData>();
 
   const fetchExercises = useCallback(async () => {
     setLoading(true);
@@ -354,9 +356,14 @@ export function WorkoutRegisterPage() {
                       filteredExercises.map((exercise) => (
                         <div
                           key={exercise.id}
-                          className="flex items-center justify-between p-3 bg-zinc-50 dark:bg-zinc-900 rounded-lg hover:bg-zinc-100 transition-colors"
+                          className="flex items-center justify-between p-3 gap-2 bg-zinc-50 dark:bg-zinc-900 rounded-lg hover:bg-zinc-100 transition-colors"
                         >
-                          <div>
+                          <img
+                            src={exercise.imageUrl}
+                            alt={exercise.name}
+                            className="w-10 h-10 rounded-lg object-cover"
+                          />
+                          <div className="flex-1">
                             <p className="font-medium">{exercise.name}</p>
                             <p className="text-sm text-zinc-600">
                               {exercise?.muscleGroup?.name}
@@ -409,9 +416,17 @@ export function WorkoutRegisterPage() {
                               {exercises.map((exercise) => (
                                 <div
                                   key={exercise.id}
-                                  className="flex items-center justify-between p-3 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
+                                  className="flex items-center gap-2 justify-between p-3 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
                                 >
-                                  <p className="text-sm">{exercise.name}</p>
+                                  <img
+                                    onClick={() => setExercise(exercise)}
+                                    src={exercise.imageUrl}
+                                    alt={exercise.name}
+                                    className="w-10 h-10 rounded-lg object-cover cursor-pointer"
+                                  />
+                                  <p className="text-sm flex-1">
+                                    {exercise.name}
+                                  </p>
                                   <button
                                     type="button"
                                     onClick={() => addExercise(exercise)}
@@ -618,6 +633,13 @@ export function WorkoutRegisterPage() {
           await handleAIGenerate(form);
           fetchWorkouts();
         }}
+      />
+
+      <ModalImage
+        isOpen={!!exercise}
+        onClose={() => setExercise(undefined)}
+        title={exercise?.name || ""}
+        src={exercise?.imageUrl || ""}
       />
     </div>
   );
