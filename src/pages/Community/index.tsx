@@ -39,6 +39,9 @@ export function CommunityPage() {
         },
         {
           baseURL: import.meta.env.VITE_API_BASE_URL,
+          headers: {
+            Authorization: `Bearer ${await getToken()}`,
+          },
         }
       )
       .then(({ data }) => {
