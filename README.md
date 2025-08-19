@@ -56,13 +56,24 @@ Experimente o WorkoutX agora mesmo: [https://workoutx.site](https://workoutx.sit
 *   [x] Dashboard com métricas dos treinos
 *   [ ] Notificações e lembretes
 
+## Variáveis de Ambiente
+
+Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
+
+```env
+VITE_API_BASE_URL=http://localhost:3000
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_Y29uY3JldGUtc2hhcmstNTQuY2xlcmsuYWNjb3VudHMuZGV2JA
+VITE_DNS_SENTRY=
+```
+
+Adapte os valores conforme necessário para seu ambiente.
 ## Suporte
 
 Encontrou algum problema ou tem alguma sugestão? Envie um e-mail para shinodalabs@gmail.com.
 
 ## Autores
 
-*   [Rodrigo Ferreira](https://www.github.com/rodrigordgfs)
+*   [Rodrigo Shinoda](https://www.github.com/rodrigordgfs)
 
 ## Feedback
 
