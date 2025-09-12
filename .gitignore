@@ -17,6 +17,12 @@
 /.next/
 /out/
 
+# arquivos lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
 # production
 /build
 
