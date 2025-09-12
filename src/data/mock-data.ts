@@ -1,6 +1,12 @@
 // Mock data for the WorkoutX application
 import { v4 as uuidv4 } from 'uuid'
 
+// IDs dos treinos para referência no histórico
+const WORKOUT_1_ID = uuidv4()
+const WORKOUT_2_ID = uuidv4()
+const WORKOUT_3_ID = uuidv4()
+const WORKOUT_4_ID = uuidv4()
+
 export const mockUser = {
   id: uuidv4(),
   name: 'João Silva',
@@ -18,7 +24,7 @@ export const mockUser = {
 
 export const mockWorkouts = [
   {
-    id: uuidv4(),
+    id: WORKOUT_1_ID,
     title: 'Treino Peito e Tríceps',
     exerciseCount: 8,
     duration: 45,
@@ -102,7 +108,7 @@ export const mockWorkouts = [
     ]
   },
   {
-    id: uuidv4(),
+    id: WORKOUT_2_ID,
     title: 'Treino Costas e Bíceps',
     exerciseCount: 7,
     duration: 50,
@@ -177,7 +183,7 @@ export const mockWorkouts = [
     ]
   },
   {
-    id: uuidv4(),
+    id: WORKOUT_3_ID,
     title: 'Treino Pernas',
     exerciseCount: 6,
     duration: 60,
@@ -243,7 +249,7 @@ export const mockWorkouts = [
     ]
   },
   {
-    id: uuidv4(),
+    id: WORKOUT_4_ID,
     title: 'Treino Ombros e Abdômen',
     exerciseCount: 8,
     duration: 35,
@@ -331,7 +337,7 @@ export const mockWorkouts = [
 export const mockWorkoutHistory = [
   {
     id: uuidv4(),
-    workoutId: '1',
+    workoutId: WORKOUT_1_ID,
     title: 'Treino Peito e Tríceps',
     date: '2024-01-25',
     duration: 45,
@@ -341,7 +347,7 @@ export const mockWorkoutHistory = [
   },
   {
     id: uuidv4(),
-    workoutId: '3',
+    workoutId: WORKOUT_3_ID,
     title: 'Treino Pernas',
     date: '2024-01-23',
     duration: 60,
@@ -351,7 +357,7 @@ export const mockWorkoutHistory = [
   },
   {
     id: uuidv4(),
-    workoutId: '2',
+    workoutId: WORKOUT_2_ID,
     title: 'Treino Costas e Bíceps',
     date: '2024-01-21',
     duration: 50,
@@ -361,7 +367,7 @@ export const mockWorkoutHistory = [
   },
   {
     id: uuidv4(),
-    workoutId: '4',
+    workoutId: WORKOUT_4_ID,
     title: 'Treino Ombros e Abdômen',
     date: '2024-01-19',
     duration: 35,
@@ -371,7 +377,7 @@ export const mockWorkoutHistory = [
   },
   {
     id: uuidv4(),
-    workoutId: '1',
+    workoutId: WORKOUT_1_ID,
     title: 'Treino Peito e Tríceps',
     date: '2024-01-18',
     duration: 42,
