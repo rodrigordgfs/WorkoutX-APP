@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, ChevronDown, ChevronUp, Dumbbell, Eye } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
+import { useRouter } from 'next/navigation'
+import { ChevronDown, ChevronUp, Dumbbell, Eye, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { mockMuscleGroups, mockExercises } from '@/data/mock-data'
+import { Card, CardContent } from '@/components/ui/card'
+import { mockExercises, mockMuscleGroups } from '@/data/mock-data'
 
 // Componentes de Skeleton
 const SkeletonMuscleGroupCard = () => (
@@ -23,6 +24,7 @@ const SkeletonMuscleGroupCard = () => (
 )
 
 export default function MuscleGroupsPage() {
+  const router = useRouter()
   const [searchTerm, setSearchTerm] = useState('')
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
   const [isLoading, setIsLoading] = useState(true)
@@ -53,12 +55,17 @@ export default function MuscleGroupsPage() {
 
   const getGroupExercises = (groupId: string) => {
     const group = mockMuscleGroups.find(g => g.id === groupId)
-    return mockExercises.filter(exercise => exercise.muscleGroup === group?.name)
+    return mockExercises.filter(exercise => 
+      exercise.muscleGroup.toLowerCase() === group?.name.toLowerCase()
+    )
   }
 
   const handleViewExercises = (groupId: string) => {
-    // Navegar para a página de exercícios filtrada por grupo muscular
-    console.log('Ver exercícios do grupo:', groupId)
+    const group = mockMuscleGroups.find(g => g.id === groupId)
+    if (group) {
+      // Navegar para a página de exercícios com o grupo muscular como parâmetro
+      router.push(`/exercises?muscleGroup=${encodeURIComponent(group.name)}`)
+    }
   }
 
   if (isLoading) {
