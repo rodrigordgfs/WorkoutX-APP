@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Search, ChevronDown, ChevronUp, Dumbbell, Play } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
@@ -25,7 +25,7 @@ const SkeletonExerciseCard = () => (
   </div>
 )
 
-export default function ExercisesPage() {
+function ExercisesContent() {
   const searchParams = useSearchParams()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState('all')
@@ -264,5 +264,30 @@ export default function ExercisesPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function ExercisesPage() {
+  return (
+    <Suspense fallback={
+      <div className="h-full w-full p-10 space-y-8">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <Dumbbell className="h-6 w-6 text-primary" />
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight">Exercícios</h1>
+        </div>
+        <div className="space-y-4">
+          <div className="h-32 bg-muted animate-pulse rounded-lg"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {['skeleton-1', 'skeleton-2', 'skeleton-3', 'skeleton-4', 'skeleton-5', 'skeleton-6'].map((id) => (
+              <SkeletonExerciseCard key={id} />
+            ))}
+          </div>
+        </div>
+      </div>
+    }>
+      <ExercisesContent />
+    </Suspense>
   )
 }
