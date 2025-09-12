@@ -1,10 +1,65 @@
-import React from 'react'
+'use client'
+
+import { useState, useEffect } from 'react'
 import { LayoutDashboard, Calendar, Clock, Target, TrendingUp } from 'lucide-react'
 import { MetricsTile } from '@/components/dashboard/metrics-tile'
 import { ActivityItem } from '@/components/dashboard/activity-item'
 import { ChartPlaceholder } from '@/components/dashboard/chart-placeholder'
 
+// Componentes de Skeleton para Dashboard
+const SkeletonMetricsTile = () => (
+  <div className="bg-card rounded-lg border p-6">
+    <div className="flex items-center justify-between">
+      <div className="space-y-2">
+        <div className="h-4 bg-muted rounded animate-pulse w-24"></div>
+        <div className="h-8 bg-muted rounded animate-pulse w-16"></div>
+        <div className="h-3 bg-muted rounded animate-pulse w-20"></div>
+      </div>
+      <div className="h-8 w-8 bg-muted rounded animate-pulse"></div>
+    </div>
+  </div>
+)
+
+const SkeletonChart = () => (
+  <div className="bg-card rounded-lg border p-6">
+    <div className="space-y-4">
+      <div className="h-6 bg-muted rounded animate-pulse w-48"></div>
+      <div className="h-64 bg-muted rounded animate-pulse"></div>
+    </div>
+  </div>
+)
+
+const SkeletonActivityItem = () => (
+  <div className="bg-card rounded-lg border p-4">
+    <div className="flex items-center justify-between">
+      <div className="space-y-2 flex-1">
+        <div className="h-5 bg-muted rounded animate-pulse w-3/4"></div>
+        <div className="flex gap-4">
+          <div className="h-4 bg-muted rounded animate-pulse w-16"></div>
+          <div className="h-4 bg-muted rounded animate-pulse w-12"></div>
+        </div>
+      </div>
+      <div className="space-y-2">
+        <div className="h-6 bg-muted rounded animate-pulse w-20"></div>
+        <div className="h-4 bg-muted rounded animate-pulse w-24"></div>
+      </div>
+    </div>
+  </div>
+)
+
 export default function DashboardPage() {
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const loadData = async () => {
+      // Simular carregamento assíncrono
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      setIsLoading(false)
+    }
+    
+    loadData()
+  }, [])
+
   const recentActivities = [
     {
       title: 'Treino Peito e Tríceps',
@@ -35,6 +90,43 @@ export default function DashboardPage() {
       date: 'Quinta, 16:00'
     }
   ]
+
+  if (isLoading) {
+    return (
+      <div className="h-full w-full p-10 space-y-8">
+        {/* Page Header Skeleton */}
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-muted rounded-lg animate-pulse">
+            <div className="h-6 w-6 bg-muted rounded"></div>
+          </div>
+          <div className="h-9 bg-muted rounded animate-pulse w-32"></div>
+        </div>
+
+        {/* Metrics Tiles Skeleton */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {['skeleton-metric-1', 'skeleton-metric-2', 'skeleton-metric-3', 'skeleton-metric-4'].map((id) => (
+            <SkeletonMetricsTile key={id} />
+          ))}
+        </div>
+
+        {/* Charts Skeleton */}
+        <div className="grid gap-6 md:grid-cols-2">
+          <SkeletonChart />
+          <SkeletonChart />
+        </div>
+
+        {/* Recent Activities Skeleton */}
+        <div className="space-y-4">
+          <div className="h-7 bg-muted rounded animate-pulse w-48"></div>
+          <div className="space-y-3">
+            {['skeleton-activity-1', 'skeleton-activity-2', 'skeleton-activity-3', 'skeleton-activity-4'].map((id) => (
+              <SkeletonActivityItem key={id} />
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="h-full w-full p-10 space-y-8">

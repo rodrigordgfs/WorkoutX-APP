@@ -1,260 +1,113 @@
-import React from 'react'
+'use client'
+
+import { useState, useEffect } from 'react'
 import { Calendar, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { WorkoutCard } from '@/components/workouts/workout-card'
+import { mockWorkouts } from '@/data/mock-data'
+
+// Componente de Skeleton para WorkoutCard
+const SkeletonWorkoutCard = () => (
+  <div className="bg-card rounded-lg border p-4 sm:p-6">
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="space-y-2 flex-1 min-w-0">
+          <div className="h-6 bg-muted rounded animate-pulse w-3/4 sm:w-48"></div>
+          <div className="h-4 bg-muted rounded animate-pulse w-1/2 sm:w-32"></div>
+        </div>
+        <div className="h-8 w-8 bg-muted rounded animate-pulse flex-shrink-0 ml-2"></div>
+      </div>
+      
+      <div className="space-y-2">
+        <div className="h-4 bg-muted rounded animate-pulse w-full"></div>
+        <div className="h-4 bg-muted rounded animate-pulse w-3/4"></div>
+        <div className="h-4 bg-muted rounded animate-pulse w-1/2"></div>
+      </div>
+      
+      <div className="flex flex-col sm:flex-row gap-2">
+        <div className="h-10 bg-muted rounded animate-pulse w-full sm:w-32"></div>
+        <div className="h-8 bg-muted rounded animate-pulse w-full sm:w-24"></div>
+      </div>
+    </div>
+  </div>
+)
 
 export default function WorkoutsPage() {
-  const workouts = [
-    {
-      title: 'Treino Peito e Tríceps',
-      exerciseCount: 8,
-      exercises: [
-        {
-          name: 'Supino Reto',
-          sets: 4,
-          reps: '8-12',
-          weight: '80kg',
-          rest: '2min'
-        },
-        {
-          name: 'Supino Inclinado',
-          sets: 3,
-          reps: '10-12',
-          weight: '70kg',
-          rest: '90s'
-        },
-        {
-          name: 'Crucifixo',
-          sets: 3,
-          reps: '12-15',
-          weight: '25kg',
-          rest: '60s'
-        },
-        {
-          name: 'Paralelas',
-          sets: 3,
-          reps: '8-12',
-          weight: 'Corporal',
-          rest: '90s'
-        },
-        {
-          name: 'Tríceps Testa',
-          sets: 3,
-          reps: '10-12',
-          weight: '30kg',
-          rest: '60s'
-        },
-        {
-          name: 'Tríceps Corda',
-          sets: 3,
-          reps: '12-15',
-          weight: '40kg',
-          rest: '45s'
-        },
-        {
-          name: 'Tríceps Francês',
-          sets: 3,
-          reps: '10-12',
-          weight: '25kg',
-          rest: '60s'
-        },
-        {
-          name: 'Flexão Diamante',
-          sets: 2,
-          reps: '10-15',
-          weight: 'Corporal',
-          rest: '45s'
-        }
-      ]
-    },
-    {
-      title: 'Treino Costas e Bíceps',
-      exerciseCount: 7,
-      exercises: [
-        {
-          name: 'Puxada Frontal',
-          sets: 4,
-          reps: '8-12',
-          weight: '70kg',
-          rest: '2min'
-        },
-        {
-          name: 'Remada Curvada',
-          sets: 4,
-          reps: '8-10',
-          weight: '60kg',
-          rest: '2min'
-        },
-        {
-          name: 'Remada Unilateral',
-          sets: 3,
-          reps: '10-12',
-          weight: '30kg',
-          rest: '90s'
-        },
-        {
-          name: 'Pullover',
-          sets: 3,
-          reps: '12-15',
-          weight: '20kg',
-          rest: '60s'
-        },
-        {
-          name: 'Rosca Direta',
-          sets: 4,
-          reps: '10-12',
-          weight: '15kg',
-          rest: '60s'
-        },
-        {
-          name: 'Rosca Martelo',
-          sets: 3,
-          reps: '12-15',
-          weight: '12kg',
-          rest: '45s'
-        },
-        {
-          name: 'Rosca Concentrada',
-          sets: 3,
-          reps: '10-12',
-          weight: '10kg',
-          rest: '45s'
-        }
-      ]
-    },
-    {
-      title: 'Treino Pernas',
-      exerciseCount: 6,
-      exercises: [
-        {
-          name: 'Agachamento',
-          sets: 4,
-          reps: '8-12',
-          weight: '100kg',
-          rest: '3min'
-        },
-        {
-          name: 'Leg Press',
-          sets: 4,
-          reps: '12-15',
-          weight: '200kg',
-          rest: '2min'
-        },
-        {
-          name: 'Extensora',
-          sets: 3,
-          reps: '12-15',
-          weight: '60kg',
-          rest: '60s'
-        },
-        {
-          name: 'Flexora',
-          sets: 3,
-          reps: '12-15',
-          weight: '50kg',
-          rest: '60s'
-        },
-        {
-          name: 'Panturrilha em Pé',
-          sets: 4,
-          reps: '15-20',
-          weight: '80kg',
-          rest: '45s'
-        },
-        {
-          name: 'Panturrilha Sentado',
-          sets: 3,
-          reps: '15-20',
-          weight: '40kg',
-          rest: '45s'
-        }
-      ]
-    },
-    {
-      title: 'Treino Ombros e Abdômen',
-      exerciseCount: 8,
-      exercises: [
-        {
-          name: 'Desenvolvimento',
-          sets: 4,
-          reps: '8-12',
-          weight: '50kg',
-          rest: '2min'
-        },
-        {
-          name: 'Elevação Lateral',
-          sets: 4,
-          reps: '12-15',
-          weight: '8kg',
-          rest: '60s'
-        },
-        {
-          name: 'Elevação Frontal',
-          sets: 3,
-          reps: '12-15',
-          weight: '8kg',
-          rest: '60s'
-        },
-        {
-          name: 'Crucifixo Inverso',
-          sets: 3,
-          reps: '12-15',
-          weight: '6kg',
-          rest: '60s'
-        },
-        {
-          name: 'Encolhimento',
-          sets: 3,
-          reps: '12-15',
-          weight: '20kg',
-          rest: '60s'
-        },
-        {
-          name: 'Abdominal Supra',
-          sets: 3,
-          reps: '15-20',
-          weight: 'Corporal',
-          rest: '45s'
-        },
-        {
-          name: 'Prancha',
-          sets: 3,
-          reps: '30-60s',
-          weight: 'Corporal',
-          rest: '60s'
-        },
-        {
-          name: 'Oblíquo',
-          sets: 3,
-          reps: '15-20',
-          weight: 'Corporal',
-          rest: '45s'
-        }
-      ]
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const loadData = async () => {
+      // Simular carregamento assíncrono
+      await new Promise(resolve => setTimeout(resolve, 1200))
+      setIsLoading(false)
     }
-  ]
+    
+    loadData()
+  }, [])
+  
+  // Usar os dados mock que já têm IDs
+  const workouts = mockWorkouts.map(workout => ({
+    id: workout.id,
+    title: workout.title,
+    exerciseCount: workout.exerciseCount,
+    exercises: workout.exercises.map(exercise => ({
+      name: exercise.name,
+      sets: exercise.sets,
+      reps: exercise.reps,
+      weight: exercise.weight,
+      rest: exercise.rest
+    }))
+  }))
+
+  if (isLoading) {
+    return (
+      <div className="h-full w-full p-10 space-y-8">
+        {/* Page Header Skeleton */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center space-x-3 flex-1 min-w-0">
+            <div className="p-2 bg-muted rounded-lg animate-pulse flex-shrink-0">
+              <div className="h-6 w-6 bg-muted rounded"></div>
+            </div>
+            <div className="h-9 bg-muted rounded animate-pulse w-40 flex-1"></div>
+          </div>
+          <div className="h-10 bg-muted rounded animate-pulse w-20 sm:w-32 flex-shrink-0"></div>
+        </div>
+
+        {/* Workout Cards Skeleton */}
+        <div className="space-y-4">
+          {['skeleton-workout-1', 'skeleton-workout-2', 'skeleton-workout-3', 'skeleton-workout-4'].map((id) => (
+            <SkeletonWorkoutCard key={id} />
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="h-full w-full p-10 space-y-6">
+    <div className="h-full w-full p-10 space-y-8">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-primary/10 rounded-lg">
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center space-x-3 flex-1 min-w-0">
+          <div className="p-2 bg-primary/10 rounded-lg flex-shrink-0">
             <Calendar className="h-6 w-6 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight">Meus Treinos</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight truncate">Meus Treinos</h1>
         </div>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Novo Treino
-        </Button>
+        <div className="flex gap-2 flex-shrink-0">
+          <Button size="sm" className="sm:size-default">
+            <Plus className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">Novo Treino</span>
+            <span className="sm:hidden">Novo</span>
+          </Button>
+        </div>
       </div>
 
       {/* Workout Cards */}
       <div className="space-y-4">
         {workouts.map((workout) => (
           <WorkoutCard
-            key={workout.title}
+            key={workout.id}
+            id={workout.id}
             title={workout.title}
             exerciseCount={workout.exerciseCount}
             exercises={workout.exercises}

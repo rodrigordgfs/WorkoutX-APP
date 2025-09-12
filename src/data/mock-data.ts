@@ -1,7 +1,8 @@
 // Mock data for the WorkoutX application
+import { v4 as uuidv4 } from 'uuid'
 
 export const mockUser = {
-  id: '1',
+  id: uuidv4(),
   name: 'João Silva',
   email: 'joao.silva@email.com',
   avatar: 'https://github.com/rodrigordgfs.png',
@@ -17,7 +18,7 @@ export const mockUser = {
 
 export const mockWorkouts = [
   {
-    id: '1',
+    id: uuidv4(),
     title: 'Treino Peito e Tríceps',
     exerciseCount: 8,
     duration: 45,
@@ -27,7 +28,7 @@ export const mockWorkouts = [
     lastPerformed: '2024-01-25',
     exercises: [
       {
-        id: '1',
+        id: uuidv4(),
         name: 'Supino Reto',
         sets: 4,
         reps: '8-12',
@@ -36,7 +37,7 @@ export const mockWorkouts = [
         muscleGroup: 'peito'
       },
       {
-        id: '2',
+        id: uuidv4(),
         name: 'Supino Inclinado',
         sets: 3,
         reps: '10-12',
@@ -45,7 +46,7 @@ export const mockWorkouts = [
         muscleGroup: 'peito'
       },
       {
-        id: '3',
+        id: uuidv4(),
         name: 'Crucifixo',
         sets: 3,
         reps: '12-15',
@@ -54,7 +55,7 @@ export const mockWorkouts = [
         muscleGroup: 'peito'
       },
       {
-        id: '4',
+        id: uuidv4(),
         name: 'Paralelas',
         sets: 3,
         reps: '8-12',
@@ -63,7 +64,7 @@ export const mockWorkouts = [
         muscleGroup: 'peito'
       },
       {
-        id: '5',
+        id: uuidv4(),
         name: 'Tríceps Testa',
         sets: 3,
         reps: '10-12',
@@ -72,7 +73,7 @@ export const mockWorkouts = [
         muscleGroup: 'tríceps'
       },
       {
-        id: '6',
+        id: uuidv4(),
         name: 'Tríceps Corda',
         sets: 3,
         reps: '12-15',
@@ -81,7 +82,7 @@ export const mockWorkouts = [
         muscleGroup: 'tríceps'
       },
       {
-        id: '7',
+        id: uuidv4(),
         name: 'Tríceps Francês',
         sets: 3,
         reps: '10-12',
@@ -90,7 +91,7 @@ export const mockWorkouts = [
         muscleGroup: 'tríceps'
       },
       {
-        id: '8',
+        id: uuidv4(),
         name: 'Flexão Diamante',
         sets: 2,
         reps: '10-15',
@@ -101,7 +102,7 @@ export const mockWorkouts = [
     ]
   },
   {
-    id: '2',
+    id: uuidv4(),
     title: 'Treino Costas e Bíceps',
     exerciseCount: 7,
     duration: 50,
@@ -111,7 +112,7 @@ export const mockWorkouts = [
     lastPerformed: '2024-01-23',
     exercises: [
       {
-        id: '9',
+        id: uuidv4(),
         name: 'Puxada Frontal',
         sets: 4,
         reps: '8-12',
@@ -120,7 +121,7 @@ export const mockWorkouts = [
         muscleGroup: 'costas'
       },
       {
-        id: '10',
+        id: uuidv4(),
         name: 'Remada Curvada',
         sets: 4,
         reps: '8-10',
@@ -129,7 +130,7 @@ export const mockWorkouts = [
         muscleGroup: 'costas'
       },
       {
-        id: '11',
+        id: uuidv4(),
         name: 'Remada Unilateral',
         sets: 3,
         reps: '10-12',
@@ -138,7 +139,7 @@ export const mockWorkouts = [
         muscleGroup: 'costas'
       },
       {
-        id: '12',
+        id: uuidv4(),
         name: 'Pullover',
         sets: 3,
         reps: '12-15',
@@ -147,7 +148,7 @@ export const mockWorkouts = [
         muscleGroup: 'costas'
       },
       {
-        id: '13',
+        id: uuidv4(),
         name: 'Rosca Direta',
         sets: 4,
         reps: '10-12',
@@ -156,7 +157,7 @@ export const mockWorkouts = [
         muscleGroup: 'bíceps'
       },
       {
-        id: '14',
+        id: uuidv4(),
         name: 'Rosca Martelo',
         sets: 3,
         reps: '12-15',
@@ -165,7 +166,7 @@ export const mockWorkouts = [
         muscleGroup: 'bíceps'
       },
       {
-        id: '15',
+        id: uuidv4(),
         name: 'Rosca Concentrada',
         sets: 3,
         reps: '10-12',
@@ -176,7 +177,7 @@ export const mockWorkouts = [
     ]
   },
   {
-    id: '3',
+    id: uuidv4(),
     title: 'Treino Pernas',
     exerciseCount: 6,
     duration: 60,
@@ -186,7 +187,7 @@ export const mockWorkouts = [
     lastPerformed: '2024-01-21',
     exercises: [
       {
-        id: '16',
+        id: uuidv4(),
         name: 'Agachamento',
         sets: 4,
         reps: '8-12',
@@ -195,7 +196,7 @@ export const mockWorkouts = [
         muscleGroup: 'pernas'
       },
       {
-        id: '17',
+        id: uuidv4(),
         name: 'Leg Press',
         sets: 4,
         reps: '12-15',
@@ -204,7 +205,7 @@ export const mockWorkouts = [
         muscleGroup: 'pernas'
       },
       {
-        id: '18',
+        id: uuidv4(),
         name: 'Extensora',
         sets: 3,
         reps: '12-15',
@@ -213,7 +214,7 @@ export const mockWorkouts = [
         muscleGroup: 'pernas'
       },
       {
-        id: '19',
+        id: uuidv4(),
         name: 'Flexora',
         sets: 3,
         reps: '12-15',
@@ -222,7 +223,7 @@ export const mockWorkouts = [
         muscleGroup: 'pernas'
       },
       {
-        id: '20',
+        id: uuidv4(),
         name: 'Panturrilha em Pé',
         sets: 4,
         reps: '15-20',
@@ -231,7 +232,7 @@ export const mockWorkouts = [
         muscleGroup: 'pernas'
       },
       {
-        id: '21',
+        id: uuidv4(),
         name: 'Panturrilha Sentado',
         sets: 3,
         reps: '15-20',
@@ -242,7 +243,7 @@ export const mockWorkouts = [
     ]
   },
   {
-    id: '4',
+    id: uuidv4(),
     title: 'Treino Ombros e Abdômen',
     exerciseCount: 8,
     duration: 35,
@@ -252,7 +253,7 @@ export const mockWorkouts = [
     lastPerformed: '2024-01-19',
     exercises: [
       {
-        id: '22',
+        id: uuidv4(),
         name: 'Desenvolvimento',
         sets: 4,
         reps: '8-12',
@@ -261,7 +262,7 @@ export const mockWorkouts = [
         muscleGroup: 'ombros'
       },
       {
-        id: '23',
+        id: uuidv4(),
         name: 'Elevação Lateral',
         sets: 4,
         reps: '12-15',
@@ -270,7 +271,7 @@ export const mockWorkouts = [
         muscleGroup: 'ombros'
       },
       {
-        id: '24',
+        id: uuidv4(),
         name: 'Elevação Frontal',
         sets: 3,
         reps: '12-15',
@@ -279,7 +280,7 @@ export const mockWorkouts = [
         muscleGroup: 'ombros'
       },
       {
-        id: '25',
+        id: uuidv4(),
         name: 'Crucifixo Inverso',
         sets: 3,
         reps: '12-15',
@@ -288,7 +289,7 @@ export const mockWorkouts = [
         muscleGroup: 'ombros'
       },
       {
-        id: '26',
+        id: uuidv4(),
         name: 'Encolhimento',
         sets: 3,
         reps: '12-15',
@@ -297,7 +298,7 @@ export const mockWorkouts = [
         muscleGroup: 'ombros'
       },
       {
-        id: '27',
+        id: uuidv4(),
         name: 'Abdominal Supra',
         sets: 3,
         reps: '15-20',
@@ -306,7 +307,7 @@ export const mockWorkouts = [
         muscleGroup: 'abdômen'
       },
       {
-        id: '28',
+        id: uuidv4(),
         name: 'Prancha',
         sets: 3,
         reps: '30-60s',
@@ -315,7 +316,7 @@ export const mockWorkouts = [
         muscleGroup: 'abdômen'
       },
       {
-        id: '29',
+        id: uuidv4(),
         name: 'Oblíquo',
         sets: 3,
         reps: '15-20',
@@ -329,7 +330,7 @@ export const mockWorkouts = [
 
 export const mockWorkoutHistory = [
   {
-    id: '1',
+    id: uuidv4(),
     workoutId: '1',
     title: 'Treino Peito e Tríceps',
     date: '2024-01-25',
@@ -339,7 +340,7 @@ export const mockWorkoutHistory = [
     notes: 'Treino excelente, consegui aumentar o peso no supino!'
   },
   {
-    id: '2',
+    id: uuidv4(),
     workoutId: '3',
     title: 'Treino Pernas',
     date: '2024-01-23',
@@ -349,7 +350,7 @@ export const mockWorkoutHistory = [
     notes: 'Pernas bem cansadas, mas treino completo.'
   },
   {
-    id: '3',
+    id: uuidv4(),
     workoutId: '2',
     title: 'Treino Costas e Bíceps',
     date: '2024-01-21',
@@ -359,7 +360,7 @@ export const mockWorkoutHistory = [
     notes: 'Foco na execução, sem pressa.'
   },
   {
-    id: '4',
+    id: uuidv4(),
     workoutId: '4',
     title: 'Treino Ombros e Abdômen',
     date: '2024-01-19',
@@ -369,7 +370,7 @@ export const mockWorkoutHistory = [
     notes: 'Treino mais leve, boa recuperação.'
   },
   {
-    id: '5',
+    id: uuidv4(),
     workoutId: '1',
     title: 'Treino Peito e Tríceps',
     date: '2024-01-18',
@@ -382,56 +383,56 @@ export const mockWorkoutHistory = [
 
 export const mockMuscleGroups = [
   {
-    id: '1',
+    id: uuidv4(),
     name: 'Peito',
     description: 'Músculos do tórax',
     exercises: 12,
     color: '#ef4444'
   },
   {
-    id: '2',
+    id: uuidv4(),
     name: 'Costas',
     description: 'Músculos dorsais',
     exercises: 15,
     color: '#3b82f6'
   },
   {
-    id: '3',
+    id: uuidv4(),
     name: 'Pernas',
     description: 'Músculos das pernas',
     exercises: 18,
     color: '#10b981'
   },
   {
-    id: '4',
+    id: uuidv4(),
     name: 'Ombros',
     description: 'Músculos deltoides',
     exercises: 10,
     color: '#f59e0b'
   },
   {
-    id: '5',
+    id: uuidv4(),
     name: 'Bíceps',
     description: 'Músculos do braço anterior',
     exercises: 8,
     color: '#8b5cf6'
   },
   {
-    id: '6',
+    id: uuidv4(),
     name: 'Tríceps',
     description: 'Músculos do braço posterior',
     exercises: 9,
     color: '#ec4899'
   },
   {
-    id: '7',
+    id: uuidv4(),
     name: 'Abdômen',
     description: 'Músculos abdominais',
     exercises: 14,
     color: '#06b6d4'
   },
   {
-    id: '8',
+    id: uuidv4(),
     name: 'Glúteos',
     description: 'Músculos glúteos',
     exercises: 6,
@@ -441,7 +442,7 @@ export const mockMuscleGroups = [
 
 export const mockExercises = [
   {
-    id: '1',
+    id: uuidv4(),
     name: 'Supino Reto',
     muscleGroup: 'peito',
     equipment: 'barra',
@@ -460,7 +461,7 @@ export const mockExercises = [
     ]
   },
   {
-    id: '2',
+    id: uuidv4(),
     name: 'Agachamento',
     muscleGroup: 'pernas',
     equipment: 'barra',
@@ -504,7 +505,7 @@ export const mockDashboardStats = {
 
 export const mockRecentActivities = [
   {
-    id: '1',
+    id: uuidv4(),
     title: 'Treino Peito e Tríceps',
     exercises: 8,
     duration: 45,
@@ -512,7 +513,7 @@ export const mockRecentActivities = [
     date: 'Hoje, 14:30'
   },
   {
-    id: '2',
+    id: uuidv4(),
     title: 'Treino Pernas',
     exercises: 6,
     duration: 60,
@@ -520,7 +521,7 @@ export const mockRecentActivities = [
     date: 'Ontem, 09:15'
   },
   {
-    id: '3',
+    id: uuidv4(),
     title: 'Treino Costas e Bíceps',
     exercises: 7,
     duration: 50,
@@ -528,7 +529,7 @@ export const mockRecentActivities = [
     date: 'Sexta, 18:00'
   },
   {
-    id: '4',
+    id: uuidv4(),
     title: 'Treino Ombros',
     exercises: 5,
     duration: 35,
@@ -539,7 +540,7 @@ export const mockRecentActivities = [
 
 export const mockCommunityPosts = [
   {
-    id: '1',
+    id: uuidv4(),
     author: 'Maria Santos',
     avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg',
     title: 'Dica para melhorar o supino',
@@ -549,7 +550,7 @@ export const mockCommunityPosts = [
     createdAt: '2024-01-25T10:30:00Z'
   },
   {
-    id: '2',
+    id: uuidv4(),
     author: 'Carlos Oliveira',
     avatar: 'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg',
     title: 'Rotina de treino ABC',
@@ -562,7 +563,7 @@ export const mockCommunityPosts = [
 
 export const mockNotifications = [
   {
-    id: '1',
+    id: uuidv4(),
     type: 'workout_reminder',
     title: 'Lembrete de Treino',
     message: 'Hora do seu treino de pernas!',
@@ -570,7 +571,7 @@ export const mockNotifications = [
     createdAt: '2024-01-25T14:00:00Z'
   },
   {
-    id: '2',
+    id: uuidv4(),
     type: 'achievement',
     title: 'Nova Conquista',
     message: 'Você completou 30 treinos este mês!',

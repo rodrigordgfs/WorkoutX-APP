@@ -6,7 +6,6 @@ import { Toolbar } from '@/components/layout/toolbar'
 import { Sidebar } from '@/components/layout/sidebar'
 import { SidebarProvider, useSidebar } from '@/contexts/sidebar-context'
 import type { Route } from '@/types'
-import { cn } from '@/lib/utils'
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -29,7 +28,10 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="h-screen bg-background flex flex-col">
-      <Toolbar />
+      <Toolbar 
+        showBackButton={pathname.includes('/workouts/') && pathname !== '/workouts'}
+        backUrl="/workouts"
+      />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar 
           activeRoute={getActiveRoute()} 
