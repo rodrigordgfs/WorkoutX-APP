@@ -32,6 +32,14 @@ export const mockWorkouts = [
     muscleGroups: ['peito', 'tríceps'],
     createdAt: '2024-01-20',
     lastPerformed: '2024-01-25',
+    privacy: 'public' as const,
+    author: {
+      id: uuidv4(),
+      name: 'João Silva',
+      avatar: 'https://github.com/rodrigordgfs.png'
+    },
+    likes: 24,
+    saves: 12,
     exercises: [
       {
         id: uuidv4(),
@@ -1292,5 +1300,285 @@ export const mockNotifications = [
     message: 'Nova versão disponível com melhorias de performance!',
     read: true,
     createdAt: '2024-01-23T10:00:00Z'
+  }
+]
+
+// Dados da comunidade - treinos públicos
+export const mockCommunityWorkouts = [
+  {
+    id: uuidv4(),
+    title: 'Treino Peito e Tríceps',
+    exerciseCount: 8,
+    duration: 45,
+    difficulty: 'intermediate' as const,
+    muscleGroups: ['peito', 'tríceps'],
+    createdAt: '2024-01-20',
+    author: {
+      id: uuidv4(),
+      name: 'João Silva',
+      avatar: 'https://github.com/rodrigordgfs.png'
+    },
+    likes: 24,
+    saves: 12,
+    description: 'Treino focado em peito e tríceps para desenvolvimento muscular',
+    tags: ['musculação', 'peito', 'tríceps', 'intermediário'],
+    exercises: [
+      {
+        id: uuidv4(),
+        name: 'Supino Reto',
+        sets: 4,
+        reps: '8-12',
+        weight: '80kg',
+        rest: '2min',
+        muscleGroup: 'peito'
+      },
+      {
+        id: uuidv4(),
+        name: 'Supino Inclinado',
+        sets: 3,
+        reps: '10-12',
+        weight: '70kg',
+        rest: '90s',
+        muscleGroup: 'peito'
+      },
+      {
+        id: uuidv4(),
+        name: 'Crucifixo',
+        sets: 3,
+        reps: '12-15',
+        weight: '25kg',
+        rest: '60s',
+        muscleGroup: 'peito'
+      },
+      {
+        id: uuidv4(),
+        name: 'Tríceps Testa',
+        sets: 3,
+        reps: '10-12',
+        weight: '30kg',
+        rest: '60s',
+        muscleGroup: 'tríceps'
+      },
+      {
+        id: uuidv4(),
+        name: 'Tríceps Corda',
+        sets: 3,
+        reps: '12-15',
+        weight: '40kg',
+        rest: '45s',
+        muscleGroup: 'tríceps'
+      },
+      {
+        id: uuidv4(),
+        name: 'Tríceps Francês',
+        sets: 3,
+        reps: '10-12',
+        weight: '25kg',
+        rest: '60s',
+        muscleGroup: 'tríceps'
+      },
+      {
+        id: uuidv4(),
+        name: 'Paralelas',
+        sets: 3,
+        reps: '8-12',
+        weight: 'Corporal',
+        rest: '90s',
+        muscleGroup: 'peito'
+      },
+      {
+        id: uuidv4(),
+        name: 'Flexão Diamante',
+        sets: 2,
+        reps: '10-15',
+        weight: 'Corporal',
+        rest: '45s',
+        muscleGroup: 'tríceps'
+      }
+    ]
+  },
+  {
+    id: uuidv4(),
+    title: 'Treino Pernas Intenso',
+    exerciseCount: 6,
+    duration: 60,
+    difficulty: 'advanced' as const,
+    muscleGroups: ['pernas'],
+    createdAt: '2024-01-18',
+    author: {
+      id: uuidv4(),
+      name: 'Maria Santos',
+      avatar: 'https://github.com/rodrigordgfs.png'
+    },
+    likes: 18,
+    saves: 8,
+    description: 'Treino pesado para pernas com foco em força e hipertrofia',
+    tags: ['pernas', 'força', 'avançado', 'hipertrofia'],
+    exercises: [
+      {
+        id: uuidv4(),
+        name: 'Agachamento Livre',
+        sets: 4,
+        reps: '6-8',
+        weight: '120kg',
+        rest: '3min',
+        muscleGroup: 'pernas'
+      },
+      {
+        id: uuidv4(),
+        name: 'Leg Press',
+        sets: 4,
+        reps: '12-15',
+        weight: '200kg',
+        rest: '2min',
+        muscleGroup: 'pernas'
+      },
+      {
+        id: uuidv4(),
+        name: 'Stiff',
+        sets: 3,
+        reps: '8-10',
+        weight: '100kg',
+        rest: '2min',
+        muscleGroup: 'pernas'
+      },
+      {
+        id: uuidv4(),
+        name: 'Cadeira Extensora',
+        sets: 3,
+        reps: '15-20',
+        weight: '60kg',
+        rest: '90s',
+        muscleGroup: 'pernas'
+      },
+      {
+        id: uuidv4(),
+        name: 'Cadeira Flexora',
+        sets: 3,
+        reps: '15-20',
+        weight: '50kg',
+        rest: '90s',
+        muscleGroup: 'pernas'
+      },
+      {
+        id: uuidv4(),
+        name: 'Panturrilha em Pé',
+        sets: 4,
+        reps: '20-25',
+        weight: '80kg',
+        rest: '60s',
+        muscleGroup: 'pernas'
+      }
+    ]
+  },
+  {
+    id: uuidv4(),
+    title: 'Treino Costas e Bíceps',
+    exerciseCount: 7,
+    duration: 50,
+    difficulty: 'intermediate' as const,
+    muscleGroups: ['costas', 'bíceps'],
+    createdAt: '2024-01-15',
+    author: {
+      id: uuidv4(),
+      name: 'Carlos Oliveira',
+      avatar: 'https://github.com/rodrigordgfs.png'
+    },
+    likes: 32,
+    saves: 15,
+    description: 'Treino completo para costas e bíceps com exercícios variados',
+    tags: ['costas', 'bíceps', 'intermediário', 'completo'],
+    exercises: [
+      { id: uuidv4(), name: 'Puxada Frontal', sets: 4, reps: '8-12', weight: '70kg', rest: '2min', muscleGroup: 'costas' },
+      { id: uuidv4(), name: 'Remada Curvada', sets: 4, reps: '8-12', weight: '60kg', rest: '2min', muscleGroup: 'costas' },
+      { id: uuidv4(), name: 'Puxada Triângulo', sets: 3, reps: '10-12', weight: '50kg', rest: '90s', muscleGroup: 'costas' },
+      { id: uuidv4(), name: 'Rosca Direta', sets: 3, reps: '10-12', weight: '20kg', rest: '60s', muscleGroup: 'bíceps' },
+      { id: uuidv4(), name: 'Rosca Martelo', sets: 3, reps: '12-15', weight: '15kg', rest: '60s', muscleGroup: 'bíceps' },
+      { id: uuidv4(), name: 'Rosca Concentrada', sets: 3, reps: '12-15', weight: '12kg', rest: '60s', muscleGroup: 'bíceps' },
+      { id: uuidv4(), name: 'Puxada Alta', sets: 3, reps: '10-12', weight: '40kg', rest: '90s', muscleGroup: 'costas' }
+    ]
+  },
+  {
+    id: uuidv4(),
+    title: 'Treino Ombros',
+    exerciseCount: 5,
+    duration: 35,
+    difficulty: 'beginner' as const,
+    muscleGroups: ['ombros'],
+    createdAt: '2024-01-12',
+    author: {
+      id: uuidv4(),
+      name: 'Ana Costa',
+      avatar: 'https://github.com/rodrigordgfs.png'
+    },
+    likes: 15,
+    saves: 6,
+    description: 'Treino básico para ombros, ideal para iniciantes',
+    tags: ['ombros', 'iniciante', 'básico', 'desenvolvimento'],
+    exercises: [
+      { id: uuidv4(), name: 'Desenvolvimento', sets: 3, reps: '10-12', weight: '20kg', rest: '90s', muscleGroup: 'ombros' },
+      { id: uuidv4(), name: 'Elevação Lateral', sets: 3, reps: '12-15', weight: '8kg', rest: '60s', muscleGroup: 'ombros' },
+      { id: uuidv4(), name: 'Elevação Frontal', sets: 3, reps: '12-15', weight: '8kg', rest: '60s', muscleGroup: 'ombros' },
+      { id: uuidv4(), name: 'Elevação Posterior', sets: 3, reps: '12-15', weight: '6kg', rest: '60s', muscleGroup: 'ombros' },
+      { id: uuidv4(), name: 'Encolhimento', sets: 3, reps: '15-20', weight: '15kg', rest: '60s', muscleGroup: 'ombros' }
+    ]
+  },
+  {
+    id: uuidv4(),
+    title: 'Treino Abdômen',
+    exerciseCount: 8,
+    duration: 25,
+    difficulty: 'intermediate' as const,
+    muscleGroups: ['abdômen'],
+    createdAt: '2024-01-10',
+    author: {
+      id: uuidv4(),
+      name: 'Pedro Lima',
+      avatar: 'https://github.com/rodrigordgfs.png'
+    },
+    likes: 28,
+    saves: 11,
+    description: 'Treino focado em abdômen com exercícios variados',
+    tags: ['abdômen', 'core', 'intermediário', 'definição'],
+    exercises: [
+      { id: uuidv4(), name: 'Prancha', sets: 3, reps: '45s', weight: 'Corporal', rest: '60s', muscleGroup: 'abdômen' },
+      { id: uuidv4(), name: 'Abdominal Crunch', sets: 3, reps: '20-25', weight: 'Corporal', rest: '45s', muscleGroup: 'abdômen' },
+      { id: uuidv4(), name: 'Abdominal Bicicleta', sets: 3, reps: '20-25', weight: 'Corporal', rest: '45s', muscleGroup: 'abdômen' },
+      { id: uuidv4(), name: 'Mountain Climber', sets: 3, reps: '30s', weight: 'Corporal', rest: '45s', muscleGroup: 'abdômen' },
+      { id: uuidv4(), name: 'Russian Twist', sets: 3, reps: '20-25', weight: '5kg', rest: '45s', muscleGroup: 'abdômen' },
+      { id: uuidv4(), name: 'Leg Raise', sets: 3, reps: '15-20', weight: 'Corporal', rest: '45s', muscleGroup: 'abdômen' },
+      { id: uuidv4(), name: 'Dead Bug', sets: 3, reps: '12-15', weight: 'Corporal', rest: '45s', muscleGroup: 'abdômen' },
+      { id: uuidv4(), name: 'Side Plank', sets: 2, reps: '30s', weight: 'Corporal', rest: '60s', muscleGroup: 'abdômen' }
+    ]
+  },
+  {
+    id: uuidv4(),
+    title: 'Treino Full Body',
+    exerciseCount: 10,
+    duration: 70,
+    difficulty: 'advanced' as const,
+    muscleGroups: ['peito', 'costas', 'pernas', 'ombros'],
+    createdAt: '2024-01-08',
+    author: {
+      id: uuidv4(),
+      name: 'Lucas Ferreira',
+      avatar: 'https://github.com/rodrigordgfs.png'
+    },
+    likes: 45,
+    saves: 22,
+    description: 'Treino completo para todo o corpo, ideal para quem tem pouco tempo',
+    tags: ['full body', 'completo', 'avançado', 'eficiência'],
+    exercises: [
+      { id: uuidv4(), name: 'Burpees', sets: 3, reps: '10-12', weight: 'Corporal', rest: '90s', muscleGroup: 'peito' },
+      { id: uuidv4(), name: 'Agachamento', sets: 3, reps: '15-20', weight: 'Corporal', rest: '60s', muscleGroup: 'pernas' },
+      { id: uuidv4(), name: 'Flexão', sets: 3, reps: '12-15', weight: 'Corporal', rest: '60s', muscleGroup: 'peito' },
+      { id: uuidv4(), name: 'Prancha', sets: 3, reps: '45s', weight: 'Corporal', rest: '60s', muscleGroup: 'abdômen' },
+      { id: uuidv4(), name: 'Mountain Climber', sets: 3, reps: '30s', weight: 'Corporal', rest: '45s', muscleGroup: 'abdômen' },
+      { id: uuidv4(), name: 'Jumping Jacks', sets: 3, reps: '30s', weight: 'Corporal', rest: '45s', muscleGroup: 'pernas' },
+      { id: uuidv4(), name: 'Lunges', sets: 3, reps: '12-15', weight: 'Corporal', rest: '60s', muscleGroup: 'pernas' },
+      { id: uuidv4(), name: 'Tríceps Dips', sets: 3, reps: '10-12', weight: 'Corporal', rest: '60s', muscleGroup: 'tríceps' },
+      { id: uuidv4(), name: 'Pike Push-ups', sets: 3, reps: '8-10', weight: 'Corporal', rest: '60s', muscleGroup: 'ombros' },
+      { id: uuidv4(), name: 'Superman', sets: 3, reps: '15-20', weight: 'Corporal', rest: '45s', muscleGroup: 'costas' }
+    ]
   }
 ]
