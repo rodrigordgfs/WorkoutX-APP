@@ -9,6 +9,7 @@ import { MobileMenuButton, MobileMenuOverlay } from '@/components/layout/mobile-
 import { cn } from '@/lib/utils'
 import type { Route } from '@/types'
 import { useSidebar } from '@/contexts/sidebar-context'
+import { useUser, useClerk } from '@clerk/nextjs'
 
 interface SidebarProps {
   activeRoute?: Route
@@ -48,6 +49,8 @@ function MenuItem({ icon, label, isActive, isCollapsed, onClick }: MenuItemProps
 
 export function Sidebar({ activeRoute = 'dashboard', onRouteChange }: SidebarProps) {
   const { isCollapsed, isMobileOpen, toggleCollapsed, setMobileOpen } = useSidebar()
+  const { user } = useUser()
+  const { signOut } = useClerk()
 
   const menuItems: Array<{ icon: React.ReactNode; label: string; route: Route } | { separator: true; id: string }> = [
     { icon: <LayoutDashboard className="h-4 w-4" />, label: 'Dashboard', route: 'dashboard' },
@@ -92,12 +95,22 @@ export function Sidebar({ activeRoute = 'dashboard', onRouteChange }: SidebarPro
           <div className={cn("flex items-center p-4 border-b", isCollapsed && "md:justify-center")}>
             <div className="flex items-center space-x-3">
               <Avatar className="h-10 w-10">
-                <AvatarImage src="https://github.com/rodrigordgfs.png" />
-                <AvatarFallback>JD</AvatarFallback>
+                <AvatarImage src={user?.imageUrl} />
+                <AvatarFallback>
+                  {user?.fullName?.split(' ').map(n => n[0]).join('').toUpperCase() || 
+                   user?.emailAddresses[0]?.emailAddress?.charAt(0).toUpperCase() || 'U'}
+                </AvatarFallback>
               </Avatar>
               <div className={cn("flex flex-col", isCollapsed && "md:hidden")}>
-                <span className="text-sm font-medium">João Silva</span>
-                <span className="text-xs text-muted-foreground">Usuário Premium</span>
+                <span className="text-sm font-medium">
+                  {user?.fullName ? 
+                    user.fullName.split(' ').filter((_, index, arr) => index === 0 || index === arr.length - 1).join(' ') :
+                    user?.emailAddresses[0]?.emailAddress || 'Usuário'
+                  }
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {user?.emailAddresses[0]?.emailAddress || 'Usuário'}
+                </span>
               </div>
             </div>
             {!isCollapsed && (
@@ -143,6 +156,10 @@ export function Sidebar({ activeRoute = 'dashboard', onRouteChange }: SidebarPro
                     route={item.route}
                     onClick={() => {
                       setMobileOpen(false)
+                      if (item.route === 'logout') {
+                        signOut()
+                        return
+                      }
                       if (onRouteChange && item.route) {
                         onRouteChange(item.route)
                       }

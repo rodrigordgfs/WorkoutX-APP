@@ -1,7 +1,15 @@
-import { Dumbbell, Bell, ArrowLeft } from 'lucide-react'
+import { Dumbbell, Bell, ArrowLeft, LogOut, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { useRouter } from 'next/navigation'
+import { useUser, useClerk } from '@clerk/nextjs'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 interface ToolbarProps {
   showBackButton?: boolean
@@ -10,9 +18,15 @@ interface ToolbarProps {
 
 export function Toolbar({ showBackButton = false, backUrl = '/workouts' }: ToolbarProps) {
   const router = useRouter()
+  const { user } = useUser()
+  const { signOut } = useClerk()
 
   const handleBack = () => {
     router.push(backUrl)
+  }
+
+  const handleLogout = async () => {
+    await signOut()
   }
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -54,6 +68,34 @@ export function Toolbar({ showBackButton = false, backUrl = '/workouts' }: Toolb
               <span className="sr-only">Notificações</span>
             </Button>
             <ThemeToggle />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-10 w-10">
+                  <User className="h-5 w-5" />
+                  <span className="sr-only">Menu do usuário</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="flex items-center justify-start gap-2 p-2">
+                  <div className="flex flex-col space-y-1 leading-none">
+                    <p className="font-medium">{user?.fullName || user?.emailAddresses[0]?.emailAddress}</p>
+                    <p className="w-[200px] truncate text-sm text-muted-foreground">
+                      {user?.emailAddresses[0]?.emailAddress}
+                    </p>
+                  </div>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push('/profile')}>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Perfil</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sair</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
@@ -85,6 +127,34 @@ export function Toolbar({ showBackButton = false, backUrl = '/workouts' }: Toolb
               <span className="sr-only">Notificações</span>
             </Button>
             <ThemeToggle />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <User className="h-4 w-4" />
+                  <span className="sr-only">Menu do usuário</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="flex items-center justify-start gap-2 p-2">
+                  <div className="flex flex-col space-y-1 leading-none">
+                    <p className="font-medium">{user?.fullName || user?.emailAddresses[0]?.emailAddress}</p>
+                    <p className="w-[200px] truncate text-sm text-muted-foreground">
+                      {user?.emailAddresses[0]?.emailAddress}
+                    </p>
+                  </div>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push('/profile')}>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Perfil</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sair</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>

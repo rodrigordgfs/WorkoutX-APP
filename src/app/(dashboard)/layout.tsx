@@ -4,13 +4,13 @@ import type React from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { Toolbar } from '@/components/layout/toolbar'
 import { Sidebar } from '@/components/layout/sidebar'
-import { SidebarProvider, useSidebar } from '@/contexts/sidebar-context'
+import { SidebarProvider } from '@/contexts/sidebar-context'
+import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/nextjs'
 import type { Route } from '@/types'
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
-  const { isCollapsed } = useSidebar()
 
   const handleRouteChange = (route: Route) => {
     if (route === 'logout') {
@@ -53,8 +53,15 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   return (
-    <SidebarProvider>
-      <DashboardContent>{children}</DashboardContent>
-    </SidebarProvider>
+    <>
+      <SignedIn>
+        <SidebarProvider>
+          <DashboardContent>{children}</DashboardContent>
+        </SidebarProvider>
+      </SignedIn>
+      <SignedOut>
+        <RedirectToSignIn />
+      </SignedOut>
+    </>
   )
 }

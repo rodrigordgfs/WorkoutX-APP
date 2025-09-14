@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
-import { Search, ChevronDown, ChevronUp, Dumbbell, Play } from 'lucide-react'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { Search, ChevronDown, ChevronUp, Dumbbell, Play, Plus } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { mockExercises, mockMuscleGroups } from '@/data/mock-data'
@@ -27,6 +27,7 @@ const SkeletonExerciseCard = () => (
 
 function ExercisesContent() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState('all')
   const [expandedExercises, setExpandedExercises] = useState<Set<string>>(new Set())
@@ -97,11 +98,20 @@ function ExercisesContent() {
   return (
     <div className="h-full w-full p-10 space-y-8">
       {/* Page Header */}
-      <div className="flex items-center space-x-3">
-        <div className="p-2 bg-primary/10 rounded-lg">
-          <Dumbbell className="h-6 w-6 text-primary" />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <Dumbbell className="h-6 w-6 text-primary" />
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight">Exercícios</h1>
         </div>
-        <h1 className="text-3xl font-bold tracking-tight">Exercícios</h1>
+        <Button 
+          onClick={() => router.push('/create-exercise')}
+          className="w-full sm:w-auto"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Cadastrar Exercício
+        </Button>
       </div>
 
       {/* Filters Card */}

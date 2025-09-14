@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, ChevronUp, Dumbbell, Eye, Search } from 'lucide-react'
+import { ChevronDown, ChevronUp, Dumbbell, Eye, Search, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { mockExercises, mockMuscleGroups } from '@/data/mock-data'
@@ -92,11 +92,20 @@ export default function MuscleGroupsPage() {
   return (
     <div className="h-full w-full p-10 space-y-8">
       {/* Page Header */}
-      <div className="flex items-center space-x-3">
-        <div className="p-2 bg-primary/10 rounded-lg">
-          <Dumbbell className="h-6 w-6 text-primary" />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <Dumbbell className="h-6 w-6 text-primary" />
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight">Grupos Musculares</h1>
         </div>
-        <h1 className="text-3xl font-bold tracking-tight">Grupos Musculares</h1>
+        <Button 
+          onClick={() => router.push('/create-muscle-group')}
+          className="w-full sm:w-auto"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Cadastrar Grupo Muscular
+        </Button>
       </div>
 
       {/* Filters Card */}
