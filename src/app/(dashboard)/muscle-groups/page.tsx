@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, ChevronUp, Dumbbell, Eye, Search, Plus } from 'lucide-react'
+import { ChevronDown, ChevronUp, Dumbbell, Eye, Search, Plus, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { mockExercises, mockMuscleGroups } from '@/data/mock-data'
+import { useMuscleGroupsContext } from '@/contexts/muscle-groups-context'
 
 // Componentes de Skeleton
 const SkeletonMuscleGroupCard = () => (
@@ -25,18 +25,8 @@ const SkeletonMuscleGroupCard = () => (
 
 export default function MuscleGroupsPage() {
   const router = useRouter()
-  const [searchTerm, setSearchTerm] = useState('')
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    const loadData = async () => {
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      setIsLoading(false)
-    }
-    
-    loadData()
-  }, [])
+  const { muscleGroups, isLoading, searchTerm, setSearchTerm, clearSearch } = useMuscleGroupsContext()
 
   const toggleGroup = (groupId: string) => {
     const newExpanded = new Set(expandedGroups)
@@ -48,20 +38,11 @@ export default function MuscleGroupsPage() {
     setExpandedGroups(newExpanded)
   }
 
-  const filteredGroups = mockMuscleGroups.filter(group =>
-    group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    group.description.toLowerCase().includes(searchTerm.toLowerCase())
-  )
-
-  const getGroupExercises = (groupId: string) => {
-    const group = mockMuscleGroups.find(g => g.id === groupId)
-    return mockExercises.filter(exercise => 
-      exercise.muscleGroup.toLowerCase() === group?.name.toLowerCase()
-    )
-  }
+  // Os dados já vêm filtrados da API, então usamos diretamente
+  const filteredGroups = muscleGroups
 
   const handleViewExercises = (groupId: string) => {
-    const group = mockMuscleGroups.find(g => g.id === groupId)
+    const group = muscleGroups.find(g => g.id === groupId)
     if (group) {
       // Navegar para a página de exercícios com o grupo muscular como parâmetro
       router.push(`/exercises?muscleGroup=${encodeURIComponent(group.name)}`)
@@ -119,13 +100,41 @@ export default function MuscleGroupsPage() {
                 placeholder="Buscar grupos musculares..."
                 value={searchTerm}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-                className="pl-10 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="pl-10 pr-10 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               />
+              {searchTerm && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearSearch}
+                  className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 hover:bg-muted"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
             </div>
 
-            {/* Results Count */}
-            <div className="text-sm text-muted-foreground">
-              {filteredGroups.length} grupo{filteredGroups.length !== 1 ? 's' : ''} encontrado{filteredGroups.length !== 1 ? 's' : ''}
+            {/* Results Count and Clear Button */}
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-muted-foreground">
+                {filteredGroups.length} grupo{filteredGroups.length !== 1 ? 's' : ''} encontrado{filteredGroups.length !== 1 ? 's' : ''}
+                {searchTerm && (
+                  <span className="ml-2">
+                    para "{searchTerm}"
+                  </span>
+                )}
+              </div>
+              {searchTerm && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={clearSearch}
+                  className="text-xs"
+                >
+                  <X className="h-3 w-3 mr-1" />
+                  Limpar Filtros
+                </Button>
+              )}
             </div>
           </div>
         </CardContent>
@@ -147,7 +156,7 @@ export default function MuscleGroupsPage() {
           </div>
         ) : (
           filteredGroups.map((group) => {
-            const groupExercises = getGroupExercises(group.id)
+            const groupExercises = group.exercises || []
             const isExpanded = expandedGroups.has(group.id)
             
             return (
@@ -158,8 +167,17 @@ export default function MuscleGroupsPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         {/* Group Image */}
-                        <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <Dumbbell className="h-6 w-6 text-primary" />
+                        <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                          {group.image ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img 
+                              src={group.image} 
+                              alt={group.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <Dumbbell className="h-6 w-6 text-primary" />
+                          )}
                         </div>
                         
                         {/* Group Info */}
@@ -214,8 +232,17 @@ export default function MuscleGroupsPage() {
                             {groupExercises.map((exercise) => (
                               <div key={exercise.id} className="flex items-start space-x-3 p-3 bg-muted/30 rounded-lg">
                                 {/* Exercise Image */}
-                                <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
-                                  <Dumbbell className="h-5 w-5 text-muted-foreground" />
+                                <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                  {exercise.image ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img 
+                                      src={exercise.image} 
+                                      alt={exercise.name}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <Dumbbell className="h-5 w-5 text-muted-foreground" />
+                                  )}
                                 </div>
                                 
                                 {/* Exercise Info */}

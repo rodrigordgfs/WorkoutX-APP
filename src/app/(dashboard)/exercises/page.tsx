@@ -5,7 +5,8 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { Search, ChevronDown, ChevronUp, Dumbbell, Play, Plus } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { mockExercises, mockMuscleGroups } from '@/data/mock-data'
+import { mockExercises } from '@/data/mock-data'
+import { useMuscleGroupsContext } from '@/contexts/muscle-groups-context'
 
 // Componentes de Skeleton
 const SkeletonExerciseCard = () => (
@@ -32,6 +33,7 @@ function ExercisesContent() {
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState('all')
   const [expandedExercises, setExpandedExercises] = useState<Set<string>>(new Set())
   const [isLoading, setIsLoading] = useState(true)
+  const { muscleGroups, isLoading: muscleGroupsLoading } = useMuscleGroupsContext()
 
   useEffect(() => {
     const loadData = async () => {
@@ -70,11 +72,11 @@ function ExercisesContent() {
   })
 
   const getMuscleGroupName = (muscleGroup: string) => {
-    const group = mockMuscleGroups.find(g => g.name === muscleGroup)
+    const group = muscleGroups.find(g => g.name === muscleGroup)
     return group?.name || muscleGroup
   }
 
-  if (isLoading) {
+  if (isLoading || muscleGroupsLoading) {
     return (
       <div className="h-full w-full p-10 space-y-8">
         <div className="flex items-center space-x-3">
@@ -141,7 +143,7 @@ function ExercisesContent() {
                 className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
               >
                 <option value="all">Todos os grupos</option>
-                {mockMuscleGroups.map((group) => (
+                {muscleGroups.map((group) => (
                   <option key={group.id} value={group.name}>
                     {group.name}
                   </option>

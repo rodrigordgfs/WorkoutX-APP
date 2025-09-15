@@ -54,6 +54,7 @@ export function Sidebar({ activeRoute = 'dashboard', onRouteChange }: SidebarPro
 
   const menuItems: Array<{ icon: React.ReactNode; label: string; route: Route } | { separator: true; id: string }> = [
     { icon: <LayoutDashboard className="h-4 w-4" />, label: 'Dashboard', route: 'dashboard' },
+    { icon: <Users className="h-4 w-4" />, label: 'Comunidade', route: 'community' },
     { separator: true, id: 'sep-1' },
     { icon: <Calendar className="h-4 w-4" />, label: 'Meus Treinos', route: 'workouts' },
     { icon: <Plus className="h-4 w-4" />, label: 'Cadastro de Treino', route: 'create-workout' },
@@ -61,15 +62,7 @@ export function Sidebar({ activeRoute = 'dashboard', onRouteChange }: SidebarPro
     { icon: <Muscle className="h-4 w-4" />, label: 'Grupos Musculares', route: 'muscle-groups' },
     { icon: <Target className="h-4 w-4" />, label: 'Exercícios', route: 'exercises' },
     { separator: true, id: 'sep-2' },
-    { icon: <PlusCircle className="h-4 w-4" />, label: 'Cadastrar Grupo Muscular', route: 'create-muscle-group' },
-    { icon: <Dumbbell className="h-4 w-4" />, label: 'Cadastrar Exercício', route: 'create-exercise' },
-    { separator: true, id: 'sep-3' },
-    { icon: <User className="h-4 w-4" />, label: 'Menu Perfil', route: 'profile' },
-    { icon: <Users className="h-4 w-4" />, label: 'Comunidade', route: 'community' },
-    { separator: true, id: 'sep-4' },
     { icon: <Bug className="h-4 w-4" />, label: 'Reportar Bug', route: 'report-bug' },
-    { separator: true, id: 'sep-5' },
-    { icon: <LogOut className="h-4 w-4" />, label: 'Sair', route: 'logout' },
   ]
 
   return (

@@ -2,56 +2,120 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { toast } from 'sonner'
 import { PlusCircle, Save, Upload, X, Image as ImageIcon } from 'lucide-react'
+import { useCreateMuscleGroup } from '@/hooks/use-muscle-groups'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 
+// Schema de validação com Zod
+const muscleGroupSchema = z.object({
+  name: z
+    .string()
+    .min(2, 'Nome deve ter pelo menos 2 caracteres')
+    .max(50, 'Nome deve ter no máximo 50 caracteres')
+    .regex(/^[a-zA-ZÀ-ÿ\s]+$/, 'Nome deve conter apenas letras e espaços'),
+  description: z
+    .string()
+    .min(10, 'Descrição deve ter pelo menos 10 caracteres')
+    .max(500, 'Descrição deve ter no máximo 500 caracteres'),
+  image: z
+    .string()
+    .min(1, 'Imagem é obrigatória')
+    .refine((base64) => {
+      if (!base64) return false
+      // Verificar se é uma string base64 válida
+      const base64Regex = /^data:image\/(jpeg|jpg|png);base64,/
+      return base64Regex.test(base64)
+    }, { message: 'Formato de imagem deve ser JPG, JPEG ou PNG' })
+})
+
+type MuscleGroupFormData = z.infer<typeof muscleGroupSchema>
+
 export default function CreateMuscleGroupPage() {
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-  const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const createMuscleGroupMutation = useCreateMuscleGroup()
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setValue,
+    reset
+  } = useForm<MuscleGroupFormData>({
+    resolver: zodResolver(muscleGroupSchema),
+    defaultValues: {
+      name: '',
+      description: '',
+      image: ''
+    }
+  })
+
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
-      setSelectedImage(file)
+      // Validar tamanho do arquivo
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Arquivo muito grande', {
+          description: 'A imagem deve ter no máximo 5MB.',
+          duration: 3000,
+        })
+        return
+      }
+
+      // Validar tipo do arquivo
+      if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
+        toast.error('Formato inválido', {
+          description: 'Apenas arquivos JPG, JPEG ou PNG são permitidos.',
+          duration: 3000,
+        })
+        return
+      }
+
       const reader = new FileReader()
       reader.onload = (e) => {
-        setImagePreview(e.target?.result as string)
+        const base64String = e.target?.result as string
+        setValue('image', base64String)
+        setImagePreview(base64String)
       }
       reader.readAsDataURL(file)
     }
   }
 
   const handleRemoveImage = () => {
-    setSelectedImage(null)
+    setValue('image', '')
     setImagePreview(null)
   }
 
-  const handleSave = async () => {
-    if (!name.trim()) {
-      alert('Por favor, preencha o nome do grupo muscular')
-      return
-    }
 
-    setIsLoading(true)
-    
-    // Simular salvamento
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    // Aqui você implementaria a lógica de salvamento
-    console.log('Salvando grupo muscular:', { name, description, image: selectedImage })
-    
-    setIsLoading(false)
-    alert('Grupo muscular salvo com sucesso!')
-    
-    // Limpar formulário
-    setName('')
-    setDescription('')
-    setSelectedImage(null)
-    setImagePreview(null)
+  const onSubmit = async (data: MuscleGroupFormData) => {
+    createMuscleGroupMutation.mutate(data, {
+      onSuccess: (response) => {
+        toast.success('Grupo muscular salvo com sucesso!', {
+          description: `O grupo "${response.name}" foi cadastrado com sucesso.`,
+          duration: 4000,
+        })
+        
+        // Limpar formulário
+        reset({
+          name: '',
+          description: '',
+          image: ''
+        })
+        setImagePreview(null)
+      },
+      onError: (error) => {
+        console.error('Erro ao salvar grupo muscular:', error)
+        toast.error('Erro ao salvar grupo muscular', {
+          description: error.message || 'Ocorreu um erro inesperado. Tente novamente.',
+          duration: 5000,
+        })
+      }
+    })
   }
 
   return (
@@ -67,7 +131,7 @@ export default function CreateMuscleGroupPage() {
       {/* Form Card */}
       <Card>
         <CardContent className="p-6">
-          <div className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Form Fields */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Left Column - Form Fields */}
@@ -75,38 +139,46 @@ export default function CreateMuscleGroupPage() {
                 {/* Name Input */}
                 <div>
                   <label htmlFor="muscle-group-name" className="block text-sm font-medium mb-2">
-                    Nome do Grupo Muscular
+                    Nome do Grupo Muscular *
                   </label>
                   <input
                     id="muscle-group-name"
                     type="text"
                     placeholder="Ex: Peito, Costas, Pernas..."
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus-visible:ring-offset-2"
+                    {...register('name')}
+                    className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus-visible:ring-offset-2 ${
+                      errors.name ? 'border-red-500' : 'border-input bg-background'
+                    }`}
                   />
+                  {errors.name && (
+                    <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
+                  )}
                 </div>
 
                 {/* Description Textarea */}
                 <div>
                   <label htmlFor="muscle-group-description" className="block text-sm font-medium mb-2">
-                    Descrição
+                    Descrição *
                   </label>
                   <textarea
                     id="muscle-group-description"
                     placeholder="Descreva o grupo muscular, seus músculos principais e características..."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    {...register('description')}
                     rows={8}
-                    className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus-visible:ring-offset-2 resize-none"
+                    className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus-visible:ring-offset-2 resize-none ${
+                      errors.description ? 'border-red-500' : 'border-input bg-background'
+                    }`}
                   />
+                  {errors.description && (
+                    <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>
+                  )}
                 </div>
               </div>
 
               {/* Right Column - Image Upload */}
               <div className="space-y-2">
                 <label htmlFor="image-upload" className="block text-sm font-medium">
-                  Imagem do Grupo Muscular
+                  Imagem do Grupo Muscular *
                 </label>
                 
                 {/* Image Upload Area */}
@@ -131,7 +203,9 @@ export default function CreateMuscleGroupPage() {
                       </Button>
                     </div>
                   ) : (
-                    <div className="w-full h-48 sm:h-56 lg:h-64 border-2 border-dashed border-muted-foreground/25 rounded-lg flex flex-col items-center justify-center space-y-3 sm:space-y-4 hover:border-muted-foreground/50 transition-colors cursor-pointer">
+                    <div className={`w-full h-48 sm:h-56 lg:h-64 border-2 border-dashed rounded-lg flex flex-col items-center justify-center space-y-3 sm:space-y-4 hover:border-muted-foreground/50 transition-colors cursor-pointer ${
+                      errors.image ? 'border-red-500' : 'border-muted-foreground/25'
+                    }`}>
                       <input
                         type="file"
                         accept="image/*"
@@ -152,6 +226,11 @@ export default function CreateMuscleGroupPage() {
                     </div>
                   )}
                 </div>
+
+                {/* Error message for image */}
+                {errors.image && (
+                  <p className="text-red-500 text-xs mt-1">{errors.image.message}</p>
+                )}
 
                 {/* Upload Button (if no image selected) */}
                 {!imagePreview && (
@@ -174,11 +253,11 @@ export default function CreateMuscleGroupPage() {
             {/* Save Button */}
             <div className="flex justify-center sm:justify-end pt-4 border-t">
               <Button
-                onClick={handleSave}
-                disabled={!name.trim() || isLoading}
+                type="submit"
+                disabled={createMuscleGroupMutation.isPending || isSubmitting}
                 className="w-full sm:w-auto sm:min-w-[120px] text-xs sm:text-sm"
               >
-                {isLoading ? (
+                {createMuscleGroupMutation.isPending || isSubmitting ? (
                   <div className="flex items-center">
                     <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                     <span className="hidden sm:inline">Salvando...</span>
@@ -193,7 +272,7 @@ export default function CreateMuscleGroupPage() {
                 )}
               </Button>
             </div>
-          </div>
+          </form>
         </CardContent>
       </Card>
     </div>

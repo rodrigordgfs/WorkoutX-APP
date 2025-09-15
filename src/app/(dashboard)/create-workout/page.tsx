@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Plus, Save, Search, ChevronDown, ChevronUp, X, Dumbbell } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { mockMuscleGroups, mockExercises } from '@/data/mock-data'
+import { useMuscleGroupsContext } from '@/contexts/muscle-groups-context'
 
 interface SelectedExercise {
   id: string
@@ -25,6 +25,7 @@ export default function CreateWorkoutPage() {
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
   const [selectedExercises, setSelectedExercises] = useState<SelectedExercise[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const { muscleGroups } = useMuscleGroupsContext()
 
   useEffect(() => {
     // Simular carregamento
@@ -42,11 +43,11 @@ export default function CreateWorkoutPage() {
     setExpandedGroups(newExpanded)
   }
 
-  const addExercise = (exercise: { id: string; name: string; muscleGroup: string; image?: string }) => {
+  const addExercise = (exercise: { id: string; name: string; image: string; description: string }, muscleGroupName: string) => {
     const newExercise: SelectedExercise = {
       id: exercise.id,
       name: exercise.name,
-      muscleGroup: exercise.muscleGroup,
+      muscleGroup: muscleGroupName,
       image: exercise.image || '/placeholder-exercise.jpg',
       sets: 3,
       reps: '8-12',
@@ -73,17 +74,17 @@ export default function CreateWorkoutPage() {
     ))
   }
 
-  const filteredGroups = mockMuscleGroups.filter(group =>
+  const filteredGroups = muscleGroups.filter(group =>
     group.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   const filteredExercises = (groupId: string) => {
-    // Encontrar o nome do grupo muscular pelo ID
-    const group = mockMuscleGroups.find(g => g.id === groupId)
+    // Encontrar o grupo muscular pelo ID
+    const group = muscleGroups.find(g => g.id === groupId)
     if (!group) return []
     
-    return mockExercises.filter(exercise => 
-      exercise.muscleGroup.toLowerCase() === group.name.toLowerCase() &&
+    // Usar os exercícios do grupo muscular do context
+    return group.exercises.filter(exercise => 
       exercise.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
   }
@@ -202,23 +203,35 @@ export default function CreateWorkoutPage() {
                 
                 {expandedGroups.has(group.id) && (
                   <div className="border-t p-3 sm:p-4 space-y-2 sm:space-y-3">
-                    {filteredExercises(group.id).map((exercise) => (
-                      <div key={exercise.id} className="flex items-center justify-between p-2 sm:p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-xs sm:text-sm truncate">{exercise.name}</h4>
-                          <p className="text-xs text-muted-foreground capitalize truncate">{exercise.muscleGroup}</p>
+                    {filteredExercises(group.id).length > 0 ? (
+                      filteredExercises(group.id).map((exercise) => (
+                        <div key={exercise.id} className="flex items-center justify-between p-2 sm:p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-xs sm:text-sm truncate">{exercise.name}</h4>
+                            <p className="text-xs text-muted-foreground capitalize truncate">{group.name}</p>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="default"
+                            onClick={() => addExercise(exercise, group.name)}
+                            disabled={selectedExercises.some(ex => ex.id === exercise.id)}
+                            className="cursor-pointer ml-2 flex-shrink-0"
+                          >
+                            <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+                          </Button>
                         </div>
-                        <Button
-                          size="sm"
-                          variant="default"
-                          onClick={() => addExercise(exercise)}
-                          disabled={selectedExercises.some(ex => ex.id === exercise.id)}
-                          className="cursor-pointer ml-2 flex-shrink-0"
-                        >
-                          <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
-                        </Button>
+                      ))
+                    ) : (
+                      <div className="flex flex-col items-center justify-center py-6 text-center">
+                        <Dumbbell className="h-8 w-8 text-muted-foreground mb-2" />
+                        <p className="text-sm text-muted-foreground mb-1">
+                          Nenhum exercício encontrado
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Cadastre exercícios para este grupo muscular
+                        </p>
                       </div>
-                    ))}
+                    )}
                   </div>
                 )}
               </div>

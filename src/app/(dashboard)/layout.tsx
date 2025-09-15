@@ -5,6 +5,8 @@ import { useRouter, usePathname } from 'next/navigation'
 import { Toolbar } from '@/components/layout/toolbar'
 import { Sidebar } from '@/components/layout/sidebar'
 import { SidebarProvider } from '@/contexts/sidebar-context'
+import { MuscleGroupsProvider } from '@/contexts/muscle-groups-context'
+import { clerkConfig, isInvalidKey } from '@/lib/clerk-config'
 import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/nextjs'
 import type { Route } from '@/types'
 
@@ -52,12 +54,26 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  return (
-    <>
-      <SignedIn>
+  // Se o Clerk não estiver configurado, renderizar diretamente
+  if (isInvalidKey(clerkConfig.publishableKey)) {
+    return (
+      <MuscleGroupsProvider>
         <SidebarProvider>
           <DashboardContent>{children}</DashboardContent>
         </SidebarProvider>
+      </MuscleGroupsProvider>
+    )
+  }
+
+  // Se o Clerk estiver configurado, usar os componentes de autenticação
+  return (
+    <>
+      <SignedIn>
+        <MuscleGroupsProvider>
+          <SidebarProvider>
+            <DashboardContent>{children}</DashboardContent>
+          </SidebarProvider>
+        </MuscleGroupsProvider>
       </SignedIn>
       <SignedOut>
         <RedirectToSignIn />
