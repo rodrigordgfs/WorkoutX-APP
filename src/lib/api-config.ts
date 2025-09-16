@@ -4,6 +4,8 @@ export const apiConfig = {
   endpoints: {
     muscleGroups: '/muscle-group',
     exercises: '/exercise',
+    auth: '/auth',
+    workouts: '/workout',
   },
 }
 

@@ -13,6 +13,8 @@ interface Exercise {
   reps: string
   weight: string
   rest: string
+  videoUrl?: string
+  status?: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED'
 }
 
 interface WorkoutCardProps {
@@ -93,7 +95,20 @@ export function WorkoutCard({
                 key={`${exercise.name}-${index}`}
                 className="p-3 bg-muted/50 rounded-lg space-y-2"
               >
-                <h5 className="font-medium">{exercise.name}</h5>
+                <div className="flex items-center justify-between">
+                  <h5 className="font-medium">{exercise.name}</h5>
+                  {exercise.status && (
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      exercise.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
+                      exercise.status === 'IN_PROGRESS' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {exercise.status === 'COMPLETED' ? 'Exercício finalizado' :
+                       exercise.status === 'IN_PROGRESS' ? 'Exercício em andamento' :
+                       'Exercício não iniciado'}
+                    </span>
+                  )}
+                </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
                   <div className="flex flex-col">
                     <span className="text-muted-foreground text-xs">Séries</span>

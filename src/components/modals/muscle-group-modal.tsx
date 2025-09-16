@@ -7,6 +7,8 @@ import { z } from 'zod'
 import { toast } from 'sonner'
 import { PlusCircle, Save, Upload, X, Image as ImageIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { useCreateMuscleGroup, useUpdateMuscleGroup } from '@/hooks/use-muscle-groups'
 import Image from 'next/image'
 
@@ -225,14 +227,12 @@ export function MuscleGroupModal({ isOpen, onClose, onSuccess, editData }: Muscl
                   <label htmlFor="modal-muscle-group-name" className="block text-sm font-medium mb-2">
                     Nome do Grupo Muscular *
                   </label>
-                  <input
+                  <Input
                     id="modal-muscle-group-name"
                     type="text"
                     placeholder="Ex: Peito, Costas, Pernas..."
                     {...register('name')}
-                    className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus-visible:ring-offset-2 ${
-                      errors.name ? 'border-red-500' : 'border-input bg-background'
-                    }`}
+                    className={errors.name ? 'border-red-500' : ''}
                   />
                   {errors.name && (
                     <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
@@ -244,14 +244,12 @@ export function MuscleGroupModal({ isOpen, onClose, onSuccess, editData }: Muscl
                   <label htmlFor="modal-muscle-group-description" className="block text-sm font-medium mb-2">
                     Descrição *
                   </label>
-                  <textarea
+                  <Textarea
                     id="modal-muscle-group-description"
                     placeholder="Descreva o grupo muscular, seus músculos principais e características..."
                     {...register('description')}
                     rows={6}
-                    className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus-visible:ring-offset-2 resize-none ${
-                      errors.description ? 'border-red-500' : 'border-input bg-background'
-                    }`}
+                    className={`resize-none ${errors.description ? 'border-red-500' : ''}`}
                   />
                   {errors.description && (
                     <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>

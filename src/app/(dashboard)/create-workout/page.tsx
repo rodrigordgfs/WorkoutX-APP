@@ -24,8 +24,12 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Select } from '@/components/ui/select'
 import { useMuscleGroups } from '@/hooks/use-muscle-groups'
 import { useExercises } from '@/hooks/use-exercises-list'
+import { useCreateWorkout } from '@/hooks/use-workouts'
+import { toast } from 'sonner'
 
 interface SelectedExercise {
   id: string
@@ -66,6 +70,8 @@ function DraggableExerciseItem({
       className={`border rounded-lg p-3 sm:p-4 transition-all duration-300 ease-in-out transform ${
         isDragging ? 'scale-105 shadow-xl bg-primary/10 border-primary/30 -translate-y-0.5 z-10' : 'hover:shadow-md'
       }`}
+      // Inline styles are required for drag and drop functionality
+      // eslint-disable-next-line react/forbid-dom-props
       style={{
         transform: CSS.Transform.toString(transform),
         transition,
@@ -127,47 +133,43 @@ function DraggableExerciseItem({
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             <div>
               <label htmlFor={`sets-${exercise.id}`} className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2">Séries</label>
-              <input
+              <Input
                 id={`sets-${exercise.id}`}
                 type="number"
                 value={exercise.sets}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdateConfig(exercise.id, 'sets', parseInt(e.target.value) || 0)}
                 min="1"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               />
             </div>
             <div>
               <label htmlFor={`reps-${exercise.id}`} className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2">Repetições</label>
-              <input
+              <Input
                 id={`reps-${exercise.id}`}
                 type="number"
                 value={exercise.reps}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdateConfig(exercise.id, 'reps', parseInt(e.target.value) || 0)}
                 min="1"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               />
             </div>
             <div>
               <label htmlFor={`weight-${exercise.id}`} className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2">Peso (kg)</label>
-              <input
+              <Input
                 id={`weight-${exercise.id}`}
                 type="number"
                 value={exercise.weight}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdateConfig(exercise.id, 'weight', parseFloat(e.target.value) || 0)}
                 min="0"
                 step="0.5"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               />
             </div>
             <div>
               <label htmlFor={`rest-${exercise.id}`} className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2">Descanso (min)</label>
-              <input
+              <Input
                 id={`rest-${exercise.id}`}
                 type="number"
                 value={exercise.rest}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdateConfig(exercise.id, 'rest', parseInt(e.target.value) || 0)}
                 min="0"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               />
             </div>
           </div>
@@ -186,6 +188,7 @@ export default function CreateWorkoutPage() {
   const [isLoading, setIsLoading] = useState(true)
   const { data: muscleGroups = [], isLoading: muscleGroupsLoading } = useMuscleGroups()
   const { data: exercises = [], isLoading: exercisesLoading } = useExercises()
+  const createWorkoutMutation = useCreateWorkout()
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -253,15 +256,24 @@ export default function CreateWorkoutPage() {
     ))
   }
 
-  const filteredGroups = muscleGroups.filter(group =>
-    group.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredGroups = muscleGroups.filter(group => {
+    // Se não há termo de busca, mostrar todos os grupos
+    if (!searchTerm.trim()) return true
+    
+    // Verificar se algum exercício do grupo corresponde ao termo de busca
+    const groupExercises = exercises.filter(exercise => 
+      exercise.muscleGroupId === group.id &&
+      exercise.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    
+    return groupExercises.length > 0
+  })
 
   const filteredExercises = (groupId: string) => {
     // Filtrar exercícios por grupo muscular e termo de busca
     return exercises.filter(exercise => 
       exercise.muscleGroupId === groupId &&
-      exercise.name.toLowerCase().includes(searchTerm.toLowerCase())
+      (searchTerm.trim() === '' || exercise.name.toLowerCase().includes(searchTerm.toLowerCase()))
     )
   }
 
@@ -296,12 +308,38 @@ export default function CreateWorkoutPage() {
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Cadastro de Treino</h1>
         </div>
         <Button 
-          onClick={() => console.log('Salvar treino')}
-          disabled={!workoutName.trim() || selectedExercises.length === 0}
+          onClick={async () => {
+            const workoutData = {
+              name: workoutName,
+              privacy: privacy.toUpperCase(),
+              exercises: selectedExercises.map(exercise => ({
+                id: exercise.id,
+                series: exercise.sets,
+                repetitions: exercise.reps,
+                weight: exercise.weight,
+                rest: exercise.rest
+              }))
+            }
+            
+            try {
+              await createWorkoutMutation.mutateAsync(workoutData)
+              toast.success('Treino criado com sucesso!')
+              
+              // Limpar formulário após sucesso
+              setWorkoutName('')
+              setPrivacy('private')
+              setSelectedExercises([])
+              setExpandedGroups(new Set()) // Retrair todos os cards de exercícios
+            } catch (error) {
+              console.error('Erro ao criar treino:', error)
+              toast.error('Erro ao criar treino. Tente novamente.')
+            }
+          }}
+          disabled={!workoutName.trim() || selectedExercises.length === 0 || createWorkoutMutation.isPending}
           className="w-full sm:w-auto"
         >
           <Save className="h-4 w-4 mr-2" />
-          Salvar Treino
+          {createWorkoutMutation.isPending ? 'Salvando...' : 'Salvar Treino'}
         </Button>
       </div>
 
@@ -313,28 +351,25 @@ export default function CreateWorkoutPage() {
               <label htmlFor="workout-name" className="block text-sm font-medium mb-2">
                 Nome do Treino
               </label>
-              <input
+              <Input
                 id="workout-name"
                 placeholder="Ex: Treino de Peito e Tríceps"
                 value={workoutName}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWorkoutName(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               />
             </div>
             <div>
               <label htmlFor="privacy" className="block text-sm font-medium mb-2">
                 Privacidade
               </label>
-              <select
+              <Select
                 id="privacy"
                 value={privacy}
                 onChange={(e) => setPrivacy(e.target.value)}
-                className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
               >
-                <option value="private">Privado</option>
-                <option value="public">Público</option>
-                <option value="friends">Apenas Amigos</option>
-              </select>
+                <option value="PRIVATE">Privado</option>
+                <option value="PUBLIC">Público</option>
+              </Select>
             </div>
           </div>
         </CardContent>
@@ -348,11 +383,11 @@ export default function CreateWorkoutPage() {
             <CardTitle className="text-lg sm:text-xl">Selecionar Exercícios</CardTitle>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
-                placeholder="Buscar exercícios..."
+              <Input
+                placeholder="Buscar por nome do exercício..."
                 value={searchTerm}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-                className="pl-10 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="pl-10"
               />
             </div>
           </CardHeader>
@@ -392,9 +427,29 @@ export default function CreateWorkoutPage() {
                     {filteredExercises(group.id).length > 0 ? (
                       filteredExercises(group.id).map((exercise) => (
                         <div key={exercise.id} className="flex items-center justify-between p-2 sm:p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-xs sm:text-sm truncate">{exercise.name}</h4>
-                            <p className="text-xs text-muted-foreground capitalize truncate">{group.name}</p>
+                          <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+                            {/* Exercise Image */}
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                              {exercise.image ? (
+                                <Image
+                                  src={exercise.image}
+                                  alt={exercise.name}
+                                  width={40}
+                                  height={40}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full bg-primary/10 rounded-lg flex items-center justify-center">
+                                  <Dumbbell className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
+                                </div>
+                              )}
+                            </div>
+                            
+                            {/* Exercise Info */}
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-medium text-xs sm:text-sm truncate">{exercise.name}</h4>
+                              <p className="text-xs text-muted-foreground capitalize truncate">{group.name}</p>
+                            </div>
                           </div>
                           <Button
                             size="sm"

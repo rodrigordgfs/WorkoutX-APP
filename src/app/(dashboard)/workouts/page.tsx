@@ -1,10 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { Calendar, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { WorkoutCard } from '@/components/workouts/workout-card'
-import { mockWorkouts } from '@/data/mock-data'
+import { useUserWorkouts } from '@/hooks/use-workouts'
 
 // Componente de Skeleton para WorkoutCard
 const SkeletonWorkoutCard = () => (
@@ -33,31 +32,29 @@ const SkeletonWorkoutCard = () => (
 )
 
 export default function WorkoutsPage() {
-  const [isLoading, setIsLoading] = useState(true)
+  const { data: workouts = [], isLoading, error } = useUserWorkouts()
 
-  useEffect(() => {
-    const loadData = async () => {
-      // Simular carregamento assíncrono
-      await new Promise(resolve => setTimeout(resolve, 1200))
-      setIsLoading(false)
-    }
-    
-    loadData()
-  }, [])
-  
-  // Usar os dados mock que já têm IDs
-  const workouts = mockWorkouts.map(workout => ({
-    id: workout.id,
-    title: workout.title,
-    exerciseCount: workout.exerciseCount,
-    exercises: workout.exercises.map(exercise => ({
-      name: exercise.name,
-      sets: exercise.sets,
-      reps: exercise.reps,
-      weight: exercise.weight,
-      rest: exercise.rest
-    }))
-  }))
+  if (error) {
+    return (
+      <div className="h-full w-full p-10 space-y-8">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center space-x-3 flex-1 min-w-0">
+            <div className="p-2 bg-primary/10 rounded-lg flex-shrink-0">
+              <Calendar className="h-6 w-6 text-primary" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight truncate">Meus Treinos</h1>
+          </div>
+        </div>
+        
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-muted-foreground mb-4">Erro ao carregar treinos</p>
+            <p className="text-sm text-muted-foreground">{error.message}</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   if (isLoading) {
     return (
@@ -104,15 +101,31 @@ export default function WorkoutsPage() {
 
       {/* Workout Cards */}
       <div className="space-y-4">
-        {workouts.map((workout) => (
-          <WorkoutCard
-            key={workout.id}
-            id={workout.id}
-            title={workout.title}
-            exerciseCount={workout.exerciseCount}
-            exercises={workout.exercises}
-          />
-        ))}
+        {workouts.length === 0 ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <p className="text-muted-foreground mb-4">Nenhum treino encontrado</p>
+              <p className="text-sm text-muted-foreground">Crie seu primeiro treino para começar!</p>
+            </div>
+          </div>
+        ) : (
+          workouts.map((workout) => (
+            <WorkoutCard
+              key={workout.id}
+              id={workout.id}
+              title={workout.name}
+              exerciseCount={workout.exercises.length}
+              exercises={workout.exercises.map(exercise => ({
+                name: exercise.name,
+                sets: parseInt(exercise.series),
+                reps: exercise.repetitions,
+                weight: exercise.weight,
+                rest: exercise.restTime,
+                videoUrl: exercise.videoUrl
+              }))}
+            />
+          ))
+        )}
       </div>
     </div>
   )

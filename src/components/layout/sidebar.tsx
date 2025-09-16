@@ -1,6 +1,6 @@
 'use client'
 
-import { LayoutDashboard, Calendar, Plus, History, FileMusic as Muscle, Target, PlusCircle, Dumbbell, User, Users, Bug, LogOut, ChevronLeft, ChevronRight } from 'lucide-react'
+import { LayoutDashboard, Calendar, Plus, History, FileMusic as Muscle, Target, Users, Bug, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 import type { Route } from '@/types'
 import { useSidebar } from '@/contexts/sidebar-context'
 import { useUser, useClerk } from '@clerk/nextjs'
+import { usePermissions } from '@/hooks/use-permissions'
 
 interface SidebarProps {
   activeRoute?: Route
@@ -51,6 +52,7 @@ export function Sidebar({ activeRoute = 'dashboard', onRouteChange }: SidebarPro
   const { isCollapsed, isMobileOpen, toggleCollapsed, setMobileOpen } = useSidebar()
   const { user } = useUser()
   const { signOut } = useClerk()
+  const { permission } = usePermissions()
 
   const menuItems: Array<{ icon: React.ReactNode; label: string; route: Route } | { separator: true; id: string }> = [
     { icon: <LayoutDashboard className="h-4 w-4" />, label: 'Dashboard', route: 'dashboard' },
@@ -101,8 +103,8 @@ export function Sidebar({ activeRoute = 'dashboard', onRouteChange }: SidebarPro
                     user?.emailAddresses[0]?.emailAddress || 'Usuário'
                   }
                 </span>
-                <span className="text-xs text-muted-foreground">
-                  {user?.emailAddresses[0]?.emailAddress || 'Usuário'}
+                <span className="text-xs text-muted-foreground capitalize">
+                  {permission === 'admin' ? 'Administrador' : 'Usuário'}
                 </span>
               </div>
             </div>

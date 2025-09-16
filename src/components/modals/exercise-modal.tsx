@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -8,8 +8,11 @@ import { z } from 'zod'
 import { toast } from 'sonner'
 import { X, Save, Upload, Image as ImageIcon, Video, Dumbbell } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Select } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
 import { useMuscleGroupsContext } from '@/contexts/muscle-groups-context'
-import { useCreateExercise } from '@/hooks/use-exercises'
+import { useCreateExercise, useUpdateExercise, type Exercise } from '@/hooks/use-exercises'
 
 // Schema de validação
 const exerciseSchema = z.object({
@@ -32,12 +35,14 @@ interface ExerciseModalProps {
   isOpen: boolean
   onClose: () => void
   onSuccess?: () => void
+  editData?: Exercise | null
 }
 
-export function ExerciseModal({ isOpen, onClose, onSuccess }: ExerciseModalProps) {
+export function ExerciseModal({ isOpen, onClose, onSuccess, editData }: ExerciseModalProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const { muscleGroups, isLoading: muscleGroupsLoading } = useMuscleGroupsContext()
   const createExerciseMutation = useCreateExercise()
+  const updateExerciseMutation = useUpdateExercise()
 
   const {
     register,
@@ -49,15 +54,30 @@ export function ExerciseModal({ isOpen, onClose, onSuccess }: ExerciseModalProps
   } = useForm<ExerciseFormData>({
     resolver: zodResolver(exerciseSchema),
     defaultValues: {
-      name: '',
-      muscleGroupId: '',
-      description: '',
-      videoUrl: '',
-      image: ''
+      name: editData?.name || '',
+      muscleGroupId: editData?.muscleGroupId || '',
+      description: editData?.description || '',
+      videoUrl: editData?.videoUrl || '',
+      image: editData?.image || ''
     }
   })
 
   const watchedImage = watch('image')
+
+  // Atualizar o formulário quando editData mudar
+  useEffect(() => {
+    if (editData) {
+      setValue('name', editData.name)
+      setValue('muscleGroupId', editData.muscleGroupId)
+      setValue('description', editData.description)
+      setValue('videoUrl', editData.videoUrl || '')
+      setValue('image', editData.image)
+      setImagePreview(editData.image)
+    } else {
+      reset()
+      setImagePreview(null)
+    }
+  }, [editData, setValue, reset])
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -103,22 +123,36 @@ export function ExerciseModal({ isOpen, onClose, onSuccess }: ExerciseModalProps
 
       console.log('Grupo muscular selecionado:', selectedMuscleGroup)
 
-      await createExerciseMutation.mutateAsync({
-        muscleGroupId: data.muscleGroupId,
-        name: data.name,
-        description: data.description,
-        image: data.image,
-        videoUrl: data.videoUrl
-      })
+      if (editData) {
+        // Modo de edição
+        await updateExerciseMutation.mutateAsync({
+          id: editData.id,
+          muscleGroupId: data.muscleGroupId,
+          name: data.name,
+          description: data.description,
+          image: data.image,
+          videoUrl: data.videoUrl
+        })
+        toast.success('Exercício atualizado com sucesso!')
+      } else {
+        // Modo de criação
+        await createExerciseMutation.mutateAsync({
+          muscleGroupId: data.muscleGroupId,
+          name: data.name,
+          description: data.description,
+          image: data.image,
+          videoUrl: data.videoUrl
+        })
+        toast.success('Exercício criado com sucesso!')
+      }
 
-      toast.success('Exercício criado com sucesso!')
       reset()
       setImagePreview(null)
       onSuccess?.()
       onClose()
     } catch (error) {
-      console.error('Erro ao criar exercício:', error)
-      toast.error('Erro ao criar exercício. Tente novamente.')
+      console.error('Erro ao salvar exercício:', error)
+      toast.error('Erro ao salvar exercício. Tente novamente.')
     }
   }
 
@@ -142,7 +176,9 @@ export function ExerciseModal({ isOpen, onClose, onSuccess }: ExerciseModalProps
             <div className="p-2 bg-primary/10 rounded-lg">
               <Dumbbell className="h-5 w-5 text-primary" />
             </div>
-            <h2 className="text-xl font-semibold">Cadastrar Exercício</h2>
+            <h2 className="text-xl font-semibold">
+              {editData ? 'Editar Exercício' : 'Cadastrar Exercício'}
+            </h2>
           </div>
           <Button
             variant="ghost"
@@ -164,14 +200,12 @@ export function ExerciseModal({ isOpen, onClose, onSuccess }: ExerciseModalProps
                 <label htmlFor="modal-exercise-name" className="block text-sm font-medium mb-2">
                   Nome do Exercício *
                 </label>
-                <input
+                <Input
                   id="modal-exercise-name"
                   type="text"
                   placeholder="Ex: Supino Reto, Agachamento..."
                   {...register('name')}
-                  className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus-visible:ring-offset-2 ${
-                    errors.name ? 'border-red-500' : 'border-input bg-background'
-                  }`}
+                  className={errors.name ? 'border-red-500' : ''}
                 />
                 {errors.name && (
                   <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
@@ -183,12 +217,10 @@ export function ExerciseModal({ isOpen, onClose, onSuccess }: ExerciseModalProps
                 <label htmlFor="modal-muscle-group-select" className="block text-sm font-medium mb-2">
                   Grupo Muscular *
                 </label>
-                <select
+                <Select
                   id="modal-muscle-group-select"
                   {...register('muscleGroupId')}
-                  className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus-visible:ring-offset-2 ${
-                    errors.muscleGroupId ? 'border-red-500' : 'border-input bg-background'
-                  }`}
+                  className={errors.muscleGroupId ? 'border-red-500' : ''}
                   disabled={muscleGroupsLoading}
                 >
                   <option value="">Selecione um grupo muscular</option>
@@ -197,7 +229,7 @@ export function ExerciseModal({ isOpen, onClose, onSuccess }: ExerciseModalProps
                       {group.name}
                     </option>
                   ))}
-                </select>
+                </Select>
                 {errors.muscleGroupId && (
                   <p className="text-red-500 text-xs mt-1">{errors.muscleGroupId.message}</p>
                 )}
@@ -210,14 +242,12 @@ export function ExerciseModal({ isOpen, onClose, onSuccess }: ExerciseModalProps
                 </label>
                 <div className="relative">
                   <Video className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <input
+                  <Input
                     id="modal-video-url"
                     type="url"
                     placeholder="https://youtube.com/watch?v=..."
                     {...register('videoUrl')}
-                    className={`pl-10 w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus-visible:ring-offset-2 ${
-                      errors.videoUrl ? 'border-red-500' : 'border-input bg-background'
-                    }`}
+                    className={`pl-10 ${errors.videoUrl ? 'border-red-500' : ''}`}
                   />
                 </div>
                 {errors.videoUrl && (
@@ -230,14 +260,12 @@ export function ExerciseModal({ isOpen, onClose, onSuccess }: ExerciseModalProps
                 <label htmlFor="modal-exercise-description" className="block text-sm font-medium mb-2">
                   Descrição *
                 </label>
-                <textarea
+                <Textarea
                   id="modal-exercise-description"
                   placeholder="Descreva como executar o exercício, posicionamento, dicas importantes..."
                   {...register('description')}
                   rows={6}
-                  className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus-visible:ring-offset-2 resize-none ${
-                    errors.description ? 'border-red-500' : 'border-input bg-background'
-                  }`}
+                  className={`resize-none ${errors.description ? 'border-red-500' : ''}`}
                 />
                 {errors.description && (
                   <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>
@@ -335,15 +363,15 @@ export function ExerciseModal({ isOpen, onClose, onSuccess }: ExerciseModalProps
               type="button"
               variant="outline"
               onClick={onClose}
-              disabled={isSubmitting || createExerciseMutation.isPending}
+              disabled={isSubmitting || createExerciseMutation.isPending || updateExerciseMutation.isPending}
             >
               Cancelar
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting || createExerciseMutation.isPending || muscleGroupsLoading}
+              disabled={isSubmitting || createExerciseMutation.isPending || updateExerciseMutation.isPending || muscleGroupsLoading}
             >
-              {isSubmitting || createExerciseMutation.isPending ? (
+              {isSubmitting || createExerciseMutation.isPending || updateExerciseMutation.isPending ? (
                 <div className="flex items-center">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                   Salvando...
@@ -351,7 +379,7 @@ export function ExerciseModal({ isOpen, onClose, onSuccess }: ExerciseModalProps
               ) : (
                 <>
                   <Save className="h-4 w-4 mr-2" />
-                  Salvar Exercício
+                  {editData ? 'Atualizar Exercício' : 'Salvar Exercício'}
                 </>
               )}
             </Button>

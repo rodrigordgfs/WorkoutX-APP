@@ -9,6 +9,7 @@ import { MuscleGroupsProvider } from '@/contexts/muscle-groups-context'
 import { ExercisesProvider } from '@/contexts/exercises-context'
 import { clerkConfig, isInvalidKey } from '@/lib/clerk-config'
 import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/nextjs'
+import { AuthIntegration } from '@/components/auth/auth-integration'
 import type { Route } from '@/types'
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
@@ -72,6 +73,7 @@ export default function DashboardLayout({
   return (
     <>
       <SignedIn>
+        <AuthIntegration />
         <MuscleGroupsProvider>
           <ExercisesProvider>
             <SidebarProvider>

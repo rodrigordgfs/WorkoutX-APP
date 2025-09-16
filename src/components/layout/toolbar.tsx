@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { useRouter } from 'next/navigation'
 import { useUser, useClerk } from '@clerk/nextjs'
+import { usePermissions } from '@/hooks/use-permissions'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +21,7 @@ export function Toolbar({ showBackButton = false, backUrl = '/workouts' }: Toolb
   const router = useRouter()
   const { user } = useUser()
   const { signOut } = useClerk()
+  const { permission } = usePermissions()
 
   const handleBack = () => {
     router.push(backUrl)
@@ -79,18 +81,18 @@ export function Toolbar({ showBackButton = false, backUrl = '/workouts' }: Toolb
                 <div className="flex items-center justify-start gap-2 p-2">
                   <div className="flex flex-col space-y-1 leading-none">
                     <p className="font-medium">{user?.fullName || user?.emailAddresses[0]?.emailAddress}</p>
-                    <p className="w-[200px] truncate text-sm text-muted-foreground">
-                      {user?.emailAddresses[0]?.emailAddress}
+                    <p className="w-[200px] truncate text-sm text-muted-foreground capitalize">
+                      {permission === 'admin' ? 'Administrador' : 'Usuário'}
                     </p>
                   </div>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => router.push('/profile')}>
+                <DropdownMenuItem className='cursor-pointer' onClick={() => router.push('/profile')}>
                   <User className="mr-2 h-4 w-4" />
                   <span>Perfil</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
+                <DropdownMenuItem className='cursor-pointer' onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Sair</span>
                 </DropdownMenuItem>
@@ -138,18 +140,18 @@ export function Toolbar({ showBackButton = false, backUrl = '/workouts' }: Toolb
                 <div className="flex items-center justify-start gap-2 p-2">
                   <div className="flex flex-col space-y-1 leading-none">
                     <p className="font-medium">{user?.fullName || user?.emailAddresses[0]?.emailAddress}</p>
-                    <p className="w-[200px] truncate text-sm text-muted-foreground">
-                      {user?.emailAddresses[0]?.emailAddress}
+                    <p className="w-[200px] truncate text-sm text-muted-foreground capitalize">
+                      {permission === 'admin' ? 'Administrador' : 'Usuário'}
                     </p>
                   </div>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => router.push('/profile')}>
+                <DropdownMenuItem className='cursor-pointer' onClick={() => router.push('/profile')}>
                   <User className="mr-2 h-4 w-4" />
                   <span>Perfil</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
+                <DropdownMenuItem className='cursor-pointer' onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Sair</span>
                 </DropdownMenuItem>
