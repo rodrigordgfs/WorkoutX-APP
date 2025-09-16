@@ -1,11 +1,25 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, ChevronUp, Dumbbell, Eye, Search, Plus, X } from 'lucide-react'
+import Image from 'next/image'
+import { ChevronDown, ChevronUp, Dumbbell, Eye, Search, Plus, X, MoreVertical, Edit, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { useMuscleGroupsContext } from '@/contexts/muscle-groups-context'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { MuscleGroupModal } from '@/components/modals/muscle-group-modal'
+import { useDeleteMuscleGroup, useMuscleGroups } from '@/hooks/use-muscle-groups'
+import { useDebounce } from '@/hooks/use-debounce'
+import { toast } from 'sonner'
 
 // Componentes de Skeleton
 const SkeletonMuscleGroupCard = () => (
@@ -26,7 +40,23 @@ const SkeletonMuscleGroupCard = () => (
 export default function MuscleGroupsPage() {
   const router = useRouter()
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
-  const { muscleGroups, isLoading, searchTerm, setSearchTerm, clearSearch } = useMuscleGroupsContext()
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+  const [editingGroup, setEditingGroup] = useState<{
+    id: string
+    name: string
+    description: string
+    image: string
+  } | null>(null)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [groupToDelete, setGroupToDelete] = useState<{
+    id: string
+    name: string
+  } | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const debouncedSearchTerm = useDebounce(searchTerm, 1000)
+  const { data: muscleGroups = [], isLoading } = useMuscleGroups(debouncedSearchTerm)
+  const deleteMuscleGroupMutation = useDeleteMuscleGroup()
 
   const toggleGroup = (groupId: string) => {
     const newExpanded = new Set(expandedGroups)
@@ -44,10 +74,86 @@ export default function MuscleGroupsPage() {
   const handleViewExercises = (groupId: string) => {
     const group = muscleGroups.find(g => g.id === groupId)
     if (group) {
-      // Navegar para a página de exercícios com o grupo muscular como parâmetro
-      router.push(`/exercises?muscleGroup=${encodeURIComponent(group.name)}`)
+      // Navegar para a página de exercícios com o ID do grupo muscular como parâmetro
+      router.push(`/exercises?muscleGroupId=${groupId}`)
     }
   }
+
+  const openModal = () => {
+    setIsModalOpen(true)
+  }
+
+  const closeModal = () => {
+    setIsModalOpen(false)
+    setEditingGroup(null)
+  }
+
+  const handleEditGroup = (groupId: string) => {
+    const group = muscleGroups.find(g => g.id === groupId)
+    if (group) {
+      setEditingGroup({
+        id: group.id,
+        name: group.name,
+        description: group.description,
+        image: group.image
+      })
+      setIsModalOpen(true)
+    }
+    setOpenMenuId(null)
+  }
+
+  const handleDeleteGroup = (groupId: string) => {
+    const group = muscleGroups.find(g => g.id === groupId)
+    if (group) {
+      setGroupToDelete({ id: groupId, name: group.name })
+      setDeleteDialogOpen(true)
+    }
+    setOpenMenuId(null)
+  }
+
+  const toggleMenu = (groupId: string) => {
+    setOpenMenuId(openMenuId === groupId ? null : groupId)
+  }
+
+  const confirmDelete = async () => {
+    if (!groupToDelete) return
+    
+    try {
+      await deleteMuscleGroupMutation.mutateAsync(groupToDelete.id)
+      toast.success('Grupo muscular excluído com sucesso!')
+      setDeleteDialogOpen(false)
+      setGroupToDelete(null)
+    } catch (error) {
+      console.error('Erro ao excluir grupo:', error)
+      toast.error(error instanceof Error ? error.message : 'Erro ao excluir grupo muscular')
+    }
+  }
+
+  const cancelDelete = () => {
+    setDeleteDialogOpen(false)
+    setGroupToDelete(null)
+  }
+
+  const clearSearch = () => {
+    setSearchTerm('')
+  }
+
+  // Fechar menu quando clicar fora
+  useEffect(() => {
+    const handleClickOutside = (_event: MouseEvent) => {
+      if (openMenuId) {
+        setOpenMenuId(null)
+      }
+    }
+
+    if (openMenuId) {
+      document.addEventListener('click', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [openMenuId])
 
   if (isLoading) {
     return (
@@ -81,7 +187,7 @@ export default function MuscleGroupsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Grupos Musculares</h1>
         </div>
         <Button 
-          onClick={() => router.push('/create-muscle-group')}
+          onClick={openModal}
           className="w-full sm:w-auto"
         >
           <Plus className="h-4 w-4 mr-2" />
@@ -160,7 +266,7 @@ export default function MuscleGroupsPage() {
             const isExpanded = expandedGroups.has(group.id)
             
             return (
-              <Card key={group.id} className="overflow-hidden h-fit">
+              <Card key={group.id} className="h-fit">
                 <div className="p-6">
                   <div className="flex flex-col space-y-4">
                     {/* Group Header */}
@@ -169,10 +275,11 @@ export default function MuscleGroupsPage() {
                         {/* Group Image */}
                         <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
                           {group.image ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img 
+                            <Image 
                               src={group.image} 
                               alt={group.name}
+                              width={48}
+                              height={48}
                               className="w-full h-full object-cover"
                             />
                           ) : (
@@ -189,19 +296,58 @@ export default function MuscleGroupsPage() {
                         </div>
                       </div>
 
-                      {/* Expand Button */}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleGroup(group.id)}
-                        className="cursor-pointer p-2"
-                      >
-                        {isExpanded ? (
-                          <ChevronUp className="h-4 w-4" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4" />
-                        )}
-                      </Button>
+                      {/* Action Buttons */}
+                      <div className="flex items-center space-x-2">
+                        {/* Options Menu */}
+                        <div className="relative">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleMenu(group.id)}
+                            className="cursor-pointer p-2"
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                          
+                          {/* Dropdown Menu */}
+                          {openMenuId === group.id && (
+                            <div className="absolute right-0 top-full mt-1 w-48 bg-background border rounded-md shadow-lg z-50">
+                              <div className="py-1">
+                                <button
+                                  type="button"
+                                  onClick={() => handleEditGroup(group.id)}
+                                  className="flex items-center w-full px-4 py-2 text-sm text-foreground hover:bg-muted"
+                                >
+                                  <Edit className="h-4 w-4 mr-3" />
+                                  Editar Grupo
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteGroup(group.id)}
+                                  className="flex items-center w-full px-4 py-2 text-sm text-destructive hover:bg-muted"
+                                >
+                                  <Trash2 className="h-4 w-4 mr-3" />
+                                  Excluir Grupo
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Expand Button */}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleGroup(group.id)}
+                          className="cursor-pointer p-2"
+                        >
+                          {isExpanded ? (
+                            <ChevronUp className="h-4 w-4" />
+                          ) : (
+                            <ChevronDown className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
                     </div>
 
                     {/* Expanded Content */}
@@ -229,31 +375,44 @@ export default function MuscleGroupsPage() {
                           </div>
                           
                           <div className="space-y-2 max-h-60 overflow-y-auto">
-                            {groupExercises.map((exercise) => (
-                              <div key={exercise.id} className="flex items-start space-x-3 p-3 bg-muted/30 rounded-lg">
-                                {/* Exercise Image */}
-                                <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
-                                  {exercise.image ? (
-                                    // eslint-disable-next-line @next/next/no-img-element
-                                    <img 
-                                      src={exercise.image} 
-                                      alt={exercise.name}
-                                      className="w-full h-full object-cover"
-                                    />
-                                  ) : (
-                                    <Dumbbell className="h-5 w-5 text-muted-foreground" />
-                                  )}
+                            {groupExercises.length > 0 ? (
+                              groupExercises.map((exercise) => (
+                                <div key={exercise.id} className="flex items-start space-x-3 p-3 bg-muted/30 rounded-lg">
+                                  {/* Exercise Image */}
+                                  <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                    {exercise.image ? (
+                                      <Image 
+                                        src={exercise.image} 
+                                        alt={exercise.name}
+                                        width={40}
+                                        height={40}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    ) : (
+                                      <Dumbbell className="h-5 w-5 text-muted-foreground" />
+                                    )}
+                                  </div>
+                                  
+                                  {/* Exercise Info */}
+                                  <div className="flex-1 min-w-0">
+                                    <h5 className="font-medium text-sm truncate">{exercise.name}</h5>
+                                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                      {exercise.description}
+                                    </p>
+                                  </div>
                                 </div>
-                                
-                                {/* Exercise Info */}
-                                <div className="flex-1 min-w-0">
-                                  <h5 className="font-medium text-sm truncate">{exercise.name}</h5>
-                                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                                    {exercise.description}
-                                  </p>
-                                </div>
+                              ))
+                            ) : (
+                              <div className="text-center py-2">
+                                <Dumbbell className="h-6 w-6 text-muted-foreground mx-auto mb-3" />
+                                <p className="text-sm text-muted-foreground mb-2">
+                                  Nenhum exercício cadastrado
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  Adicione exercícios para este grupo muscular
+                                </p>
                               </div>
-                            ))}
+                            )}
                           </div>
                         </div>
                       </div>
@@ -265,6 +424,51 @@ export default function MuscleGroupsPage() {
           })
         )}
       </div>
+
+      {/* Modal de Cadastro */}
+      <MuscleGroupModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        editData={editingGroup}
+        onSuccess={() => {
+          // Opcional: adicionar lógica adicional após sucesso
+          console.log(editingGroup ? 'Grupo muscular atualizado com sucesso!' : 'Grupo muscular criado com sucesso!')
+        }}
+      />
+
+      {/* Dialog de Confirmação de Exclusão */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir o grupo muscular <strong>"{groupToDelete?.name}"</strong>?
+              <br />
+              <br />
+              Esta ação não pode ser desfeita e todos os exercícios associados a este grupo também serão removidos.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelDelete}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDelete}
+              disabled={deleteMuscleGroupMutation.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50"
+            >
+              {deleteMuscleGroupMutation.isPending ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                  Excluindo...
+                </>
+              ) : (
+                'Excluir'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

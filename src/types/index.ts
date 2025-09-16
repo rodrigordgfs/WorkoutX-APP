@@ -5,8 +5,6 @@ export type Route =
   | 'workout-history'
   | 'muscle-groups'
   | 'exercises'
-  | 'create-muscle-group'
-  | 'create-exercise'
   | 'profile'
   | 'community'
   | 'report-bug'

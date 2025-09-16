@@ -3,6 +3,7 @@ export const apiConfig = {
   baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002',
   endpoints: {
     muscleGroups: '/muscle-group',
+    exercises: '/exercise',
   },
 }
 

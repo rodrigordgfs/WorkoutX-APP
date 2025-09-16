@@ -2,11 +2,14 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { Search, ChevronDown, ChevronUp, Dumbbell, Play, Plus } from 'lucide-react'
+import Image from 'next/image'
+import { Search, ChevronDown, ChevronUp, Dumbbell, Play, Plus, X } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { mockExercises } from '@/data/mock-data'
-import { useMuscleGroupsContext } from '@/contexts/muscle-groups-context'
+import { useMuscleGroups } from '@/hooks/use-muscle-groups'
+import { useExercises } from '@/hooks/use-exercises-list'
+import { useDebounce } from '@/hooks/use-debounce'
+import { ExerciseModal } from '@/components/modals/exercise-modal'
 
 // Componentes de Skeleton
 const SkeletonExerciseCard = () => (
@@ -29,26 +32,22 @@ const SkeletonExerciseCard = () => (
 function ExercisesContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedMuscleGroup, setSelectedMuscleGroup] = useState('all')
   const [expandedExercises, setExpandedExercises] = useState<Set<string>>(new Set())
-  const [isLoading, setIsLoading] = useState(true)
-  const { muscleGroups, isLoading: muscleGroupsLoading } = useMuscleGroupsContext()
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string>('all')
+  const debouncedSearchTerm = useDebounce(searchTerm, 1000)
+  
+  const { data: muscleGroups = [], isLoading: muscleGroupsLoading } = useMuscleGroups()
+  const { data: exercises = [], isLoading: exercisesLoading } = useExercises(debouncedSearchTerm, selectedMuscleGroup)
 
-  useEffect(() => {
-    const loadData = async () => {
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      setIsLoading(false)
-    }
-    
-    loadData()
-  }, [])
+  // Removido useEffect de loading - agora usa o context
 
   // Aplicar filtro de grupo muscular da URL
   useEffect(() => {
-    const muscleGroupParam = searchParams.get('muscleGroup')
-    if (muscleGroupParam) {
-      setSelectedMuscleGroup(muscleGroupParam)
+    const muscleGroupIdParam = searchParams.get('muscleGroupId')
+    if (muscleGroupIdParam) {
+      setSelectedMuscleGroup(muscleGroupIdParam)
     }
   }, [searchParams])
 
@@ -62,21 +61,54 @@ function ExercisesContent() {
     setExpandedExercises(newExpanded)
   }
 
-  const filteredExercises = mockExercises.filter(exercise => {
-    const matchesSearch = exercise.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         exercise.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         exercise.muscleGroup.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesMuscleGroup = selectedMuscleGroup === 'all' || 
-                              exercise.muscleGroup.toLowerCase() === selectedMuscleGroup.toLowerCase()
-    return matchesSearch && matchesMuscleGroup
-  })
+  // Filtros agora são feitos na API - usar exercises diretamente
+  const filteredExercises = exercises
 
-  const getMuscleGroupName = (muscleGroup: string) => {
-    const group = muscleGroups.find(g => g.name === muscleGroup)
-    return group?.name || muscleGroup
+  // Função removida - agora usa exercise.muscleGroup.name diretamente
+
+  // Função para converter URL do YouTube para embed
+  const getEmbedUrl = (url: string) => {
+    // YouTube
+    if (url.includes('youtube.com/watch?v=')) {
+      const videoId = url.split('v=')[1]?.split('&')[0]
+      return videoId ? `https://www.youtube.com/embed/${videoId}?controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&fs=0&disablekb=1&playsinline=1` : url
+    }
+    // YouTube short format
+    if (url.includes('youtu.be/')) {
+      const videoId = url.split('youtu.be/')[1]?.split('?')[0]
+      return videoId ? `https://www.youtube.com/embed/${videoId}?controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&fs=0&disablekb=1&playsinline=1` : url
+    }
+    // Vimeo
+    if (url.includes('vimeo.com/')) {
+      const videoId = url.split('vimeo.com/')[1]?.split('?')[0]
+      return videoId ? `https://player.vimeo.com/video/${videoId}?controls=0&title=0&byline=0&portrait=0&autoplay=0` : url
+    }
+    // Se não for YouTube ou Vimeo, retorna a URL original
+    return url
   }
 
-  if (isLoading || muscleGroupsLoading) {
+  const clearSearch = () => {
+    setSearchTerm('')
+    setSelectedMuscleGroup('all')
+    
+    // Remover parâmetro muscleGroupId da URL se existir
+    const currentParams = new URLSearchParams(searchParams.toString())
+    if (currentParams.has('muscleGroupId')) {
+      currentParams.delete('muscleGroupId')
+      const newUrl = currentParams.toString() ? `?${currentParams.toString()}` : '/exercises'
+      router.push(newUrl)
+    }
+  }
+
+  const openModal = () => {
+    setIsModalOpen(true)
+  }
+
+  const closeModal = () => {
+    setIsModalOpen(false)
+  }
+
+  if (exercisesLoading || muscleGroupsLoading) {
     return (
       <div className="h-full w-full p-10 space-y-8">
         <div className="flex items-center space-x-3">
@@ -108,7 +140,7 @@ function ExercisesContent() {
           <h1 className="text-3xl font-bold tracking-tight">Exercícios</h1>
         </div>
         <Button 
-          onClick={() => router.push('/create-exercise')}
+          onClick={openModal}
           className="w-full sm:w-auto"
         >
           <Plus className="h-4 w-4 mr-2" />
@@ -120,36 +152,60 @@ function ExercisesContent() {
       <Card>
         <CardContent className="p-6">
           <div className="space-y-4">
-            {/* Search Input */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
-                placeholder="Buscar exercícios por nome ou descrição..."
-                value={searchTerm}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-                className="pl-10 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              />
+            {/* Filters Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Search Input */}
+              <div>
+                <label htmlFor="search-exercises" className="block text-sm font-medium mb-2">
+                  Nome do Exercício
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input
+                    id="search-exercises"
+                    placeholder="Buscar exercícios por nome"
+                    value={searchTerm}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                    className="pl-10 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  />
+                </div>
+              </div>
+
+              {/* Muscle Group Filter */}
+              <div>
+                <label htmlFor="muscle-group-filter" className="block text-sm font-medium mb-2">
+                  Grupo Muscular
+                </label>
+                <select
+                  id="muscle-group-filter"
+                  value={selectedMuscleGroup}
+                  onChange={(e) => setSelectedMuscleGroup(e.target.value)}
+                  className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                >
+                  <option value="all">Todos os grupos</option>
+                    {muscleGroups.map((group) => (
+                      <option key={group.id} value={group.id}>
+                        {group.name}
+                      </option>
+                    ))}
+                </select>
+              </div>
             </div>
 
-            {/* Muscle Group Filter */}
-            <div>
-              <label htmlFor="muscle-group-filter" className="block text-sm font-medium mb-2">
-                Grupo Muscular
-              </label>
-              <select
-                id="muscle-group-filter"
-                value={selectedMuscleGroup}
-                onChange={(e) => setSelectedMuscleGroup(e.target.value)}
-                className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              >
-                <option value="all">Todos os grupos</option>
-                {muscleGroups.map((group) => (
-                  <option key={group.id} value={group.name}>
-                    {group.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {/* Clear Filters Button */}
+            {(searchTerm || selectedMuscleGroup !== 'all') && (
+              <div className="flex justify-end">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={clearSearch}
+                  className="text-sm"
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Limpar Filtros
+                </Button>
+              </div>
+            )}
 
             {/* Results Count */}
             <div className="text-sm text-muted-foreground">
@@ -185,15 +241,27 @@ function ExercisesContent() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         {/* Exercise Image */}
-                        <div className="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <Dumbbell className="h-8 w-8 text-primary" />
+                        <div className="w-16 h-16 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                          {exercise.image ? (
+                            <Image
+                              src={exercise.image}
+                              alt={exercise.name}
+                              width={64}
+                              height={64}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-primary/10 rounded-lg flex items-center justify-center">
+                              <Dumbbell className="h-8 w-8 text-primary" />
+                            </div>
+                          )}
                         </div>
                         
                         {/* Exercise Info */}
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold text-base truncate">{exercise.name}</h3>
                           <p className="text-sm text-muted-foreground">
-                            {getMuscleGroupName(exercise.muscleGroup)}
+                            {exercise.muscleGroup.name}
                           </p>
                         </div>
                       </div>
@@ -230,7 +298,7 @@ function ExercisesContent() {
                               <Dumbbell className="h-3 w-3 text-primary" />
                             </div>
                             <span className="text-sm text-muted-foreground">
-                              {getMuscleGroupName(exercise.muscleGroup)}
+                              {exercise.muscleGroup.name}
                             </span>
                           </div>
                         </div>
@@ -238,32 +306,48 @@ function ExercisesContent() {
                         {/* Video Demonstrativo */}
                         <div>
                           <h4 className="font-medium text-sm mb-2">Demonstração</h4>
-                          <div className="relative w-full h-48 bg-muted rounded-lg overflow-hidden">
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <div className="text-center">
-                                <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                                  <Play className="h-8 w-8 text-primary" />
+                          {exercise.videoUrl ? (
+                            <div className="relative w-full h-48 bg-muted rounded-lg overflow-hidden">
+                              <iframe
+                                src={getEmbedUrl(exercise.videoUrl)}
+                                title={`Demonstração do exercício ${exercise.name}`}
+                                className="w-full h-full"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                              />
+                            </div>
+                          ) : (
+                            <div className="relative w-full h-48 bg-muted rounded-lg overflow-hidden">
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="text-center">
+                                  <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                                    <Play className="h-8 w-8 text-primary" />
+                                  </div>
+                                  <p className="text-sm text-muted-foreground">
+                                    Nenhum vídeo disponível
+                                  </p>
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    {exercise.name}
+                                  </p>
                                 </div>
-                                <p className="text-sm text-muted-foreground">
-                                  Vídeo demonstrativo
-                                </p>
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  {exercise.name}
-                                </p>
                               </div>
                             </div>
-                          </div>
+                          )}
                         </div>
 
                         {/* Exercise Details */}
                         <div className="grid grid-cols-2 gap-3">
                           <div className="p-3 bg-muted/30 rounded-lg">
-                            <p className="text-xs text-muted-foreground">Equipamento</p>
-                            <p className="text-sm font-medium">{exercise.equipment}</p>
+                            <p className="text-xs text-muted-foreground">Criado em</p>
+                            <p className="text-sm font-medium">
+                              {new Date(exercise.createdAt).toLocaleDateString('pt-BR')}
+                            </p>
                           </div>
                           <div className="p-3 bg-muted/30 rounded-lg">
-                            <p className="text-xs text-muted-foreground">Dificuldade</p>
-                            <p className="text-sm font-medium capitalize">{exercise.difficulty}</p>
+                            <p className="text-xs text-muted-foreground">Atualizado em</p>
+                            <p className="text-sm font-medium">
+                              {new Date(exercise.updatedAt).toLocaleDateString('pt-BR')}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -275,6 +359,16 @@ function ExercisesContent() {
           })
         )}
       </div>
+
+      {/* Modal de Cadastro */}
+      <ExerciseModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onSuccess={() => {
+          // Opcional: adicionar lógica adicional após sucesso
+          console.log('Exercício criado com sucesso!')
+        }}
+      />
     </div>
   )
 }

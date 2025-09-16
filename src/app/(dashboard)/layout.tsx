@@ -6,6 +6,7 @@ import { Toolbar } from '@/components/layout/toolbar'
 import { Sidebar } from '@/components/layout/sidebar'
 import { SidebarProvider } from '@/contexts/sidebar-context'
 import { MuscleGroupsProvider } from '@/contexts/muscle-groups-context'
+import { ExercisesProvider } from '@/contexts/exercises-context'
 import { clerkConfig, isInvalidKey } from '@/lib/clerk-config'
 import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/nextjs'
 import type { Route } from '@/types'
@@ -58,9 +59,11 @@ export default function DashboardLayout({
   if (isInvalidKey(clerkConfig.publishableKey)) {
     return (
       <MuscleGroupsProvider>
-        <SidebarProvider>
-          <DashboardContent>{children}</DashboardContent>
-        </SidebarProvider>
+        <ExercisesProvider>
+          <SidebarProvider>
+            <DashboardContent>{children}</DashboardContent>
+          </SidebarProvider>
+        </ExercisesProvider>
       </MuscleGroupsProvider>
     )
   }
@@ -70,9 +73,11 @@ export default function DashboardLayout({
     <>
       <SignedIn>
         <MuscleGroupsProvider>
-          <SidebarProvider>
-            <DashboardContent>{children}</DashboardContent>
-          </SidebarProvider>
+          <ExercisesProvider>
+            <SidebarProvider>
+              <DashboardContent>{children}</DashboardContent>
+            </SidebarProvider>
+          </ExercisesProvider>
         </MuscleGroupsProvider>
       </SignedIn>
       <SignedOut>

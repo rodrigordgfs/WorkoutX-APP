@@ -28,7 +28,7 @@ export interface CreateMuscleGroupData {
 const fetchMuscleGroups = async (searchTerm?: string): Promise<MuscleGroup[]> => {
   const url = new URL(getApiUrl(apiConfig.endpoints.muscleGroups))
   
-  if (searchTerm && searchTerm.trim()) {
+  if (searchTerm?.trim()) {
     url.searchParams.set('name', searchTerm.trim())
   }
   
@@ -36,24 +36,6 @@ const fetchMuscleGroups = async (searchTerm?: string): Promise<MuscleGroup[]> =>
   if (!response.ok) {
     throw new Error('Erro ao buscar grupos musculares')
   }
-  return response.json()
-}
-
-// Função para criar grupo muscular
-const createMuscleGroup = async (data: CreateMuscleGroupData): Promise<MuscleGroup> => {
-  const response = await fetch(getApiUrl(apiConfig.endpoints.muscleGroups), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  })
-
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || 'Erro ao criar grupo muscular')
-  }
-
   return response.json()
 }
 
@@ -70,7 +52,76 @@ export const useCreateMuscleGroup = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: createMuscleGroup,
+    mutationFn: async (data: CreateMuscleGroupData): Promise<MuscleGroup> => {
+      const response = await fetch(getApiUrl(apiConfig.endpoints.muscleGroups), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.message || 'Erro ao criar grupo muscular')
+      }
+
+      return response.json()
+    },
+    onSuccess: () => {
+      // Invalidar e refetch da lista de grupos musculares
+      queryClient.invalidateQueries({ queryKey: ['muscle-groups'] })
+    },
+  })
+}
+
+// Hook para atualizar grupo muscular
+export const useUpdateMuscleGroup = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (data: { id: string; name: string; description: string; image: string }): Promise<MuscleGroup> => {
+      const response = await fetch(`${getApiUrl(apiConfig.endpoints.muscleGroups)}/${data.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: data.name,
+          description: data.description,
+          image: data.image,
+        }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.message || 'Erro ao atualizar grupo muscular')
+      }
+
+      return response.json()
+    },
+    onSuccess: () => {
+      // Invalidar e refetch da lista de grupos musculares
+      queryClient.invalidateQueries({ queryKey: ['muscle-groups'] })
+    },
+  })
+}
+
+// Hook para deletar grupo muscular
+export const useDeleteMuscleGroup = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (id: string): Promise<void> => {
+      const response = await fetch(`${getApiUrl(apiConfig.endpoints.muscleGroups)}/${id}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || error.message || 'Erro ao excluir grupo muscular')
+      }
+    },
     onSuccess: () => {
       // Invalidar e refetch da lista de grupos musculares
       queryClient.invalidateQueries({ queryKey: ['muscle-groups'] })

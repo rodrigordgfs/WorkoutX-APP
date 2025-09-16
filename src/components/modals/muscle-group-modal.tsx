@@ -1,15 +1,14 @@
 'use client'
 
-import { useState } from 'react'
-import Image from 'next/image'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
 import { PlusCircle, Save, Upload, X, Image as ImageIcon } from 'lucide-react'
-import { useCreateMuscleGroup } from '@/hooks/use-muscle-groups'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
+import { useCreateMuscleGroup, useUpdateMuscleGroup } from '@/hooks/use-muscle-groups'
+import Image from 'next/image'
 
 // Schema de validação com Zod
 const muscleGroupSchema = z.object({
@@ -35,9 +34,24 @@ const muscleGroupSchema = z.object({
 
 type MuscleGroupFormData = z.infer<typeof muscleGroupSchema>
 
-export default function CreateMuscleGroupPage() {
+interface MuscleGroupModalProps {
+  isOpen: boolean
+  onClose: () => void
+  onSuccess?: () => void
+  editData?: {
+    id: string
+    name: string
+    description: string
+    image: string
+  } | null
+}
+
+export function MuscleGroupModal({ isOpen, onClose, onSuccess, editData }: MuscleGroupModalProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const createMuscleGroupMutation = useCreateMuscleGroup()
+  const updateMuscleGroupMutation = useUpdateMuscleGroup()
+  
+  const isEditing = !!editData
 
   const {
     register,
@@ -46,14 +60,35 @@ export default function CreateMuscleGroupPage() {
     setValue,
     reset
   } = useForm<MuscleGroupFormData>({
-    resolver: zodResolver(muscleGroupSchema),
-    defaultValues: {
-      name: '',
-      description: '',
-      image: ''
-    }
+    resolver: zodResolver(muscleGroupSchema)
   })
 
+  // Configurar preview da imagem e resetar formulário quando estiver editando
+  useEffect(() => {
+    if (editData) {
+      // Resetar formulário com os dados de edição
+      reset({
+        name: editData.name,
+        description: editData.description,
+        image: editData.image
+      })
+      
+      // Configurar preview da imagem
+      if (editData.image) {
+        setImagePreview(editData.image)
+      } else {
+        setImagePreview(null)
+      }
+    } else {
+      // Limpar formulário quando não estiver editando
+      reset({
+        name: '',
+        description: '',
+        image: ''
+      })
+      setImagePreview(null)
+    }
+  }, [editData, reset])
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -91,58 +126,107 @@ export default function CreateMuscleGroupPage() {
     setImagePreview(null)
   }
 
-
-  const onSubmit = async (data: MuscleGroupFormData) => {
-    createMuscleGroupMutation.mutate(data, {
-      onSuccess: (response) => {
-        toast.success('Grupo muscular salvo com sucesso!', {
-          description: `O grupo "${response.name}" foi cadastrado com sucesso.`,
-          duration: 4000,
-        })
-        
-        // Limpar formulário
-        reset({
-          name: '',
-          description: '',
-          image: ''
-        })
-        setImagePreview(null)
-      },
-      onError: (error) => {
-        console.error('Erro ao salvar grupo muscular:', error)
-        toast.error('Erro ao salvar grupo muscular', {
-          description: error.message || 'Ocorreu um erro inesperado. Tente novamente.',
-          duration: 5000,
-        })
-      }
-    })
+  const handleClose = () => {
+    reset()
+    setImagePreview(null)
+    onClose()
   }
 
-  return (
-    <div className="h-full w-full p-10 space-y-8">
-      {/* Page Header */}
-      <div className="flex items-center space-x-3">
-        <div className="p-2 bg-primary/10 rounded-lg">
-          <PlusCircle className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-        </div>
-        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">Cadastro de Grupos Musculares</h1>
-      </div>
+  const onSubmit = async (data: MuscleGroupFormData) => {
+    if (isEditing && editData) {
+      // Atualizar grupo muscular
+      updateMuscleGroupMutation.mutate(
+        { id: editData.id, ...data },
+        {
+          onSuccess: (response) => {
+            toast.success('Grupo muscular atualizado com sucesso!', {
+              description: `O grupo "${response.name}" foi atualizado com sucesso.`,
+              duration: 4000,
+            })
+            
+            // Fechar modal e limpar formulário
+            handleClose()
+            
+            // Chamar callback de sucesso se fornecido
+            onSuccess?.()
+          },
+          onError: (error) => {
+            console.error('Erro ao atualizar grupo muscular:', error)
+            toast.error('Erro ao atualizar grupo muscular', {
+              description: error.message || 'Ocorreu um erro inesperado. Tente novamente.',
+              duration: 5000,
+            })
+          }
+        }
+      )
+    } else {
+      // Criar novo grupo muscular
+      createMuscleGroupMutation.mutate(data, {
+        onSuccess: (response) => {
+          toast.success('Grupo muscular salvo com sucesso!', {
+            description: `O grupo "${response.name}" foi cadastrado com sucesso.`,
+            duration: 4000,
+          })
+          
+          // Fechar modal e limpar formulário
+          handleClose()
+          
+          // Chamar callback de sucesso se fornecido
+          onSuccess?.()
+        },
+        onError: (error) => {
+          console.error('Erro ao salvar grupo muscular:', error)
+          toast.error('Erro ao salvar grupo muscular', {
+            description: error.message || 'Ocorreu um erro inesperado. Tente novamente.',
+            duration: 5000,
+          })
+        }
+      })
+    }
+  }
 
-      {/* Form Card */}
-      <Card>
-        <CardContent className="p-6">
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+      <div className="bg-background rounded-lg shadow-lg border w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          {/* Header do Modal */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                {isEditing ? (
+                  <ImageIcon className="h-5 w-5 text-primary" />
+                ) : (
+                  <PlusCircle className="h-5 w-5 text-primary" />
+                )}
+              </div>
+              <h2 className="text-xl font-bold">
+                {isEditing ? 'Editar Grupo Muscular' : 'Cadastrar Grupo Muscular'}
+              </h2>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClose}
+              className="h-8 w-8 p-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Formulário */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Form Fields */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Left Column - Form Fields */}
+              {/* Coluna Esquerda - Campos do Formulário */}
               <div className="space-y-6">
-                {/* Name Input */}
+                {/* Nome */}
                 <div>
-                  <label htmlFor="muscle-group-name" className="block text-sm font-medium mb-2">
+                  <label htmlFor="modal-muscle-group-name" className="block text-sm font-medium mb-2">
                     Nome do Grupo Muscular *
                   </label>
                   <input
-                    id="muscle-group-name"
+                    id="modal-muscle-group-name"
                     type="text"
                     placeholder="Ex: Peito, Costas, Pernas..."
                     {...register('name')}
@@ -155,16 +239,16 @@ export default function CreateMuscleGroupPage() {
                   )}
                 </div>
 
-                {/* Description Textarea */}
+                {/* Descrição */}
                 <div>
-                  <label htmlFor="muscle-group-description" className="block text-sm font-medium mb-2">
+                  <label htmlFor="modal-muscle-group-description" className="block text-sm font-medium mb-2">
                     Descrição *
                   </label>
                   <textarea
-                    id="muscle-group-description"
+                    id="modal-muscle-group-description"
                     placeholder="Descreva o grupo muscular, seus músculos principais e características..."
                     {...register('description')}
-                    rows={8}
+                    rows={6}
                     className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus-visible:ring-offset-2 resize-none ${
                       errors.description ? 'border-red-500' : 'border-input bg-background'
                     }`}
@@ -175,13 +259,12 @@ export default function CreateMuscleGroupPage() {
                 </div>
               </div>
 
-              {/* Right Column - Image Upload */}
+              {/* Coluna Direita - Upload de Imagem */}
               <div className="space-y-2">
-                <label htmlFor="image-upload" className="block text-sm font-medium">
+                <label htmlFor="modal-image-upload" className="block text-sm font-medium">
                   Imagem do Grupo Muscular *
                 </label>
                 
-                {/* Image Upload Area */}
                 <div className="relative">
                   {imagePreview ? (
                     <div className="relative">
@@ -189,8 +272,8 @@ export default function CreateMuscleGroupPage() {
                         src={imagePreview}
                         alt="Preview da imagem selecionada"
                         width={400}
-                        height={256}
-                        className="w-full h-48 sm:h-56 lg:h-64 object-cover rounded-lg border border-input"
+                        height={200}
+                        className="w-full h-48 object-cover rounded-lg border border-input"
                       />
                       <Button
                         type="button"
@@ -203,7 +286,7 @@ export default function CreateMuscleGroupPage() {
                       </Button>
                     </div>
                   ) : (
-                    <div className={`w-full h-48 sm:h-56 lg:h-64 border-2 border-dashed rounded-lg flex flex-col items-center justify-center space-y-3 sm:space-y-4 hover:border-muted-foreground/50 transition-colors cursor-pointer ${
+                    <div className={`w-full h-48 border-2 border-dashed rounded-lg flex flex-col items-center justify-center space-y-3 hover:border-muted-foreground/50 transition-colors cursor-pointer ${
                       errors.image ? 'border-red-500' : 'border-muted-foreground/25'
                     }`}>
                       <input
@@ -211,12 +294,12 @@ export default function CreateMuscleGroupPage() {
                         accept="image/*"
                         onChange={handleImageSelect}
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        id="image-upload"
+                        id="modal-image-upload"
                         aria-label="Selecionar imagem do grupo muscular"
                       />
                       <div className="text-center px-4">
-                        <ImageIcon className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 text-muted-foreground mx-auto mb-2" />
-                        <p className="text-xs sm:text-sm text-muted-foreground">
+                        <ImageIcon className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                        <p className="text-sm text-muted-foreground">
                           Clique para selecionar uma imagem
                         </p>
                         <p className="text-xs text-muted-foreground mt-1">
@@ -227,54 +310,57 @@ export default function CreateMuscleGroupPage() {
                   )}
                 </div>
 
-                {/* Error message for image */}
                 {errors.image && (
                   <p className="text-red-500 text-xs mt-1">{errors.image.message}</p>
                 )}
 
-                {/* Upload Button (if no image selected) */}
                 {!imagePreview && (
                   <div className="flex justify-center">
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => document.getElementById('image-upload')?.click()}
-                      className="w-full text-xs sm:text-sm"
+                      onClick={() => document.getElementById('modal-image-upload')?.click()}
+                      className="w-full text-sm"
                     >
-                      <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                      <span className="hidden sm:inline">Selecionar Imagem</span>
-                      <span className="sm:hidden">Selecionar</span>
+                      <Upload className="h-4 w-4 mr-2" />
+                      Selecionar Imagem
                     </Button>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Save Button */}
-            <div className="flex justify-center sm:justify-end pt-4 border-t">
+            {/* Botões do Modal */}
+            <div className="flex justify-end space-x-3 pt-4 border-t">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleClose}
+                className="text-sm"
+              >
+                Cancelar
+              </Button>
               <Button
                 type="submit"
-                disabled={createMuscleGroupMutation.isPending || isSubmitting}
-                className="w-full sm:w-auto sm:min-w-[120px] text-xs sm:text-sm"
+                disabled={createMuscleGroupMutation.isPending || updateMuscleGroupMutation.isPending || isSubmitting}
+                className="text-sm min-w-[120px]"
               >
-                {createMuscleGroupMutation.isPending || isSubmitting ? (
+                {createMuscleGroupMutation.isPending || updateMuscleGroupMutation.isPending || isSubmitting ? (
                   <div className="flex items-center">
-                    <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    <span className="hidden sm:inline">Salvando...</span>
-                    <span className="sm:hidden">Salvando...</span>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    {isEditing ? 'Atualizando...' : 'Salvando...'}
                   </div>
                 ) : (
                   <>
-                    <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                    <span className="hidden sm:inline">Salvar Grupo Muscular</span>
-                    <span className="sm:hidden">Salvar</span>
+                    <Save className="h-4 w-4 mr-2" />
+                    {isEditing ? 'Atualizar Grupo' : 'Salvar Grupo'}
                   </>
                 )}
               </Button>
             </div>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }
