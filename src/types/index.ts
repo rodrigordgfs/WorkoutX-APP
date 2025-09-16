@@ -1,0 +1,11 @@
+export type Route = 
+  | 'dashboard'
+  | 'workouts'
+  | 'create-workout'
+  | 'workout-history'
+  | 'muscle-groups'
+  | 'exercises'
+  | 'profile'
+  | 'community'
+  | 'report-bug'
+  | 'logout'
