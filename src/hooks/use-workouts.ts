@@ -2,7 +2,8 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useUser } from '@clerk/nextjs'
-import { apiConfig, getApiUrl } from '@/lib/api-config'
+import { apiConfig, getApiUrl, authenticatedRequest } from '@/lib/api-config'
+import { useClerkToken } from './use-clerk-token'
 
 export interface WorkoutExercise {
   id: string
@@ -88,150 +89,81 @@ export interface ApiWorkout {
   exercises: ApiWorkoutExercise[]
 }
 
-const createWorkout = async (data: CreateWorkoutData): Promise<WorkoutResponse> => {
+const createWorkout = async (data: CreateWorkoutData, token: string | null): Promise<WorkoutResponse> => {
   console.log('Dados sendo enviados para criação do treino:', data)
-  console.log('URL da API:', getApiUrl(apiConfig.endpoints.workouts))
   
-  const response = await fetch(getApiUrl(apiConfig.endpoints.workouts), {
+  return authenticatedRequest<WorkoutResponse>(apiConfig.endpoints.workouts, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
+    body: data,
+    token
   })
-
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || 'Erro ao criar treino')
-  }
-
-  return response.json()
 }
 
-const fetchUserWorkouts = async (userId: string): Promise<ApiWorkout[]> => {
+const fetchUserWorkouts = async (userId: string, token: string | null): Promise<ApiWorkout[]> => {
   const url = new URL(getApiUrl(apiConfig.endpoints.workouts))
   url.searchParams.append('userId', userId)
   
   console.log('Buscando treinos do usuário:', userId)
-  console.log('URL da API:', url.toString())
   
-  const response = await fetch(url.toString(), {
+  return authenticatedRequest<ApiWorkout[]>(url.pathname + url.search, {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    token
   })
-
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || 'Erro ao buscar treinos')
-  }
-
-  return response.json()
 }
 
-const fetchWorkout = async (workoutId: string): Promise<ApiWorkout> => {
+const fetchWorkout = async (workoutId: string, token: string | null): Promise<ApiWorkout> => {
   console.log('Buscando treino específico:', workoutId)
-  console.log('URL da API:', getApiUrl(`${apiConfig.endpoints.workouts}/${workoutId}`))
   
-  const response = await fetch(getApiUrl(`${apiConfig.endpoints.workouts}/${workoutId}`), {
+  return authenticatedRequest<ApiWorkout>(`${apiConfig.endpoints.workouts}/${workoutId}`, {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    token
   })
-
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || 'Erro ao buscar treino')
-  }
-
-  return response.json()
 }
 
-const updateWorkout = async (data: UpdateWorkoutData): Promise<ApiWorkout> => {
+const updateWorkout = async (data: UpdateWorkoutData, token: string | null): Promise<ApiWorkout> => {
   console.log('Atualizando treino:', data)
-  console.log('URL da API:', getApiUrl(`${apiConfig.endpoints.workouts}/${data.id}`))
   
-  const response = await fetch(getApiUrl(`${apiConfig.endpoints.workouts}/${data.id}`), {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
+  return authenticatedRequest<ApiWorkout>(`${apiConfig.endpoints.workouts}/${data.id}`, {
+    method: 'PATCH',
+    body: data,
+    token
   })
-
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || 'Erro ao atualizar treino')
-  }
-
-  return response.json()
 }
 
-const deleteWorkout = async (workoutId: string): Promise<void> => {
+const deleteWorkout = async (workoutId: string, token: string | null): Promise<void> => {
   console.log('Deletando treino:', workoutId)
-  console.log('URL da API:', getApiUrl(`${apiConfig.endpoints.workouts}/${workoutId}`))
   
-  const response = await fetch(getApiUrl(`${apiConfig.endpoints.workouts}/${workoutId}`), {
+  return authenticatedRequest<void>(`${apiConfig.endpoints.workouts}/${workoutId}`, {
     method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    token
   })
-
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || 'Erro ao deletar treino')
-  }
 }
 
-const startWorkout = async (workoutId: string): Promise<ApiWorkout> => {
+const startWorkout = async (workoutId: string, token: string | null): Promise<ApiWorkout> => {
   console.log('Iniciando treino:', workoutId)
-  console.log('URL da API:', getApiUrl(`${apiConfig.endpoints.workouts}/${workoutId}/start`))
   
-  const response = await fetch(getApiUrl(`${apiConfig.endpoints.workouts}/${workoutId}/start`), {
-    method: 'PATCH'
+  return authenticatedRequest<ApiWorkout>(`${apiConfig.endpoints.workouts}/${workoutId}/start`, {
+    method: 'PATCH',
+    token
   })
-
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || 'Erro ao iniciar treino')
-  }
-
-  return response.json()
 }
 
-const stopWorkout = async (workoutId: string): Promise<ApiWorkout> => {
+const stopWorkout = async (workoutId: string, token: string | null): Promise<ApiWorkout> => {
   console.log('Parando treino:', workoutId)
-  console.log('URL da API:', getApiUrl(`${apiConfig.endpoints.workouts}/${workoutId}/stop`))
   
-  const response = await fetch(getApiUrl(`${apiConfig.endpoints.workouts}/${workoutId}/stop`), {
-    method: 'PATCH'
+  return authenticatedRequest<ApiWorkout>(`${apiConfig.endpoints.workouts}/${workoutId}/stop`, {
+    method: 'PATCH',
+    token
   })
-
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || 'Erro ao parar treino')
-  }
-
-  return response.json()
 }
 
-const completeWorkout = async (workoutId: string): Promise<ApiWorkout> => {
+const completeWorkout = async (workoutId: string, token: string | null): Promise<ApiWorkout> => {
   console.log('Finalizando treino:', workoutId)
-  console.log('URL da API:', getApiUrl(`${apiConfig.endpoints.workouts}/${workoutId}/complete`))
   
-  const response = await fetch(getApiUrl(`${apiConfig.endpoints.workouts}/${workoutId}/complete`), {
-    method: 'PATCH'
+  return authenticatedRequest<ApiWorkout>(`${apiConfig.endpoints.workouts}/${workoutId}/complete`, {
+    method: 'PATCH',
+    token
   })
-
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || 'Erro ao finalizar treino')
-  }
-
-  return response.json()
 }
 
 const completeExercise = async (workoutId: string, sessionExerciseId: string, exerciseData: {
@@ -239,37 +171,28 @@ const completeExercise = async (workoutId: string, sessionExerciseId: string, ex
   repetitions: string;
   weight: string;
   restTime: string;
-}): Promise<ApiWorkout> => {
+}, token: string | null): Promise<ApiWorkout> => {
   console.log('Concluindo exercício:', { workoutId, sessionExerciseId, exerciseData })
-  console.log('URL da API:', getApiUrl(`${apiConfig.endpoints.workouts}/${workoutId}/exercise/${sessionExerciseId}/complete`))
   
-  const response = await fetch(getApiUrl(`${apiConfig.endpoints.workouts}/${workoutId}/exercise/${sessionExerciseId}/complete`), {
+  return authenticatedRequest<ApiWorkout>(`${apiConfig.endpoints.workouts}/${workoutId}/exercise/${sessionExerciseId}/complete`, {
     method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
+    body: {
       series: exerciseData.series,
       repetitions: exerciseData.repetitions,
       weight: exerciseData.weight,
       restTime: exerciseData.restTime
-    })
+    },
+    token
   })
-
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || 'Erro ao concluir exercício')
-  }
-
-  return response.json()
 }
 
 export const useCreateWorkout = () => {
   const queryClient = useQueryClient()
   const { user } = useUser()
+  const { getAuthToken } = useClerkToken()
 
   return useMutation({
-    mutationFn: (data: Omit<CreateWorkoutData, 'userId'>) => {
+    mutationFn: async (data: Omit<CreateWorkoutData, 'userId'>) => {
       if (!user) {
         throw new Error('Usuário não autenticado')
       }
@@ -279,7 +202,8 @@ export const useCreateWorkout = () => {
         userId: user.id
       }
       
-      return createWorkout(workoutData)
+      const token = await getAuthToken()
+      return createWorkout(workoutData, token)
     },
     onSuccess: (data) => {
       console.log('Treino criado com sucesso:', data)
@@ -294,14 +218,16 @@ export const useCreateWorkout = () => {
 
 export const useUserWorkouts = () => {
   const { user } = useUser()
+  const { getAuthToken } = useClerkToken()
 
   return useQuery({
     queryKey: ['workouts', user?.id],
-    queryFn: () => {
+    queryFn: async () => {
       if (!user) {
         throw new Error('Usuário não autenticado')
       }
-      return fetchUserWorkouts(user.id)
+      const token = await getAuthToken()
+      return fetchUserWorkouts(user.id, token)
     },
     enabled: !!user, // Só executa se o usuário estiver autenticado
     staleTime: 5 * 60 * 1000, // 5 minutos
@@ -311,9 +237,14 @@ export const useUserWorkouts = () => {
 
 // Hook para buscar um treino específico
 export const useWorkout = (workoutId: string) => {
+  const { getAuthToken } = useClerkToken()
+
   return useQuery({
     queryKey: ['workout', workoutId],
-    queryFn: () => fetchWorkout(workoutId),
+    queryFn: async () => {
+      const token = await getAuthToken()
+      return fetchWorkout(workoutId, token)
+    },
     enabled: !!workoutId,
     staleTime: 5 * 60 * 1000, // 5 minutos
     retry: 2,
@@ -323,9 +254,13 @@ export const useWorkout = (workoutId: string) => {
 // Hook para atualizar um treino
 export const useUpdateWorkout = () => {
   const queryClient = useQueryClient()
+  const { getAuthToken } = useClerkToken()
 
   return useMutation({
-    mutationFn: updateWorkout,
+    mutationFn: async (data: UpdateWorkoutData) => {
+      const token = await getAuthToken()
+      return updateWorkout(data, token)
+    },
     onSuccess: (data, variables) => {
       console.log('Treino atualizado com sucesso:', data)
       // Invalidar queries relacionadas
@@ -341,9 +276,13 @@ export const useUpdateWorkout = () => {
 // Hook para deletar um treino
 export const useDeleteWorkout = () => {
   const queryClient = useQueryClient()
+  const { getAuthToken } = useClerkToken()
 
   return useMutation({
-    mutationFn: deleteWorkout,
+    mutationFn: async (workoutId: string) => {
+      const token = await getAuthToken()
+      return deleteWorkout(workoutId, token)
+    },
     onSuccess: (data, variables) => {
       console.log('Treino deletado com sucesso:', data)
       // Invalidar queries relacionadas
@@ -359,9 +298,13 @@ export const useDeleteWorkout = () => {
 // Hook para iniciar um treino
 export const useStartWorkout = () => {
   const queryClient = useQueryClient()
+  const { getAuthToken } = useClerkToken()
 
   return useMutation({
-    mutationFn: startWorkout,
+    mutationFn: async (workoutId: string) => {
+      const token = await getAuthToken()
+      return startWorkout(workoutId, token)
+    },
     onSuccess: (data, variables) => {
       console.log('Treino iniciado com sucesso:', data)
       // Invalidar queries relacionadas
@@ -377,9 +320,13 @@ export const useStartWorkout = () => {
 // Hook para parar um treino
 export const useStopWorkout = () => {
   const queryClient = useQueryClient()
+  const { getAuthToken } = useClerkToken()
 
   return useMutation({
-    mutationFn: stopWorkout,
+    mutationFn: async (workoutId: string) => {
+      const token = await getAuthToken()
+      return stopWorkout(workoutId, token)
+    },
     onSuccess: (data, variables) => {
       console.log('Treino parado com sucesso:', data)
       // Invalidar queries relacionadas
@@ -395,9 +342,13 @@ export const useStopWorkout = () => {
 // Hook para finalizar um treino
 export const useCompleteWorkout = () => {
   const queryClient = useQueryClient()
+  const { getAuthToken } = useClerkToken()
 
   return useMutation({
-    mutationFn: completeWorkout,
+    mutationFn: async (workoutId: string) => {
+      const token = await getAuthToken()
+      return completeWorkout(workoutId, token)
+    },
     onSuccess: (data, variables) => {
       console.log('Treino finalizado com sucesso:', data)
       // Invalidar queries relacionadas
@@ -413,9 +364,10 @@ export const useCompleteWorkout = () => {
 // Hook para concluir um exercício
 export const useCompleteExercise = () => {
   const queryClient = useQueryClient()
+  const { getAuthToken } = useClerkToken()
 
   return useMutation({
-    mutationFn: ({ 
+    mutationFn: async ({ 
       workoutId, 
       sessionExerciseId, 
       exerciseData 
@@ -428,8 +380,10 @@ export const useCompleteExercise = () => {
         weight: string;
         restTime: string;
       };
-    }) => 
-      completeExercise(workoutId, sessionExerciseId, exerciseData),
+    }) => {
+      const token = await getAuthToken()
+      return completeExercise(workoutId, sessionExerciseId, exerciseData, token)
+    },
     onSuccess: (data, variables) => {
       console.log('Exercício concluído com sucesso:', data)
       // Invalidar queries relacionadas

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { apiConfig, getApiUrl } from '@/lib/api-config'
+import { apiConfig, authenticatedRequest } from '@/lib/api-config'
+import { useClerkToken } from './use-clerk-token'
 
 export interface ExerciseWithMuscleGroup {
   id: string
@@ -16,32 +17,28 @@ export interface ExerciseWithMuscleGroup {
   updatedAt: string
 }
 
-const fetchExercises = async (searchTerm?: string, muscleGroupId?: string): Promise<ExerciseWithMuscleGroup[]> => {
+const fetchExercises = async (searchTerm?: string, muscleGroupId?: string, token?: string | null): Promise<ExerciseWithMuscleGroup[]> => {
   const params = new URLSearchParams()
   if (searchTerm) params.append('name', searchTerm)
   if (muscleGroupId && muscleGroupId !== 'all') params.append('muscleGroupId', muscleGroupId)
   
-  const url = `${getApiUrl(apiConfig.endpoints.exercises)}${params.toString() ? `?${params.toString()}` : ''}`
+  const url = `${apiConfig.endpoints.exercises}${params.toString() ? `?${params.toString()}` : ''}`
   
-  const response = await fetch(url, {
+  return authenticatedRequest<ExerciseWithMuscleGroup[]>(url, {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    token
   })
-
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || 'Erro ao buscar exercícios')
-  }
-
-  return response.json()
 }
 
 export const useExercises = (searchTerm?: string, muscleGroupId?: string) => {
+  const { getAuthToken } = useClerkToken()
+  
   return useQuery({
     queryKey: ['exercises', searchTerm, muscleGroupId],
-    queryFn: () => fetchExercises(searchTerm, muscleGroupId),
+    queryFn: async () => {
+      const token = await getAuthToken()
+      return fetchExercises(searchTerm, muscleGroupId, token)
+    },
     staleTime: 5 * 60 * 1000, // 5 minutos
   })
 }

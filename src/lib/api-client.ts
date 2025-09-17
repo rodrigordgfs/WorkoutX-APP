@@ -1,28 +1,17 @@
-// API Configuration
-export const apiConfig = {
-  baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002',
-  endpoints: {
-    muscleGroups: '/muscle-group',
-    exercises: '/exercise',
-    auth: '/auth',
-    workouts: '/workout',
-  },
+'use client'
+
+import { getApiUrl } from './api-config'
+
+interface ApiRequestOptions {
+  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
+  headers?: Record<string, string>
+  body?: unknown
+  token?: string | null
 }
 
-// Helper para construir URLs completas
-export const getApiUrl = (endpoint: string) => {
-  return `${apiConfig.baseUrl}${endpoint}`
-}
-
-// Helper para fazer requisições autenticadas
-export async function authenticatedRequest<T>(
+export async function apiRequest<T>(
   endpoint: string,
-  options: {
-    method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
-    headers?: Record<string, string>
-    body?: unknown
-    token?: string | null
-  } = {}
+  options: ApiRequestOptions = {}
 ): Promise<T> {
   const {
     method = 'GET',
@@ -41,9 +30,6 @@ export async function authenticatedRequest<T>(
   // Adicionar token de autorização se disponível
   if (token) {
     requestHeaders.Authorization = `Bearer ${token}`
-    console.log(`🔑 Authorization Header: Bearer ${token.substring(0, 20)}...`)
-  } else {
-    console.log('⚠️ Nenhum token disponível para esta requisição')
   }
 
   const requestOptions: RequestInit = {
@@ -56,7 +42,9 @@ export async function authenticatedRequest<T>(
   }
 
   console.log(`🌐 API Request: ${method} ${url}`)
-  console.log(`📋 Headers:`, requestHeaders)
+  if (token) {
+    console.log(`🔑 Token: ${token.substring(0, 20)}...`)
+  }
 
   const response = await fetch(url, requestOptions)
 

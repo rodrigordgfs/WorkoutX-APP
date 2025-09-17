@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { getApiUrl, apiConfig } from '@/lib/api-config'
+import { getApiUrl, apiConfig, authenticatedRequest } from '@/lib/api-config'
+import { useClerkToken } from './use-clerk-token'
 
 export interface Exercise {
   id: string
@@ -25,48 +26,45 @@ export interface CreateMuscleGroupData {
 }
 
 // Função para buscar grupos musculares
-const fetchMuscleGroups = async (searchTerm?: string): Promise<MuscleGroup[]> => {
+const fetchMuscleGroups = async (searchTerm?: string, token?: string | null): Promise<MuscleGroup[]> => {
   const url = new URL(getApiUrl(apiConfig.endpoints.muscleGroups))
   
   if (searchTerm?.trim()) {
     url.searchParams.set('name', searchTerm.trim())
   }
   
-  const response = await fetch(url.toString())
-  if (!response.ok) {
-    throw new Error('Erro ao buscar grupos musculares')
-  }
-  return response.json()
+  return authenticatedRequest<MuscleGroup[]>(url.pathname + url.search, {
+    method: 'GET',
+    token
+  })
 }
 
 // Hook para buscar grupos musculares
 export const useMuscleGroups = (searchTerm?: string) => {
+  const { getAuthToken } = useClerkToken()
+  
   return useQuery({
     queryKey: ['muscle-groups', searchTerm],
-    queryFn: () => fetchMuscleGroups(searchTerm),
+    queryFn: async () => {
+      const token = await getAuthToken()
+      return fetchMuscleGroups(searchTerm, token)
+    },
   })
 }
 
 // Hook para criar grupo muscular
 export const useCreateMuscleGroup = () => {
   const queryClient = useQueryClient()
+  const { getAuthToken } = useClerkToken()
 
   return useMutation({
     mutationFn: async (data: CreateMuscleGroupData): Promise<MuscleGroup> => {
-      const response = await fetch(getApiUrl(apiConfig.endpoints.muscleGroups), {
+      const token = await getAuthToken()
+      return authenticatedRequest<MuscleGroup>(apiConfig.endpoints.muscleGroups, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+        body: data,
+        token
       })
-
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || 'Erro ao criar grupo muscular')
-      }
-
-      return response.json()
     },
     onSuccess: () => {
       // Invalidar e refetch da lista de grupos musculares
@@ -78,27 +76,20 @@ export const useCreateMuscleGroup = () => {
 // Hook para atualizar grupo muscular
 export const useUpdateMuscleGroup = () => {
   const queryClient = useQueryClient()
+  const { getAuthToken } = useClerkToken()
 
   return useMutation({
     mutationFn: async (data: { id: string; name: string; description: string; image: string }): Promise<MuscleGroup> => {
-      const response = await fetch(`${getApiUrl(apiConfig.endpoints.muscleGroups)}/${data.id}`, {
+      const token = await getAuthToken()
+      return authenticatedRequest<MuscleGroup>(`${apiConfig.endpoints.muscleGroups}/${data.id}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+        body: {
           name: data.name,
           description: data.description,
           image: data.image,
-        }),
+        },
+        token
       })
-
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || 'Erro ao atualizar grupo muscular')
-      }
-
-      return response.json()
     },
     onSuccess: () => {
       // Invalidar e refetch da lista de grupos musculares
@@ -110,17 +101,15 @@ export const useUpdateMuscleGroup = () => {
 // Hook para deletar grupo muscular
 export const useDeleteMuscleGroup = () => {
   const queryClient = useQueryClient()
+  const { getAuthToken } = useClerkToken()
 
   return useMutation({
     mutationFn: async (id: string): Promise<void> => {
-      const response = await fetch(`${getApiUrl(apiConfig.endpoints.muscleGroups)}/${id}`, {
+      const token = await getAuthToken()
+      return authenticatedRequest<void>(`${apiConfig.endpoints.muscleGroups}/${id}`, {
         method: 'DELETE',
+        token
       })
-
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || error.message || 'Erro ao excluir grupo muscular')
-      }
     },
     onSuccess: () => {
       // Invalidar e refetch da lista de grupos musculares

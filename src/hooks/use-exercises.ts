@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { getApiUrl, apiConfig } from '@/lib/api-config'
+import { apiConfig, authenticatedRequest } from '@/lib/api-config'
+import { useClerkToken } from './use-clerk-token'
 
 export interface CreateExerciseData {
   muscleGroupId: string
@@ -27,77 +28,60 @@ export interface Exercise {
   muscleGroupId: string
 }
 
-const createExercise = async (data: CreateExerciseData): Promise<Exercise> => {
+const createExercise = async (data: CreateExerciseData, token: string | null): Promise<Exercise> => {
   console.log('Dados sendo enviados para a API:', data)
-  console.log('URL da API:', getApiUrl(apiConfig.endpoints.exercises))
+  console.log('🔍 createExercise - Token recebido:', token ? `${token.substring(0, 20)}...` : 'null')
   
-  const response = await fetch(getApiUrl(apiConfig.endpoints.exercises), {
+  return authenticatedRequest<Exercise>(apiConfig.endpoints.exercises, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
+    body: {
       muscleGroupId: data.muscleGroupId,
       name: data.name,
       description: data.description,
       image: data.image,
       videoUrl: data.videoUrl
-    }),
+    },
+    token
   })
-
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || 'Erro ao criar exercício')
-  }
-
-  return response.json()
 }
 
-const updateExercise = async (data: UpdateExerciseData): Promise<Exercise> => {
+const updateExercise = async (data: UpdateExerciseData, token: string | null): Promise<Exercise> => {
   console.log('Dados sendo enviados para atualizar exercício:', data)
-  console.log('URL da API:', `${getApiUrl(apiConfig.endpoints.exercises)}/${data.id}`)
+  console.log('🔍 updateExercise - Token recebido:', token ? `${token.substring(0, 20)}...` : 'null')
   
-  const response = await fetch(`${getApiUrl(apiConfig.endpoints.exercises)}/${data.id}`, {
+  return authenticatedRequest<Exercise>(`${apiConfig.endpoints.exercises}/${data.id}`, {
     method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
+    body: {
       muscleGroupId: data.muscleGroupId,
       name: data.name,
       description: data.description,
       image: data.image,
       videoUrl: data.videoUrl
-    }),
+    },
+    token
   })
-
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || 'Erro ao atualizar exercício')
-  }
-
-  return response.json()
 }
 
-const deleteExercise = async (id: string): Promise<void> => {
+const deleteExercise = async (id: string, token: string | null): Promise<void> => {
   console.log('Deletando exercício:', id)
-  console.log('URL da API:', `${getApiUrl(apiConfig.endpoints.exercises)}/${id}`)
+  console.log('🔍 deleteExercise - Token recebido:', token ? `${token.substring(0, 20)}...` : 'null')
   
-  const response = await fetch(`${getApiUrl(apiConfig.endpoints.exercises)}/${id}`, {
+  return authenticatedRequest<void>(`${apiConfig.endpoints.exercises}/${id}`, {
     method: 'DELETE',
+    token
   })
-
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || 'Erro ao excluir exercício')
-  }
 }
 
 export const useCreateExercise = () => {
   const queryClient = useQueryClient()
+  const { getAuthToken } = useClerkToken()
 
   return useMutation({
-    mutationFn: createExercise,
+    mutationFn: async (data: CreateExerciseData) => {
+      const token = await getAuthToken()
+      console.log('🔍 useCreateExercise - Token obtido:', token ? `${token.substring(0, 20)}...` : 'null')
+      return createExercise(data, token)
+    },
     onSuccess: () => {
       // Invalidar queries relacionadas para atualizar os dados
       queryClient.invalidateQueries({ queryKey: ['muscle-groups'] })
@@ -108,9 +92,14 @@ export const useCreateExercise = () => {
 
 export const useUpdateExercise = () => {
   const queryClient = useQueryClient()
+  const { getAuthToken } = useClerkToken()
 
   return useMutation({
-    mutationFn: updateExercise,
+    mutationFn: async (data: UpdateExerciseData) => {
+      const token = await getAuthToken()
+      console.log('🔍 useUpdateExercise - Token obtido:', token ? `${token.substring(0, 20)}...` : 'null')
+      return updateExercise(data, token)
+    },
     onSuccess: () => {
       // Invalidar queries relacionadas para atualizar os dados
       queryClient.invalidateQueries({ queryKey: ['muscle-groups'] })
@@ -121,9 +110,13 @@ export const useUpdateExercise = () => {
 
 export const useDeleteExercise = () => {
   const queryClient = useQueryClient()
+  const { getAuthToken } = useClerkToken()
 
   return useMutation({
-    mutationFn: deleteExercise,
+    mutationFn: async (id: string) => {
+      const token = await getAuthToken()
+      return deleteExercise(id, token)
+    },
     onSuccess: () => {
       // Invalidar queries relacionadas para atualizar os dados
       queryClient.invalidateQueries({ queryKey: ['muscle-groups'] })

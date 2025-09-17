@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { getApiUrl, apiConfig } from '@/lib/api-config'
+import { apiConfig, authenticatedRequest } from '@/lib/api-config'
+import { useClerkToken } from './use-clerk-token'
 
 export interface AuthData {
   id: string
@@ -16,36 +17,30 @@ export interface AuthResponse {
   message?: string
 }
 
-const authenticateUser = async (data: AuthData): Promise<AuthResponse> => {
+const authenticateUser = async (data: AuthData, token: string | null): Promise<AuthResponse> => {
   console.log('Dados sendo enviados para autenticação:', data)
-  console.log('URL da API:', getApiUrl(apiConfig.endpoints.auth))
   
-  const response = await fetch(getApiUrl(apiConfig.endpoints.auth), {
+  return authenticatedRequest<AuthResponse>(apiConfig.endpoints.auth, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
+    body: {
       id: data.id,
       name: data.name,
       avatar: data.avatar,
       permission: data.permission
-    }),
+    },
+    token
   })
-
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || 'Erro na autenticação')
-  }
-
-  return response.json()
 }
 
 export const useAuthenticate = () => {
   const queryClient = useQueryClient()
+  const { getAuthToken } = useClerkToken()
 
   return useMutation({
-    mutationFn: authenticateUser,
+    mutationFn: async (data: AuthData) => {
+      const token = await getAuthToken()
+      return authenticateUser(data, token)
+    },
     onSuccess: (data) => {
       console.log('Autenticação realizada com sucesso:', data)
       // Invalidar queries relacionadas ao usuário se necessário
