@@ -77,23 +77,25 @@ function DraggableExerciseItem({
         transition,
       }}
     >
-      <div className="flex items-center space-x-3 sm:space-x-4">
-        <div className="w-12 h-12 sm:w-16 sm:h-16 bg-muted rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
-          {exercise.image ? (
-            <Image 
-              src={exercise.image} 
-              alt={exercise.name}
-              width={64}
-              height={64}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <Dumbbell className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
-          )}
-        </div>
-        <div className="flex-1 min-w-0">
-          <h4 className="font-medium text-sm sm:text-base truncate">{exercise.name}</h4>
-          <p className="text-xs sm:text-sm text-muted-foreground capitalize truncate">{exercise.muscleGroup}</p>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center space-x-3 sm:space-x-4 flex-1 min-w-0">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-muted rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+            {exercise.image ? (
+              <Image 
+                src={exercise.image} 
+                alt={exercise.name}
+                width={64}
+                height={64}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <Dumbbell className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="font-medium text-sm sm:text-base truncate overflow-hidden text-ellipsis whitespace-nowrap">{exercise.name}</h4>
+            <p className="text-xs sm:text-sm text-muted-foreground capitalize truncate">{exercise.muscleGroup}</p>
+          </div>
         </div>
         <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
           <Button
@@ -279,7 +281,7 @@ export default function CreateWorkoutPage() {
 
   if (isLoading) {
     return (
-      <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6">
+      <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-primary/10 rounded-lg">
             <Plus className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
@@ -298,7 +300,7 @@ export default function CreateWorkoutPage() {
   }
 
   return (
-    <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6">
+    <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center space-x-3">
@@ -399,7 +401,7 @@ export default function CreateWorkoutPage() {
                   onClick={() => toggleGroup(group.id)}
                   className="w-full p-3 sm:p-4 flex items-center justify-between hover:bg-muted/50 transition-colors cursor-pointer"
                 >
-                  <div className="flex items-center space-x-2 sm:space-x-3">
+                  <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
                     <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
                       {group.image ? (
                         <Image 
@@ -413,20 +415,22 @@ export default function CreateWorkoutPage() {
                         <Dumbbell className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
                       )}
                     </div>
-                    <span className="font-medium text-sm sm:text-base">{group.name}</span>
+                    <span className="font-medium text-sm sm:text-base truncate overflow-hidden text-ellipsis whitespace-nowrap">{group.name}</span>
                   </div>
-                  {expandedGroups.has(group.id) ? (
-                    <ChevronUp className="h-4 w-4" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4" />
-                  )}
+                  <div className="flex-shrink-0">
+                    {expandedGroups.has(group.id) ? (
+                      <ChevronUp className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
+                  </div>
                 </button>
                 
                 {expandedGroups.has(group.id) && (
                   <div className="border-t p-3 sm:p-4 space-y-2 sm:space-y-3">
                     {filteredExercises(group.id).length > 0 ? (
                       filteredExercises(group.id).map((exercise) => (
-                        <div key={exercise.id} className="flex items-center justify-between p-2 sm:p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
+                        <div key={exercise.id} className="flex items-center justify-between gap-2 p-2 sm:p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
                           <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
                             {/* Exercise Image */}
                             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
@@ -447,7 +451,7 @@ export default function CreateWorkoutPage() {
                             
                             {/* Exercise Info */}
                             <div className="flex-1 min-w-0">
-                              <h4 className="font-medium text-xs sm:text-sm truncate">{exercise.name}</h4>
+                              <h4 className="font-medium text-xs sm:text-sm truncate overflow-hidden text-ellipsis whitespace-nowrap">{exercise.name}</h4>
                               <p className="text-xs text-muted-foreground capitalize truncate">{group.name}</p>
                             </div>
                           </div>
@@ -456,7 +460,7 @@ export default function CreateWorkoutPage() {
                             variant="default"
                             onClick={() => addExercise(exercise)}
                             disabled={selectedExercises.some(ex => ex.id === exercise.id)}
-                            className="cursor-pointer ml-2 flex-shrink-0"
+                            className="cursor-pointer flex-shrink-0"
                           >
                             <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
                           </Button>

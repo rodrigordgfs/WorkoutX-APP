@@ -152,7 +152,7 @@ export default function WorkoutHistoryPage() {
 
   if (isLoading) {
     return (
-      <div className="h-full w-full p-10 space-y-8">
+      <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-primary/10 rounded-lg">
             <History className="h-6 w-6 text-primary" />
@@ -172,7 +172,7 @@ export default function WorkoutHistoryPage() {
   }
 
   return (
-    <div className="h-full w-full p-10 space-y-8">
+    <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
       {/* Page Header */}
       <div className="flex items-center space-x-3">
         <div className="p-2 bg-primary/10 rounded-lg">

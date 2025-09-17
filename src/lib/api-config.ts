@@ -34,8 +34,17 @@ export async function authenticatedRequest<T>(
   const url = getApiUrl(endpoint)
   
   const requestHeaders: Record<string, string> = {
-    'Content-Type': 'application/json',
     ...headers
+  }
+
+  // Adicionar Content-Type apenas quando necessário
+  const shouldIncludeContentType = 
+    (method === 'POST' || method === 'PATCH') && 
+    body !== undefined && 
+    body !== null
+
+  if (shouldIncludeContentType) {
+    requestHeaders['Content-Type'] = 'application/json'
   }
 
   // Adicionar token de autorização se disponível

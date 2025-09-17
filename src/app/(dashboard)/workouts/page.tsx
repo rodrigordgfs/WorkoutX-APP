@@ -36,7 +36,7 @@ export default function WorkoutsPage() {
 
   if (error) {
     return (
-      <div className="h-full w-full p-10 space-y-8">
+      <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center space-x-3 flex-1 min-w-0">
             <div className="p-2 bg-primary/10 rounded-lg flex-shrink-0">
@@ -58,7 +58,7 @@ export default function WorkoutsPage() {
 
   if (isLoading) {
     return (
-      <div className="h-full w-full p-10 space-y-8">
+      <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
         {/* Page Header Skeleton */}
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center space-x-3 flex-1 min-w-0">
@@ -81,7 +81,7 @@ export default function WorkoutsPage() {
   }
 
   return (
-    <div className="h-full w-full p-10 space-y-8">
+    <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
       {/* Page Header */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center space-x-3 flex-1 min-w-0">

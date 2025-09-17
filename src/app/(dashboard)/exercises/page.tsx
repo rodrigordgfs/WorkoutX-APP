@@ -206,7 +206,7 @@ function ExercisesContent() {
 
   if (exercisesLoading || muscleGroupsLoading) {
     return (
-      <div className="h-full w-full p-10 space-y-8">
+      <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-primary/10 rounded-lg">
             <Dumbbell className="h-6 w-6 text-primary" />
@@ -233,7 +233,7 @@ function ExercisesContent() {
   }
 
   return (
-    <div className="h-full w-full p-10 space-y-8">
+    <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center space-x-3">
@@ -351,8 +351,8 @@ function ExercisesContent() {
                 <div className="p-6">
                   <div className="flex flex-col space-y-4">
                     {/* Exercise Header */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center space-x-3 flex-1 min-w-0">
                         {/* Exercise Image */}
                         <div className="w-16 h-16 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
                           {exercise.image ? (
@@ -372,17 +372,17 @@ function ExercisesContent() {
 
                         {/* Exercise Info */}
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-base truncate">
+                          <h3 className="font-semibold text-base truncate overflow-hidden text-ellipsis whitespace-nowrap">
                             {exercise.name}
                           </h3>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-sm text-muted-foreground truncate">
                             {exercise.muscleGroup.name}
                           </p>
                         </div>
                       </div>
 
                       {/* Action Buttons */}
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2 flex-shrink-0">
                         {/* Options Menu */}
                         <AdminOnly>
                           <div className="relative">
@@ -556,7 +556,12 @@ function ExercisesContent() {
       />
 
       {/* Dialog de Confirmação de Exclusão */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+      <AlertDialog open={deleteDialogOpen} onOpenChange={(open) => {
+        if (!open) {
+          setDeleteDialogOpen(false);
+          setExerciseToDelete(null);
+        }
+      }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
@@ -567,7 +572,12 @@ function ExercisesContent() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => {
+              setDeleteDialogOpen(false);
+              setExerciseToDelete(null);
+            }}>
+              Cancelar
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteExercise}
               className="bg-red-500 hover:bg-red-600"
@@ -586,7 +596,7 @@ export default function ExercisesPage() {
   return (
     <Suspense
       fallback={
-        <div className="h-full w-full p-10 space-y-8">
+        <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-primary/10 rounded-lg">
               <Dumbbell className="h-6 w-6 text-primary" />

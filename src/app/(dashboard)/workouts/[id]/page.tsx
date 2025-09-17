@@ -431,7 +431,7 @@ export default function WorkoutDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto p-10 space-y-8">
+      <div className="container mx-auto p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 items-start">
           {/* Coluna Esquerda - Skeleton */}
           <div className="space-y-4 sm:space-y-6">
@@ -477,7 +477,7 @@ export default function WorkoutDetailPage() {
   }
 
   return (
-    <div className="container mx-auto p-10 space-y-8">
+    <div className="container mx-auto p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 items-start">
         {/* Coluna Esquerda - 1/3 da tela */}
         <div className="space-y-4 sm:space-y-6">
@@ -531,7 +531,7 @@ export default function WorkoutDetailPage() {
               </div>
 
               {/* Botões de Ação */}
-              <div className="flex flex-col sm:flex-row gap-2">
+              <div className="flex flex-col gap-2">
                 <Button
                   onClick={
                     getSessionStatus() === 'IN_PROGRESS' || getSessionStatus() === 'COMPLETED'
@@ -540,7 +540,7 @@ export default function WorkoutDetailPage() {
                         : handleStopWorkout
                       : handleStartWorkout
                   }
-                  className="flex-1"
+                  className="w-full"
                   variant={
                     getSessionStatus() === 'IN_PROGRESS' || getSessionStatus() === 'COMPLETED'
                       ? isAllExercisesCompleted()
@@ -574,20 +574,20 @@ export default function WorkoutDetailPage() {
           </Card>
 
           {/* Card de Exercícios */}
-          <Card className="min-h-[400px] sm:min-h-[600px] flex flex-col">
-            <CardHeader>
-              <CardTitle>Exercícios</CardTitle>
-              <CardDescription>
+          <Card className="min-h-[300px] sm:min-h-[400px] lg:min-h-[600px] flex flex-col">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Exercícios</CardTitle>
+              <CardDescription className="text-sm">
                 Clique em um exercício para ver os detalhes
               </CardDescription>
             </CardHeader>
             <CardContent className="p-0 flex-1 flex flex-col">
-              <div className="flex-1 overflow-y-auto overflow-x-visible">
+              <div className="flex-1 overflow-y-auto overflow-x-visible max-h-[400px] sm:max-h-[500px] lg:max-h-none">
                 {getExercisesWithStatus().map((exercise, index) => (
                   <div key={exercise.id}>
                     <button
                       type="button"
-                      className={`w-full p-4 text-left hover:bg-accent transition-colors cursor-pointer ${
+                      className={`w-full p-3 sm:p-4 text-left hover:bg-accent transition-colors cursor-pointer ${
                         selectedExercise?.id === exercise.id
                           ? "bg-primary/10 border-l-4 border-primary"
                           : ""
@@ -606,22 +606,22 @@ export default function WorkoutDetailPage() {
                         }
                       }}
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-muted-foreground">
+                            <span className="text-sm font-medium text-muted-foreground flex-shrink-0">
                               {index + 1}.
                             </span>
-                            <h4 className="font-medium">{exercise.name}</h4>
+                            <h4 className="font-medium truncate overflow-hidden text-ellipsis whitespace-nowrap">{exercise.name}</h4>
                           </div>
-                          <div className="mt-1 flex items-center gap-4 text-sm text-muted-foreground">
+                          <div className="mt-1 flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                             <span className="flex items-center gap-1">
                               <Layers className="h-3 w-3" />
-                              {exercise.series} séries
+                              {exercise.series}s
                             </span>
                             <span className="flex items-center gap-1">
                               <Repeat className="h-3 w-3" />
-                              {exercise.repetitions} repetições
+                              {exercise.repetitions}rep
                             </span>
                             <span className="flex items-center gap-1">
                               <Weight className="h-3 w-3" />
@@ -633,8 +633,7 @@ export default function WorkoutDetailPage() {
                             </span>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-1">
-
+                        <div className="flex items-center space-x-1 flex-shrink-0">
                           <ChevronRight className="h-4 w-4 text-muted-foreground" />
                         </div>
                       </div>
@@ -650,26 +649,26 @@ export default function WorkoutDetailPage() {
         {/* Coluna Direita - 2/3 da tela */}
         <div className="lg:col-span-2">
           {selectedExercise ? (
-            <Card className="min-h-[400px] sm:min-h-[600px] flex flex-col">
-              <CardHeader>
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex-1">
-                    <CardTitle className="text-xl sm:text-2xl">
+            <Card className="min-h-[400px] sm:min-h-[500px] lg:min-h-[600px] flex flex-col">
+              <CardHeader className="pb-3">
+                <div className="flex flex-col gap-3">
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="text-lg sm:text-xl lg:text-2xl truncate overflow-hidden text-ellipsis whitespace-nowrap">
                       {selectedExercise.name}
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-sm">
                       Grupo muscular: {selectedExercise.muscleGroup.name}
                     </CardDescription>
                   </div>
                   {(getSessionStatus() === 'IN_PROGRESS' || getSessionStatus() === 'COMPLETED') && (
-                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <div className="flex flex-col gap-2">
                       <div className="flex gap-2">
                         {!isFirstExercise() && (
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={handlePreviousExercise}
-                            className="flex-1 sm:flex-none"
+                            className="flex-1 text-xs sm:text-sm"
                           >
                             ← Anterior
                           </Button>
@@ -679,7 +678,7 @@ export default function WorkoutDetailPage() {
                             variant="outline"
                             size="sm"
                             onClick={handleNextExercise}
-                            className="flex-1 sm:flex-none"
+                            className="flex-1 text-xs sm:text-sm"
                           >
                             Próximo →
                           </Button>
@@ -693,7 +692,7 @@ export default function WorkoutDetailPage() {
                             ? "success"
                             : "default"
                         }
-                        className="w-full sm:w-auto"
+                        className="w-full text-xs sm:text-sm"
                       >
                         {isExerciseCompleted(selectedExercise.id) ? (
                           <>Exercício Finalizado</>
@@ -731,9 +730,9 @@ export default function WorkoutDetailPage() {
 
                 {/* Instruções */}
                 <div>
-                  <h3 className="text-lg font-semibold mb-3">Instruções</h3>
+                  <h3 className="text-base sm:text-lg font-semibold mb-3">Instruções</h3>
                   <div className="prose prose-sm max-w-none">
-                    <p className="text-muted-foreground whitespace-pre-line">
+                    <p className="text-sm sm:text-base text-muted-foreground whitespace-pre-line">
                       {selectedExercise.description ||
                         `Execute o exercício ${selectedExercise.name} com ${selectedExercise.series} séries de ${selectedExercise.repetitions} repetições. 
                         Use ${selectedExercise.weight} de peso e descanse ${selectedExercise.restTime} entre as séries. 
@@ -743,39 +742,39 @@ export default function WorkoutDetailPage() {
                 </div>
 
                 {/* Tiles de Informações */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                  <div className="bg-muted/50 rounded-lg p-4 text-center">
-                    <Layers className="h-6 w-6 mx-auto mb-2 text-primary" />
-                    <div className="text-2xl font-bold">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                  <div className="bg-muted/50 rounded-lg p-3 sm:p-4 text-center">
+                    <Layers className="h-5 w-5 sm:h-6 sm:w-6 mx-auto mb-2 text-primary" />
+                    <div className="text-xl sm:text-2xl font-bold">
                       {selectedExercise.series}
                     </div>
-                    <div className="text-sm text-muted-foreground">Séries</div>
+                    <div className="text-xs sm:text-sm text-muted-foreground">Séries</div>
                   </div>
 
-                  <div className="bg-muted/50 rounded-lg p-4 text-center">
-                    <Repeat className="h-6 w-6 mx-auto mb-2 text-primary" />
-                    <div className="text-2xl font-bold">
+                  <div className="bg-muted/50 rounded-lg p-3 sm:p-4 text-center">
+                    <Repeat className="h-5 w-5 sm:h-6 sm:w-6 mx-auto mb-2 text-primary" />
+                    <div className="text-xl sm:text-2xl font-bold">
                       {selectedExercise.repetitions}
                     </div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-xs sm:text-sm text-muted-foreground">
                       Repetições
                     </div>
                   </div>
 
-                  <div className="bg-muted/50 rounded-lg p-4 text-center">
-                    <Weight className="h-6 w-6 mx-auto mb-2 text-primary" />
-                    <div className="text-2xl font-bold">
+                  <div className="bg-muted/50 rounded-lg p-3 sm:p-4 text-center">
+                    <Weight className="h-5 w-5 sm:h-6 sm:w-6 mx-auto mb-2 text-primary" />
+                    <div className="text-xl sm:text-2xl font-bold">
                       {selectedExercise.weight}
                     </div>
-                    <div className="text-sm text-muted-foreground">Peso</div>
+                    <div className="text-xs sm:text-sm text-muted-foreground">Peso</div>
                   </div>
 
-                  <div className="bg-muted/50 rounded-lg p-4 text-center">
-                    <Clock className="h-6 w-6 mx-auto mb-2 text-primary" />
-                    <div className="text-2xl font-bold">
+                  <div className="bg-muted/50 rounded-lg p-3 sm:p-4 text-center">
+                    <Clock className="h-5 w-5 sm:h-6 sm:w-6 mx-auto mb-2 text-primary" />
+                    <div className="text-xl sm:text-2xl font-bold">
                       {selectedExercise.restTime}
                     </div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-xs sm:text-sm text-muted-foreground">
                       Descanso
                     </div>
                   </div>
@@ -803,15 +802,15 @@ export default function WorkoutDetailPage() {
       {/* Modal de Confirmação */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-background rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4">Confirmar Exercício</h3>
-            <p className="text-muted-foreground mb-4">
+          <div className="bg-background rounded-lg p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <h3 className="text-base sm:text-lg font-semibold mb-4">Confirmar Exercício</h3>
+            <p className="text-sm sm:text-base text-muted-foreground mb-4">
               Confirme os dados do exercício{" "}
-              <strong>{selectedExercise?.name}</strong>:
+              <strong className="truncate overflow-hidden text-ellipsis whitespace-nowrap">{selectedExercise?.name}</strong>:
             </p>
 
             <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label
                     htmlFor="sets-input"
@@ -895,20 +894,20 @@ export default function WorkoutDetailPage() {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-2 mt-6">
-              <Button
-                variant="outline"
-                onClick={handleCancelExercise}
-                className="flex-1 order-2 sm:order-1"
-              >
-                Cancelar
-              </Button>
+            <div className="flex flex-col gap-2 mt-6">
               <Button
                 onClick={handleConfirmExercise}
-                className="flex-1 order-1 sm:order-2"
+                className="w-full"
                 disabled={completeExerciseMutation.isPending}
               >
                 {completeExerciseMutation.isPending ? 'Concluindo...' : 'Confirmar'}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleCancelExercise}
+                className="w-full"
+              >
+                Cancelar
               </Button>
             </div>
           </div>

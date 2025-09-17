@@ -16,7 +16,6 @@ export interface WorkoutExercise {
 export interface CreateWorkoutData {
   name: string
   privacy: string
-  userId: string
   exercises: WorkoutExercise[]
 }
 
@@ -188,22 +187,12 @@ const completeExercise = async (workoutId: string, sessionExerciseId: string, ex
 
 export const useCreateWorkout = () => {
   const queryClient = useQueryClient()
-  const { user } = useUser()
   const { getAuthToken } = useClerkToken()
 
   return useMutation({
-    mutationFn: async (data: Omit<CreateWorkoutData, 'userId'>) => {
-      if (!user) {
-        throw new Error('Usuário não autenticado')
-      }
-      
-      const workoutData: CreateWorkoutData = {
-        ...data,
-        userId: user.id
-      }
-      
+    mutationFn: async (data: CreateWorkoutData) => {
       const token = await getAuthToken()
-      return createWorkout(workoutData, token)
+      return createWorkout(data, token)
     },
     onSuccess: (data) => {
       console.log('Treino criado com sucesso:', data)
