@@ -73,8 +73,8 @@ export function ExerciseModal({ isOpen, onClose, onSuccess, editData }: Exercise
       setValue('muscleGroupId', editData.muscleGroupId)
       setValue('description', editData.description)
       setValue('videoUrl', editData.videoUrl || '')
-      setValue('image', editData.image)
-      setImagePreview(editData.image)
+      setValue('image', editData.image || '')
+      setImagePreview(editData.image || null)
     } else {
       reset()
       setImagePreview(null)
@@ -286,7 +286,7 @@ export function ExerciseModal({ isOpen, onClose, onSuccess, editData }: Exercise
                 {imagePreview || watchedImage ? (
                   <div className="relative">
                     <Image
-                      src={imagePreview || watchedImage}
+                      src={imagePreview || watchedImage || ''}
                       alt="Preview da imagem selecionada"
                       width={400}
                       height={360}
