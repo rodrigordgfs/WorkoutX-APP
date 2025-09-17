@@ -61,7 +61,7 @@ export default function MuscleGroupsPage() {
     id: string;
     name: string;
     description: string;
-    image: string;
+    image?: string;
   } | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [groupToDelete, setGroupToDelete] = useState<{

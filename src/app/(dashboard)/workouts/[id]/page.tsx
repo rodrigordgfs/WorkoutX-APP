@@ -38,7 +38,7 @@ import { toast } from "sonner";
 interface WorkoutExercise {
   id: string;
   name: string;
-  image: string;
+  image?: string;
   videoUrl?: string;
   description: string;
   series: string;

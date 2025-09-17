@@ -6,7 +6,7 @@ export interface CreateExerciseData {
   muscleGroupId: string
   name: string
   description: string
-  image: string
+  image?: string
   videoUrl?: string
 }
 
@@ -15,14 +15,14 @@ export interface UpdateExerciseData {
   muscleGroupId: string
   name: string
   description: string
-  image: string
+  image?: string
   videoUrl?: string
 }
 
 export interface Exercise {
   id: string
   name: string
-  image: string
+  image?: string
   description: string
   videoUrl?: string
   muscleGroupId: string

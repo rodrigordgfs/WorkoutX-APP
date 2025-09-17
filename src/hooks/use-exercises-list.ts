@@ -6,7 +6,7 @@ export interface ExerciseWithMuscleGroup {
   id: string
   name: string
   description: string
-  image: string
+  image?: string
   videoUrl?: string
   muscleGroupId: string
   muscleGroup: {

@@ -19,8 +19,10 @@ const exerciseSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório').min(3, 'Nome deve ter pelo menos 3 caracteres'),
   muscleGroupId: z.string().min(1, 'Grupo muscular é obrigatório'),
   description: z.string().min(1, 'Descrição é obrigatória').min(10, 'Descrição deve ter pelo menos 10 caracteres'),
-  videoUrl: z.string().min(1, 'URL do vídeo é obrigatória').url('URL do vídeo deve ser válida'),
-  image: z.string().min(1, 'Imagem é obrigatória')
+  videoUrl: z.string().optional().refine((val) => !val || z.string().url().safeParse(val).success, {
+    message: 'URL do vídeo deve ser válida'
+  }),
+  image: z.string().optional()
 }).refine((data) => {
   console.log('Validação do schema - muscleGroupId:', data.muscleGroupId)
   return data.muscleGroupId && data.muscleGroupId.length > 0
@@ -238,14 +240,14 @@ export function ExerciseModal({ isOpen, onClose, onSuccess, editData }: Exercise
               {/* URL do Vídeo */}
               <div>
                 <label htmlFor="modal-video-url" className="block text-sm font-medium mb-2">
-                  URL do Vídeo *
+                  URL do Vídeo (opcional)
                 </label>
                 <div className="relative">
                   <Video className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="modal-video-url"
                     type="url"
-                    placeholder="https://youtube.com/watch?v=..."
+                    placeholder="https://youtube.com/watch?v=... (opcional)"
                     {...register('videoUrl')}
                     className={`pl-10 ${errors.videoUrl ? 'border-red-500' : ''}`}
                   />
@@ -276,7 +278,7 @@ export function ExerciseModal({ isOpen, onClose, onSuccess, editData }: Exercise
             {/* Coluna Direita - Upload de Imagem */}
             <div className="space-y-2">
               <label htmlFor="modal-image-upload" className="block text-sm font-medium">
-                Imagem do Exercício *
+                Imagem do Exercício (opcional)
               </label>
               
               {/* Image Upload Area */}
@@ -323,7 +325,7 @@ export function ExerciseModal({ isOpen, onClose, onSuccess, editData }: Exercise
                       <p className={`text-xs sm:text-sm ${
                         errors.image ? 'text-red-500' : 'text-muted-foreground'
                       }`}>
-                        Clique para selecionar uma imagem
+                        Clique para selecionar uma imagem (opcional)
                       </p>
                       <p className={`text-xs mt-1 ${
                         errors.image ? 'text-red-500' : 'text-muted-foreground'
@@ -345,7 +347,7 @@ export function ExerciseModal({ isOpen, onClose, onSuccess, editData }: Exercise
                     className="w-full text-xs sm:text-sm"
                   >
                     <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                    <span className="hidden sm:inline">Selecionar Imagem</span>
+                    <span className="hidden sm:inline">Selecionar Imagem (opcional)</span>
                     <span className="sm:hidden">Selecionar</span>
                   </Button>
                 </div>

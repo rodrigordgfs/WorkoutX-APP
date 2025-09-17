@@ -35,7 +35,7 @@ interface SelectedExercise {
   id: string
   name: string
   muscleGroup: string
-  image: string
+  image?: string
   sets: number
   reps: number
   weight: number
@@ -214,12 +214,12 @@ export default function CreateWorkoutPage() {
     setExpandedGroups(newExpanded)
   }
 
-  const addExercise = (exercise: { id: string; name: string; image: string; description: string; muscleGroup: { name: string } }) => {
+  const addExercise = (exercise: { id: string; name: string; image?: string; description: string; muscleGroup: { name: string } }) => {
     const newExercise: SelectedExercise = {
       id: exercise.id,
       name: exercise.name,
       muscleGroup: exercise.muscleGroup.name,
-      image: exercise.image || '/placeholder-exercise.jpg',
+      image: exercise.image,
       sets: 4,
       reps: 12,
       weight: 0,

@@ -39,7 +39,7 @@ export interface WorkoutResponse {
 export interface ApiWorkoutExercise {
   id: string
   name: string
-  image: string
+  image?: string
   videoUrl?: string
   description: string
   series: string
@@ -62,7 +62,7 @@ export interface ApiSessionExercise {
   weight: string
   restTime: string
   name: string
-  image: string
+  image?: string
   videoUrl?: string
   description: string
 }

@@ -5,13 +5,13 @@ import { useClerkToken } from './use-clerk-token'
 export interface WorkoutHistoryExercise {
   id: string
   name: string
-  image: string
-  videoUrl: string
+  image?: string
+  videoUrl?: string
   description: string
   muscleGroup: {
     id: string
     name: string
-    image: string
+    image?: string
     description: string
   }
   series: string
