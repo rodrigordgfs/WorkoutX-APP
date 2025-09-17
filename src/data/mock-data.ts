@@ -347,9 +347,9 @@ export const mockWorkoutHistory = [
     id: uuidv4(),
     workoutId: WORKOUT_1_ID,
     title: 'Treino Peito e Tríceps',
-    date: '2024-01-25',
+    date: '2024-01-25T21:00:00',
     duration: 45,
-    status: 'completed' as const,
+    status: 'COMPLETED' as const,
     exercises: 8,
     notes: 'Treino excelente, consegui aumentar o peso no supino!'
   },
@@ -357,9 +357,9 @@ export const mockWorkoutHistory = [
     id: uuidv4(),
     workoutId: WORKOUT_3_ID,
     title: 'Treino Pernas',
-    date: '2024-01-23',
+    date: '2024-01-23T19:30:00',
     duration: 60,
-    status: 'completed' as const,
+    status: 'COMPLETED' as const,
     exercises: 6,
     notes: 'Pernas bem cansadas, mas treino completo.'
   },
@@ -367,9 +367,9 @@ export const mockWorkoutHistory = [
     id: uuidv4(),
     workoutId: WORKOUT_2_ID,
     title: 'Treino Costas e Bíceps',
-    date: '2024-01-21',
+    date: '2024-01-21T18:45:00',
     duration: 50,
-    status: 'completed' as const,
+    status: 'COMPLETED' as const,
     exercises: 7,
     notes: 'Foco na execução, sem pressa.'
   },
@@ -377,9 +377,9 @@ export const mockWorkoutHistory = [
     id: uuidv4(),
     workoutId: WORKOUT_4_ID,
     title: 'Treino Ombros e Abdômen',
-    date: '2024-01-19',
+    date: '2024-01-19T20:15:00',
     duration: 35,
-    status: 'completed' as const,
+    status: 'COMPLETED' as const,
     exercises: 8,
     notes: 'Treino mais leve, boa recuperação.'
   },
@@ -387,9 +387,9 @@ export const mockWorkoutHistory = [
     id: uuidv4(),
     workoutId: WORKOUT_1_ID,
     title: 'Treino Peito e Tríceps',
-    date: '2024-01-18',
+    date: '2024-01-18T17:30:00',
     duration: 42,
-    status: 'completed' as const,
+    status: 'COMPLETED' as const,
     exercises: 8,
     notes: 'Bom treino, mantive a intensidade.'
   }
@@ -1216,7 +1216,7 @@ export const mockRecentActivities = [
     title: 'Treino Peito e Tríceps',
     exercises: 8,
     duration: 45,
-    status: 'completed' as const,
+    status: 'COMPLETED' as const,
     date: 'Hoje, 14:30'
   },
   {
@@ -1224,7 +1224,7 @@ export const mockRecentActivities = [
     title: 'Treino Pernas',
     exercises: 6,
     duration: 60,
-    status: 'completed' as const,
+    status: 'COMPLETED' as const,
     date: 'Ontem, 09:15'
   },
   {
@@ -1232,7 +1232,7 @@ export const mockRecentActivities = [
     title: 'Treino Costas e Bíceps',
     exercises: 7,
     duration: 50,
-    status: 'in-progress' as const,
+    status: 'IN_PROGRESS' as const,
     date: 'Sexta, 18:00'
   },
   {
@@ -1240,7 +1240,7 @@ export const mockRecentActivities = [
     title: 'Treino Ombros',
     exercises: 5,
     duration: 35,
-    status: 'pending' as const,
+    status: 'NOT_STARTED' as const,
     date: 'Quinta, 16:00'
   }
 ]

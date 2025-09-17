@@ -39,7 +39,7 @@ import { toast } from "sonner";
 
 // Componentes de Skeleton
 const SkeletonExerciseCard = () => (
-  <div className="bg-card rounded-lg border p-6">
+  <div className="bg-card rounded-lg border border-input p-6">
     <div className="flex flex-col space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">

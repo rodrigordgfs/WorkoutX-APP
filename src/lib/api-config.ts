@@ -6,6 +6,7 @@ export const apiConfig = {
     exercises: '/exercise',
     auth: '/auth',
     workouts: '/workout',
+    workoutHistory: '/workout/history',
   },
 }
 

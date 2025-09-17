@@ -1,4 +1,3 @@
-import React from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Dumbbell, Clock, Target } from 'lucide-react'
@@ -7,7 +6,7 @@ interface ActivityItemProps {
   title: string
   exercises: number
   duration: number
-  status: 'completed' | 'in-progress' | 'pending'
+  status: 'COMPLETED' | 'IN_PROGRESS' | 'NOT_STARTED' | 'UNCOMPLETED'
   date: string
 }
 
@@ -20,10 +19,14 @@ export function ActivityItem({
 }: ActivityItemProps) {
   const getStatusVariant = () => {
     switch (status) {
-      case 'completed':
+      case 'COMPLETED':
         return 'success'
-      case 'in-progress':
+      case 'IN_PROGRESS':
         return 'warning'
+      case 'NOT_STARTED':
+        return 'secondary'
+      case 'UNCOMPLETED':
+        return 'destructive'
       default:
         return 'secondary'
     }
@@ -31,12 +34,16 @@ export function ActivityItem({
 
   const getStatusText = () => {
     switch (status) {
-      case 'completed':
+      case 'COMPLETED':
         return 'Concluído'
-      case 'in-progress':
+      case 'IN_PROGRESS':
         return 'Em andamento'
+      case 'NOT_STARTED':
+        return 'Não iniciado'
+      case 'UNCOMPLETED':
+        return 'Incompleto'
       default:
-        return 'Pendente'
+        return 'Desconhecido'
     }
   }
 
@@ -63,7 +70,7 @@ export function ActivityItem({
               <p className="text-xs text-muted-foreground mt-1">{date}</p>
             </div>
           </div>
-          <Badge variant={getStatusVariant() as any}>
+          <Badge variant={getStatusVariant() as "default" | "secondary" | "destructive" | "outline" | "success" | "warning"}>
             {getStatusText()}
           </Badge>
         </div>

@@ -8,7 +8,7 @@ import { ChartPlaceholder } from '@/components/dashboard/chart-placeholder'
 
 // Componentes de Skeleton para Dashboard
 const SkeletonMetricsTile = () => (
-  <div className="bg-card rounded-lg border p-6">
+  <div className="bg-card rounded-lg border border-input p-6">
     <div className="flex items-center justify-between">
       <div className="space-y-2">
         <div className="h-4 bg-muted rounded animate-pulse w-24"></div>
@@ -21,7 +21,7 @@ const SkeletonMetricsTile = () => (
 )
 
 const SkeletonChart = () => (
-  <div className="bg-card rounded-lg border p-6">
+  <div className="bg-card rounded-lg border border-input p-6">
     <div className="space-y-4">
       <div className="h-6 bg-muted rounded animate-pulse w-48"></div>
       <div className="h-64 bg-muted rounded animate-pulse"></div>
@@ -30,7 +30,7 @@ const SkeletonChart = () => (
 )
 
 const SkeletonActivityItem = () => (
-  <div className="bg-card rounded-lg border p-4">
+  <div className="bg-card rounded-lg border border-input p-4">
     <div className="flex items-center justify-between">
       <div className="space-y-2 flex-1">
         <div className="h-5 bg-muted rounded animate-pulse w-3/4"></div>
@@ -65,28 +65,28 @@ export default function DashboardPage() {
       title: 'Treino Peito e Tríceps',
       exercises: 8,
       duration: 45,
-      status: 'completed' as const,
+      status: 'COMPLETED' as const,
       date: 'Hoje, 14:30'
     },
     {
       title: 'Treino Pernas',
       exercises: 6,
       duration: 60,
-      status: 'completed' as const,
+      status: 'COMPLETED' as const,
       date: 'Ontem, 09:15'
     },
     {
       title: 'Treino Costas e Bíceps',
       exercises: 7,
       duration: 50,
-      status: 'in-progress' as const,
+      status: 'IN_PROGRESS' as const,
       date: 'Sexta, 18:00'
     },
     {
       title: 'Treino Ombros',
       exercises: 5,
       duration: 35,
-      status: 'pending' as const,
+      status: 'NOT_STARTED' as const,
       date: 'Quinta, 16:00'
     }
   ]

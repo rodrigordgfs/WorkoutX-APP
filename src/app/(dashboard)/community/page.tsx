@@ -133,7 +133,7 @@ export default function CommunityPage() {
           <div className="h-32 bg-muted animate-pulse rounded-lg"></div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {['skeleton-1', 'skeleton-2', 'skeleton-3', 'skeleton-4', 'skeleton-5', 'skeleton-6'].map((id) => (
-              <div key={id} className="bg-card rounded-lg border p-6 animate-pulse">
+              <div key={id} className="bg-card rounded-lg border border-input p-6 animate-pulse">
                 <div className="space-y-4">
                   <div className="h-6 bg-muted rounded w-3/4"></div>
                   <div className="h-4 bg-muted rounded w-1/2"></div>
@@ -165,7 +165,7 @@ export default function CommunityPage() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
-                placeholder="Buscar treinos, descrições ou tags..."
+                placeholder="Buscar treinos por nome"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"

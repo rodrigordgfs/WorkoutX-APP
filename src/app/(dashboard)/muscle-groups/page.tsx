@@ -38,7 +38,7 @@ import { toast } from "sonner";
 
 // Componentes de Skeleton
 const SkeletonMuscleGroupCard = () => (
-  <div className="bg-card rounded-lg border p-6">
+  <div className="bg-card rounded-lg border border-input p-6">
     <div className="flex items-start justify-between">
       <div className="flex items-start space-x-4 flex-1">
         <div className="w-16 h-16 bg-muted rounded-lg animate-pulse"></div>

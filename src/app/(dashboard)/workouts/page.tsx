@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { Calendar, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { WorkoutCard } from '@/components/workouts/workout-card'
@@ -7,7 +8,7 @@ import { useUserWorkouts } from '@/hooks/use-workouts'
 
 // Componente de Skeleton para WorkoutCard
 const SkeletonWorkoutCard = () => (
-  <div className="bg-card rounded-lg border p-4 sm:p-6">
+  <div className="bg-card rounded-lg border border-input p-4 sm:p-6">
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="space-y-2 flex-1 min-w-0">
@@ -32,7 +33,12 @@ const SkeletonWorkoutCard = () => (
 )
 
 export default function WorkoutsPage() {
+  const router = useRouter()
   const { data: workouts = [], isLoading, error } = useUserWorkouts()
+
+  const handleCreateWorkout = () => {
+    router.push('/create-workout')
+  }
 
   if (error) {
     return (
@@ -91,7 +97,11 @@ export default function WorkoutsPage() {
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight truncate">Meus Treinos</h1>
         </div>
         <div className="flex gap-2 flex-shrink-0">
-          <Button size="sm" className="sm:size-default">
+          <Button 
+            size="sm" 
+            className="sm:size-default"
+            onClick={handleCreateWorkout}
+          >
             <Plus className="h-4 w-4 mr-2" />
             <span className="hidden sm:inline">Novo Treino</span>
             <span className="sm:hidden">Novo</span>

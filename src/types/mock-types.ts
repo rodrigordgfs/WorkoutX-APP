@@ -43,7 +43,7 @@ export interface WorkoutHistory {
   title: string
   date: string
   duration: number
-  status: 'completed' | 'in-progress' | 'cancelled'
+  status: 'COMPLETED' | 'IN_PROGRESS' | 'NOT_STARTED' | 'UNCOMPLETED'
   exercises: number
   notes?: string
 }
@@ -89,7 +89,7 @@ export interface RecentActivity {
   title: string
   exercises: number
   duration: number
-  status: 'completed' | 'in-progress' | 'pending'
+  status: 'COMPLETED' | 'IN_PROGRESS' | 'NOT_STARTED' | 'UNCOMPLETED'
   date: string
 }
 

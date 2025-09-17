@@ -11,6 +11,17 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   Play,
   Trash2,
@@ -158,6 +169,8 @@ export default function WorkoutDetailPage() {
   const [selectedExercise, setSelectedExercise] =
     useState<WorkoutExercise | null>(null);
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
+  const [isFinishDialogOpen, setIsFinishDialogOpen] = useState(false);
+  const [workoutNotes, setWorkoutNotes] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [exerciseData, setExerciseData] = useState({
     sets: "",
@@ -256,17 +269,28 @@ export default function WorkoutDetailPage() {
     }
   };
 
-  const handleFinishWorkout = async () => {
+  const handleFinishWorkout = () => {
+    setIsFinishDialogOpen(true);
+  };
+
+  const handleConfirmFinishWorkout = async () => {
     if (!workout) return;
     
     try {
       await completeWorkoutMutation.mutateAsync(workoutId);
       toast.success('Treino finalizado com sucesso!');
       setCurrentExerciseIndex(0);
+      setIsFinishDialogOpen(false);
+      setWorkoutNotes("");
     } catch (error) {
       console.error('Erro ao finalizar treino:', error);
       toast.error('Erro ao finalizar treino. Tente novamente.');
     }
+  };
+
+  const handleCancelFinishWorkout = () => {
+    setIsFinishDialogOpen(false);
+    setWorkoutNotes("");
   };
 
   const handleCompleteExercise = () => {
@@ -507,7 +531,7 @@ export default function WorkoutDetailPage() {
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Visibilidade:</span>
                   <span className="font-medium capitalize">
-                    {workout.visibility.toLowerCase()}
+                    {workout.visibility.toLowerCase() === 'public' ? 'Público' : 'Privado'}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
@@ -913,6 +937,46 @@ export default function WorkoutDetailPage() {
           </div>
         </div>
       )}
+
+      {/* Dialog de Finalização do Treino */}
+      <AlertDialog open={isFinishDialogOpen} onOpenChange={setIsFinishDialogOpen}>
+        <AlertDialogContent className="sm:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Finalizar Treino</AlertDialogTitle>
+            <AlertDialogDescription>
+              Adicione uma observação sobre o seu treino (opcional) e confirme a finalização.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="workout-notes" className="text-sm font-medium">
+                Observações do Treino
+              </label>
+              <Textarea
+                id="workout-notes"
+                placeholder="Como foi o treino? Alguma observação importante?"
+                value={workoutNotes}
+                onChange={(e) => setWorkoutNotes(e.target.value)}
+                className="mt-2 min-h-[100px]"
+              />
+            </div>
+          </div>
+
+          <AlertDialogFooter className="flex flex-col gap-2 sm:flex-row">
+            <AlertDialogCancel onClick={handleCancelFinishWorkout} className="w-full sm:w-auto">
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmFinishWorkout}
+              disabled={completeWorkoutMutation.isPending}
+              className="w-full sm:w-auto"
+            >
+              {completeWorkoutMutation.isPending ? 'Finalizando...' : 'Finalizar Treino'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
     </div>
   );
