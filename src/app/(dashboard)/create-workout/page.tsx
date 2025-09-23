@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Plus, Save, Search, ChevronDown, ChevronUp, Dumbbell, Trash, GripVertical } from 'lucide-react'
 import {
@@ -28,7 +29,7 @@ import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { useMuscleGroups } from '@/hooks/use-muscle-groups'
 import { useExercises } from '@/hooks/use-exercises-list'
-import { useCreateWorkout } from '@/hooks/use-workouts'
+import { useCreateWorkout, useWorkout, useUpdateWorkout } from '@/hooks/use-workouts'
 import { toast } from 'sonner'
 
 interface SelectedExercise {
@@ -182,8 +183,11 @@ function DraggableExerciseItem({
 }
 
 export default function CreateWorkoutPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const workoutId = searchParams.get('id') || ''
   const [workoutName, setWorkoutName] = useState('')
-  const [privacy, setPrivacy] = useState('private')
+  const [privacy, setPrivacy] = useState('PRIVATE')
   const [searchTerm, setSearchTerm] = useState('')
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
   const [selectedExercises, setSelectedExercises] = useState<SelectedExercise[]>([])
@@ -191,6 +195,8 @@ export default function CreateWorkoutPage() {
   const { data: muscleGroups = [], isLoading: muscleGroupsLoading } = useMuscleGroups()
   const { data: exercises = [], isLoading: exercisesLoading } = useExercises()
   const createWorkoutMutation = useCreateWorkout()
+  const updateWorkoutMutation = useUpdateWorkout()
+  const { data: workoutToEdit, isLoading: isLoadingWorkout } = useWorkout(workoutId)
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -201,8 +207,28 @@ export default function CreateWorkoutPage() {
 
   useEffect(() => {
     // Atualizar loading baseado nos dados dos hooks
-    setIsLoading(muscleGroupsLoading || exercisesLoading)
-  }, [muscleGroupsLoading, exercisesLoading])
+    setIsLoading(muscleGroupsLoading || exercisesLoading || (!!workoutId && isLoadingWorkout))
+  }, [muscleGroupsLoading, exercisesLoading, workoutId, isLoadingWorkout])
+
+  // Preencher formulário no modo edição
+  useEffect(() => {
+    if (workoutToEdit && workoutId) {
+      setWorkoutName(workoutToEdit.name)
+      setPrivacy((workoutToEdit.visibility || 'PRIVATE') as string)
+      const mapped: SelectedExercise[] = workoutToEdit.exercises.map((ex) => ({
+        id: ex.id,
+        name: ex.name,
+        muscleGroup: ex.muscleGroup?.name || 'Grupo Muscular',
+        image: ex.image,
+        sets: parseInt(ex.series),
+        reps: parseInt(ex.repetitions),
+        weight: parseFloat(ex.weight),
+        rest: parseInt(ex.restTime),
+        isExpanded: false,
+      }))
+      setSelectedExercises(mapped)
+    }
+  }, [workoutToEdit, workoutId])
 
   const toggleGroup = (groupId: string) => {
     const newExpanded = new Set(expandedGroups)
@@ -303,15 +329,15 @@ export default function CreateWorkoutPage() {
     <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-3">
           <div className="p-2 bg-primary/10 rounded-lg">
             <Plus className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Cadastro de Treino</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{workoutId ? 'Editar Treino' : 'Cadastro de Treino'}</h1>
         </div>
         <Button 
           onClick={async () => {
-            const workoutData = {
+            const common = {
               name: workoutName,
               privacy: privacy.toUpperCase(),
               exercises: selectedExercises.map(exercise => ({
@@ -322,26 +348,31 @@ export default function CreateWorkoutPage() {
                 rest: exercise.rest
               }))
             }
-            
+
             try {
-              await createWorkoutMutation.mutateAsync(workoutData)
-              toast.success('Treino criado com sucesso!')
-              
-              // Limpar formulário após sucesso
-              setWorkoutName('')
-              setPrivacy('private')
-              setSelectedExercises([])
-              setExpandedGroups(new Set()) // Retrair todos os cards de exercícios
+              if (workoutId) {
+                await updateWorkoutMutation.mutateAsync({ id: workoutId, ...common })
+                toast.success('Treino atualizado com sucesso!')
+              } else {
+                await createWorkoutMutation.mutateAsync(common)
+                toast.success('Treino criado com sucesso!')
+                // Limpar formulário após sucesso de criação
+                setWorkoutName('')
+                setPrivacy('PRIVATE')
+                setSelectedExercises([])
+                setExpandedGroups(new Set())
+              }
+              router.push('/workouts')
             } catch (error) {
-              console.error('Erro ao criar treino:', error)
-              toast.error('Erro ao criar treino. Tente novamente.')
+              console.error('Erro ao salvar treino:', error)
+              toast.error('Erro ao salvar treino. Tente novamente.')
             }
           }}
-          disabled={!workoutName.trim() || selectedExercises.length === 0 || createWorkoutMutation.isPending}
+          disabled={!workoutName.trim() || selectedExercises.length === 0 || createWorkoutMutation.isPending || updateWorkoutMutation.isPending}
           className="w-full sm:w-auto"
         >
           <Save className="h-4 w-4 mr-2" />
-          {createWorkoutMutation.isPending ? 'Salvando...' : 'Salvar Treino'}
+          {workoutId ? (updateWorkoutMutation.isPending ? 'Atualizando...' : 'Atualizar Treino') : (createWorkoutMutation.isPending ? 'Salvando...' : 'Salvar Treino')}
         </Button>
       </div>
 

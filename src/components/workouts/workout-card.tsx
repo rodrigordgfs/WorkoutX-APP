@@ -5,7 +5,25 @@ import { useRouter } from 'next/navigation'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ChevronDown, ChevronUp, Dumbbell, Eye } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { ChevronDown, ChevronUp, Dumbbell, Eye, MoreVertical, Edit, Trash2 } from 'lucide-react'
+import { useDeleteWorkout } from '@/hooks/use-workouts'
+import { toast } from 'sonner'
 
 interface Exercise {
   name: string
@@ -33,11 +51,35 @@ export function WorkoutCard({
   icon = <Dumbbell className="h-5 w-5 text-primary" />
 }: WorkoutCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const router = useRouter()
+  const deleteWorkoutMutation = useDeleteWorkout()
 
   const handleViewDetails = () => {
     console.log('Navegando para treino ID:', id)
     router.push(`/workouts/${id}`)
+  }
+
+  const handleEditWorkout = () => {
+    router.push(`/create-workout?id=${id}`)
+  }
+
+  const handleDeleteWorkout = async () => {
+    try {
+      await deleteWorkoutMutation.mutateAsync(id)
+      toast.success('Treino excluído com sucesso!')
+      setIsDeleteDialogOpen(false)
+    } catch (error: unknown) {
+      console.error('Erro ao excluir treino:', error)
+      
+      // Verificar se é o erro específico de vínculos
+      if (error && typeof error === 'object' && 'message' in error && 
+          typeof error.message === 'string' && error.message.includes('vínculos')) {
+        toast.error('Não é possível deletar: treino possui vínculos')
+      } else {
+        toast.error('Erro ao excluir treino. Tente novamente.')
+      }
+    }
   }
 
   return (
@@ -70,18 +112,39 @@ export function WorkoutCard({
           </Button>
         </div>
 
-        {/* View Details Button */}
-        <div className="mb-4">
+        {/* Action Buttons */}
+        <div className="mb-4 flex gap-2">
           <Button 
             variant="outline" 
             size="sm" 
-            className="w-full"
+            className="flex-1"
             onClick={handleViewDetails}
           >
             <Eye className="h-4 w-4 mr-2" />
-            <span className="hidden sm:inline">Ver Detalhes do Treino</span>
-            <span className="sm:hidden">Ver Detalhes</span>
+            <span className="hidden sm:inline">Ver Detalhes</span>
+            <span className="sm:hidden">Ver</span>
           </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleEditWorkout}>
+                <Edit className="h-4 w-4 mr-2" />
+                Editar Treino
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setIsDeleteDialogOpen(true)}
+                className="text-destructive focus:text-destructive"
+                disabled={deleteWorkoutMutation.isPending}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Deletar Treino
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Expanded Content */}
@@ -139,6 +202,28 @@ export function WorkoutCard({
             ))}
           </div>
         )}
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Excluir Treino</AlertDialogTitle>
+              <AlertDialogDescription>
+                Tem certeza que deseja excluir o treino "{title}"? Esta ação não pode ser desfeita.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteWorkout}
+                disabled={deleteWorkoutMutation.isPending}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {deleteWorkoutMutation.isPending ? 'Excluindo...' : 'Excluir'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardContent>
     </Card>
   )
