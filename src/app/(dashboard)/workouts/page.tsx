@@ -77,7 +77,7 @@ export default function WorkoutsPage() {
         </div>
 
         {/* Workout Cards Skeleton */}
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {['skeleton-workout-1', 'skeleton-workout-2', 'skeleton-workout-3', 'skeleton-workout-4'].map((id) => (
             <SkeletonWorkoutCard key={id} />
           ))}
@@ -110,7 +110,7 @@ export default function WorkoutsPage() {
       </div>
 
       {/* Workout Cards */}
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {workouts.length === 0 ? (
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
