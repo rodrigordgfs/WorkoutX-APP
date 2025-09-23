@@ -641,7 +641,7 @@ export default function WorkoutDetailPage() {
                           <div className="mt-1 flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                             <span className="flex items-center gap-1">
                               <Layers className="h-3 w-3" />
-                              {exercise.series}s
+                              {exercise.series}x
                             </span>
                             <span className="flex items-center gap-1">
                               <Repeat className="h-3 w-3" />
