@@ -156,12 +156,17 @@ const stopWorkout = async (workoutId: string, token: string | null): Promise<Api
   })
 }
 
-const completeWorkout = async (workoutId: string, token: string | null): Promise<ApiWorkout> => {
-  console.log('Finalizando treino:', workoutId)
+const completeWorkout = async (
+  workoutId: string,
+  token: string | null,
+  payload?: { observation?: string }
+): Promise<ApiWorkout> => {
+  console.log('Finalizando treino:', workoutId, 'payload:', payload)
   
   return authenticatedRequest<ApiWorkout>(`${apiConfig.endpoints.workouts}/${workoutId}/complete`, {
     method: 'PATCH',
-    token
+    token,
+    body: payload && Object.keys(payload).length > 0 ? payload : undefined,
   })
 }
 
@@ -334,15 +339,15 @@ export const useCompleteWorkout = () => {
   const { getAuthToken } = useClerkToken()
 
   return useMutation({
-    mutationFn: async (workoutId: string) => {
+    mutationFn: async (params: { workoutId: string; observation?: string }) => {
       const token = await getAuthToken()
-      return completeWorkout(workoutId, token)
+      return completeWorkout(params.workoutId, token, { observation: params.observation })
     },
     onSuccess: (data, variables) => {
       console.log('Treino finalizado com sucesso:', data)
       // Invalidar queries relacionadas
       queryClient.invalidateQueries({ queryKey: ['workouts'] })
-      queryClient.invalidateQueries({ queryKey: ['workout', variables] })
+      queryClient.invalidateQueries({ queryKey: ['workout', variables.workoutId] })
     },
     onError: (error) => {
       console.error('Erro ao finalizar treino:', error)

@@ -7,6 +7,7 @@ export const apiConfig = {
     auth: '/auth',
     workouts: '/workout',
     workoutHistory: '/workout/history',
+    dashboard: '/dashboard',
   },
 }
 

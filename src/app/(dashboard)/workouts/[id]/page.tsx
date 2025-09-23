@@ -277,7 +277,7 @@ export default function WorkoutDetailPage() {
     if (!workout) return;
     
     try {
-      await completeWorkoutMutation.mutateAsync(workoutId);
+      await completeWorkoutMutation.mutateAsync({ workoutId, observation: workoutNotes });
       toast.success('Treino finalizado com sucesso!');
       setCurrentExerciseIndex(0);
       setIsFinishDialogOpen(false);

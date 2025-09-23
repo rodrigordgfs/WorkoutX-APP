@@ -1,10 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+//
 import { LayoutDashboard, Calendar, Clock, Target, TrendingUp } from 'lucide-react'
 import { MetricsTile } from '@/components/dashboard/metrics-tile'
 import { ActivityItem } from '@/components/dashboard/activity-item'
-import { ChartPlaceholder } from '@/components/dashboard/chart-placeholder'
+//
+import { WeeklyVolumeChart } from '@/components/dashboard/weekly-volume-chart'
+import { TopExercisesChart } from '@/components/dashboard/top-exercises-chart'
+import { useDashboard } from '@/hooks/use-dashboard'
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
 // Componentes de Skeleton para Dashboard
 const SkeletonMetricsTile = () => (
@@ -48,48 +53,21 @@ const SkeletonActivityItem = () => (
 )
 
 export default function DashboardPage() {
-  const [isLoading, setIsLoading] = useState(true)
+  const { data, isLoading, error } = useDashboard()
 
-  useEffect(() => {
-    const loadData = async () => {
-      // Simular carregamento assíncrono
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      setIsLoading(false)
-    }
+  const formatActivityDate = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
     
-    loadData()
-  }, [])
-
-  const recentActivities = [
-    {
-      title: 'Treino Peito e Tríceps',
-      exercises: 8,
-      duration: 45,
-      status: 'COMPLETED' as const,
-      date: 'Hoje, 14:30'
-    },
-    {
-      title: 'Treino Pernas',
-      exercises: 6,
-      duration: 60,
-      status: 'COMPLETED' as const,
-      date: 'Ontem, 09:15'
-    },
-    {
-      title: 'Treino Costas e Bíceps',
-      exercises: 7,
-      duration: 50,
-      status: 'IN_PROGRESS' as const,
-      date: 'Sexta, 18:00'
-    },
-    {
-      title: 'Treino Ombros',
-      exercises: 5,
-      duration: 35,
-      status: 'NOT_STARTED' as const,
-      date: 'Quinta, 16:00'
+    if (diffInHours < 24) {
+      return `Hoje, ${format(date, 'HH:mm', { locale: ptBR })}`
+    } else if (diffInHours < 48) {
+      return `Ontem, ${format(date, 'HH:mm', { locale: ptBR })}`
+    } else {
+      return format(date, "EEEE, HH:mm", { locale: ptBR }).charAt(0).toUpperCase() + format(date, "EEEE, HH:mm", { locale: ptBR }).slice(1)
     }
-  ]
+  }
 
   if (isLoading) {
     return (
@@ -127,6 +105,38 @@ export default function DashboardPage() {
       </div>
     )
   }
+  if (error) {
+    return (
+      <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <LayoutDashboard className="h-6 w-6 text-primary" />
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        </div>
+        <div className="text-sm text-muted-foreground">Erro ao carregar dashboard</div>
+      </div>
+    )
+  }
+
+  // Preparar dados para os gráficos usando os campos do endpoint
+  const weeklyVolumeObj = data?.weeklyVolume
+  const weeklyVolume = weeklyVolumeObj
+    ? [
+        { day: 'Dom', exercises: weeklyVolumeObj.sunday ?? 0 },
+        { day: 'Seg', exercises: weeklyVolumeObj.monday ?? 0 },
+        { day: 'Ter', exercises: weeklyVolumeObj.tuesday ?? 0 },
+        { day: 'Qua', exercises: weeklyVolumeObj.wednesday ?? 0 },
+        { day: 'Qui', exercises: weeklyVolumeObj.thursday ?? 0 },
+        { day: 'Sex', exercises: weeklyVolumeObj.friday ?? 0 },
+        { day: 'Sáb', exercises: weeklyVolumeObj.saturday ?? 0 },
+      ]
+    : []
+
+  const topExercisesData = (data?.topExercises ?? []).map((item) => ({
+    name: item.name,
+    value: item.count,
+  }))
 
   return (
     <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
@@ -143,28 +153,29 @@ export default function DashboardPage() {
         <MetricsTile
           icon={<Calendar className="h-5 w-5 text-primary" />}
           title="Treinos do Mês"
-          value={12}
-          subtitle="0% vs mês anterior"
-          trend="neutral"
+          value={data?.month?.count ?? 0}
+          subtitle={`${data?.month?.variation ?? 0}% vs mês anterior`
+          }
+          trend={(data?.month?.variation ?? 0) > 0 ? 'up' : (data?.month?.variation ?? 0) < 0 ? 'down' : 'neutral'}
         />
         <MetricsTile
           icon={<TrendingUp className="h-5 w-5 text-primary" />}
           title="Sequência Atual"
-          value="3 Dias"
+          value={`${data?.streak ?? 0} Dias`}
           subtitle="Consecutivos"
           trend="up"
         />
         <MetricsTile
           icon={<Clock className="h-5 w-5 text-primary" />}
           title="Duração Média"
-          value="48 min"
+          value={`${data?.averageDurationMinutes ?? 0} min`}
           subtitle="Por treino"
           trend="up"
         />
         <MetricsTile
           icon={<Target className="h-5 w-5 text-primary" />}
           title="Taxa de Conclusão"
-          value="85%"
+          value={`${data?.completionRate ?? 0}%`}
           subtitle="Este mês"
           trend="up"
         />
@@ -172,30 +183,30 @@ export default function DashboardPage() {
 
       {/* Charts */}
       <div className="grid gap-6 md:grid-cols-2">
-        <ChartPlaceholder
-          title="Volume Semanal de Treino"
-          type="bar"
-        />
-        <ChartPlaceholder
-          title="Exercícios Mais Realizados"
-          type="line"
-        />
+        <WeeklyVolumeChart title="Volume Semanal de Treino" data={weeklyVolume} />
+        <TopExercisesChart title="Exercícios Mais Realizados" data={topExercisesData} />
       </div>
 
       {/* Recent Activities */}
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Atividades Recentes</h2>
         <div className="space-y-3">
-          {recentActivities.map((activity) => (
-            <ActivityItem
-              key={activity.title}
-              title={activity.title}
-              exercises={activity.exercises}
-              duration={activity.duration}
-              status={activity.status}
-              date={activity.date}
-            />
-          ))}
+          {data?.activities?.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              Nenhuma atividade recente encontrada
+            </div>
+          ) : (
+            data?.activities?.map((activity) => (
+              <ActivityItem
+                key={activity.id}
+                title={activity.title}
+                exercises={activity.exercises}
+                duration={activity.durationMinutes}
+                status={activity.status}
+                date={formatActivityDate(activity.startedAt)}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>

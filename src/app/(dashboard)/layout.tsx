@@ -42,7 +42,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           onRouteChange={handleRouteChange}
         />
         <main className="flex-1 transition-all duration-300 overflow-auto min-h-0">
-          <div className="h-full w-full">
+          <div className="h-full w-full pb-6 sm:pb-8 lg:pb-10">
             {children}
           </div>
         </main>

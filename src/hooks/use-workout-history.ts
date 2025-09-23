@@ -83,5 +83,7 @@ export const useWorkoutHistory = (filters: WorkoutHistoryFilters = {}) => {
       return fetchWorkoutHistory(filters, token)
     },
     staleTime: 5 * 60 * 1000, // 5 minutos
+    // Garantir que ao entrar na tela sempre haja um novo request
+    refetchOnMount: 'always',
   })
 }
