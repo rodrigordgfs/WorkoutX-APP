@@ -21,7 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { ChevronDown, ChevronUp, Dumbbell, Eye, MoreVertical, Edit, Trash2 } from 'lucide-react'
+import { ChevronDown, ChevronUp, Dumbbell, Eye, MoreVertical, Edit, Trash2, Heart, Globe, Lock } from 'lucide-react'
 import { useDeleteWorkout } from '@/hooks/use-workouts'
 import { toast } from 'sonner'
 
@@ -41,6 +41,8 @@ interface WorkoutCardProps {
   exerciseCount: number
   exercises: Exercise[]
   icon?: React.ReactNode
+  likesCount?: number
+  visibility?: 'PUBLIC' | 'PRIVATE' | string
 }
 
 export function WorkoutCard({ 
@@ -48,7 +50,9 @@ export function WorkoutCard({
   title, 
   exerciseCount, 
   exercises,
-  icon = <Dumbbell className="h-5 w-5 text-primary" />
+  icon = <Dumbbell className="h-5 w-5 text-primary" />,
+  likesCount,
+  visibility
 }: WorkoutCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
@@ -95,6 +99,24 @@ export function WorkoutCard({
               <h3 className="font-semibold text-base sm:text-lg truncate">{title}</h3>
               <p className="text-sm text-muted-foreground">
                 {exerciseCount} exercícios
+                {typeof likesCount === 'number' && (
+                  <span className="inline-flex items-center gap-1 ml-2 align-middle">
+                    •
+                    <Heart className="h-3.5 w-3.5 text-rose-500" />
+                    {likesCount}
+                  </span>
+                )}
+                {visibility && (
+                  <span className="inline-flex items-center gap-1 ml-2 align-middle">
+                    •
+                    {visibility === 'PRIVATE' ? (
+                      <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+                    ) : (
+                      <Globe className="h-3.5 w-3.5 text-muted-foreground" />
+                    )}
+                    {visibility === 'PRIVATE' ? 'Privado' : 'Público'}
+                  </span>
+                )}
               </p>
             </div>
           </div>

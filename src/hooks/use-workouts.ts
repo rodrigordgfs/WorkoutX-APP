@@ -17,6 +17,7 @@ export interface CreateWorkoutData {
   name: string
   privacy: string
   exercises: WorkoutExercise[]
+  description?: string
 }
 
 export interface UpdateWorkoutData {
@@ -24,6 +25,7 @@ export interface UpdateWorkoutData {
   name: string
   privacy: string
   exercises: WorkoutExercise[]
+  description?: string
 }
 
 export interface WorkoutResponse {
@@ -33,6 +35,7 @@ export interface WorkoutResponse {
   exercises: WorkoutExercise[]
   createdAt: string
   updatedAt: string
+  description?: string
 }
 
 // Interfaces para os dados que vêm da API
@@ -84,8 +87,11 @@ export interface ApiWorkout {
   visibility: string
   createdAt: string
   updatedAt: string
+  likesCount: number
+  isLiked: boolean
   session: ApiSession
   exercises: ApiWorkoutExercise[]
+  description?: string
 }
 
 const createWorkout = async (data: CreateWorkoutData, token: string | null): Promise<WorkoutResponse> => {
@@ -186,6 +192,24 @@ const completeExercise = async (workoutId: string, sessionExerciseId: string, ex
       weight: exerciseData.weight,
       restTime: exerciseData.restTime
     },
+    token
+  })
+}
+
+const likeWorkout = async (workoutId: string, token: string | null): Promise<{ likesCount: number; isLiked: boolean }> => {
+  console.log('Curtindo treino:', workoutId)
+  
+  return authenticatedRequest<{ likesCount: number; isLiked: boolean }>(`${apiConfig.endpoints.workouts}/${workoutId}/like`, {
+    method: 'POST',
+    token
+  })
+}
+
+const unlikeWorkout = async (workoutId: string, token: string | null): Promise<{ likesCount: number; isLiked: boolean }> => {
+  console.log('Descurtindo treino:', workoutId)
+  
+  return authenticatedRequest<{ likesCount: number; isLiked: boolean }>(`${apiConfig.endpoints.workouts}/${workoutId}/like`, {
+    method: 'DELETE',
     token
   })
 }
@@ -386,6 +410,52 @@ export const useCompleteExercise = () => {
     },
     onError: (error) => {
       console.error('Erro ao concluir exercício:', error)
+    },
+  })
+}
+
+// Hook para curtir um treino
+export const useLikeWorkout = () => {
+  const queryClient = useQueryClient()
+  const { getAuthToken } = useClerkToken()
+
+  return useMutation({
+    mutationFn: async (workoutId: string) => {
+      const token = await getAuthToken()
+      return likeWorkout(workoutId, token)
+    },
+    onSuccess: (data, variables) => {
+      console.log('Treino curtido com sucesso:', data)
+      // Invalidar queries relacionadas
+      queryClient.invalidateQueries({ queryKey: ['community'] })
+      queryClient.invalidateQueries({ queryKey: ['workouts'] })
+      queryClient.invalidateQueries({ queryKey: ['workout', variables] })
+    },
+    onError: (error) => {
+      console.error('Erro ao curtir treino:', error)
+    },
+  })
+}
+
+// Hook para descurtir um treino
+export const useUnlikeWorkout = () => {
+  const queryClient = useQueryClient()
+  const { getAuthToken } = useClerkToken()
+
+  return useMutation({
+    mutationFn: async (workoutId: string) => {
+      const token = await getAuthToken()
+      return unlikeWorkout(workoutId, token)
+    },
+    onSuccess: (data, variables) => {
+      console.log('Treino descurtido com sucesso:', data)
+      // Invalidar queries relacionadas
+      queryClient.invalidateQueries({ queryKey: ['community'] })
+      queryClient.invalidateQueries({ queryKey: ['workouts'] })
+      queryClient.invalidateQueries({ queryKey: ['workout', variables] })
+    },
+    onError: (error) => {
+      console.error('Erro ao descurtir treino:', error)
     },
   })
 }

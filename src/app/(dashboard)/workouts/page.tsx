@@ -125,9 +125,11 @@ export default function WorkoutsPage() {
               id={workout.id}
               title={workout.name}
               exerciseCount={workout.exercises.length}
+              likesCount={workout.likesCount}
+              visibility={workout.visibility}
               exercises={workout.exercises.map(exercise => ({
                 name: exercise.name,
-                sets: parseInt(exercise.series),
+                sets: parseInt(exercise.series, 10),
                 reps: exercise.repetitions,
                 weight: exercise.weight,
                 rest: exercise.restTime,

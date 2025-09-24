@@ -26,6 +26,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Select } from '@/components/ui/select'
 import { useMuscleGroups } from '@/hooks/use-muscle-groups'
 import { useExercises } from '@/hooks/use-exercises-list'
@@ -188,6 +189,7 @@ export default function CreateWorkoutPage() {
   const workoutId = searchParams.get('id') || ''
   const [workoutName, setWorkoutName] = useState('')
   const [privacy, setPrivacy] = useState('PRIVATE')
+  const [description, setDescription] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
   const [selectedExercises, setSelectedExercises] = useState<SelectedExercise[]>([])
@@ -197,6 +199,8 @@ export default function CreateWorkoutPage() {
   const createWorkoutMutation = useCreateWorkout()
   const updateWorkoutMutation = useUpdateWorkout()
   const { data: workoutToEdit, isLoading: isLoadingWorkout } = useWorkout(workoutId)
+
+  const maxDescriptionLength = 300
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -215,6 +219,7 @@ export default function CreateWorkoutPage() {
     if (workoutToEdit && workoutId) {
       setWorkoutName(workoutToEdit.name)
       setPrivacy((workoutToEdit.visibility || 'PRIVATE') as string)
+      setDescription(workoutToEdit.description || '')
       const mapped: SelectedExercise[] = workoutToEdit.exercises.map((ex) => ({
         id: ex.id,
         name: ex.name,
@@ -340,6 +345,7 @@ export default function CreateWorkoutPage() {
             const common = {
               name: workoutName,
               privacy: privacy.toUpperCase(),
+              description: description || undefined,
               exercises: selectedExercises.map(exercise => ({
                 id: exercise.id,
                 series: exercise.sets,
@@ -361,6 +367,7 @@ export default function CreateWorkoutPage() {
                 setPrivacy('PRIVATE')
                 setSelectedExercises([])
                 setExpandedGroups(new Set())
+                setDescription('')
               }
               router.push('/workouts')
             } catch (error) {
@@ -403,6 +410,24 @@ export default function CreateWorkoutPage() {
                 <option value="PRIVATE">Privado</option>
                 <option value="PUBLIC">Público</option>
               </Select>
+            </div>
+            <div className="sm:col-span-2">
+              <label htmlFor="description" className="block text-sm font-medium mb-2">
+                Descrição
+              </label>
+              <Textarea
+                id="description"
+                placeholder="Descreva o objetivo do treino, estrutura, dicas, etc."
+                value={description}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
+                className="min-h-[160px] sm:min-h-[80px]"
+                maxLength={maxDescriptionLength}
+              />
+              <div className="mt-1 flex items-center justify-end">
+                <span className="text-xs text-muted-foreground">
+                  {description.length}/{maxDescriptionLength}
+                </span>
+              </div>
             </div>
           </div>
         </CardContent>
