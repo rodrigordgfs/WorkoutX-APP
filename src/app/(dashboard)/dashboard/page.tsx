@@ -58,20 +58,56 @@ export default function DashboardPage() {
   const formatActivityDate = (dateString: string) => {
     const date = new Date(dateString)
     const now = new Date()
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60))
+    const diffInHours = Math.floor(diffInMinutes / 60)
+    const diffInDays = Math.floor(diffInHours / 24)
     
+    // Menos de 1 hora
+    if (diffInMinutes < 60) {
+      if (diffInMinutes < 1) {
+        return 'Agora mesmo'
+      }
+      return `há ${diffInMinutes} min`
+    }
+    
+    // Menos de 24 horas
     if (diffInHours < 24) {
-      return `Hoje, ${format(date, 'HH:mm', { locale: ptBR })}`
-    } else if (diffInHours < 48) {
-      return `Ontem, ${format(date, 'HH:mm', { locale: ptBR })}`
-    } else {
+      if (diffInHours === 1) {
+        return 'há 1 hora'
+      }
+      return `há ${diffInHours} horas`
+    }
+    
+    // Menos de 7 dias
+    if (diffInDays < 7) {
+      if (diffInDays === 1) {
+        return `Ontem, ${format(date, 'HH:mm', { locale: ptBR })}`
+      }
       return format(date, "EEEE, HH:mm", { locale: ptBR }).charAt(0).toUpperCase() + format(date, "EEEE, HH:mm", { locale: ptBR }).slice(1)
     }
+    
+    // Mais de 7 dias - mostrar data completa
+    return format(date, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })
+  }
+
+  const formatDuration = (minutes: number) => {
+    if (minutes < 60) {
+      return `${minutes} min`
+    }
+    
+    const hours = Math.floor(minutes / 60)
+    const remainingMinutes = minutes % 60
+    
+    if (remainingMinutes === 0) {
+      return `${hours}h`
+    }
+    
+    return `${hours}h ${remainingMinutes}min`
   }
 
   if (isLoading) {
     return (
-      <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
+      <div className="h-full w-full space-y-4 sm:space-y-6 lg:space-y-8">
         {/* Page Header Skeleton */}
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-muted rounded-lg animate-pulse">
@@ -107,7 +143,7 @@ export default function DashboardPage() {
   }
   if (error) {
     return (
-      <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
+      <div className="h-full w-full space-y-4 sm:space-y-6 lg:space-y-8">
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-primary/10 rounded-lg">
             <LayoutDashboard className="h-6 w-6 text-primary" />
@@ -139,7 +175,7 @@ export default function DashboardPage() {
   }))
 
   return (
-    <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
+    <div className="h-full w-full space-y-4 sm:space-y-6 lg:space-y-8">
       {/* Page Header */}
       <div className="flex items-center space-x-3">
         <div className="p-2 bg-primary/10 rounded-lg">
@@ -168,7 +204,7 @@ export default function DashboardPage() {
         <MetricsTile
           icon={<Clock className="h-5 w-5 text-primary" />}
           title="Duração Média"
-          value={`${data?.averageDurationMinutes ?? 0} min`}
+          value={formatDuration(data?.averageDurationMinutes ?? 0)}
           subtitle="Por treino"
           trend="up"
         />

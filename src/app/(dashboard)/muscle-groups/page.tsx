@@ -177,7 +177,7 @@ export default function MuscleGroupsPage() {
 
   if (isLoading) {
     return (
-      <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
+      <div className="h-full w-full space-y-4 sm:space-y-6 lg:space-y-8">
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-primary/10 rounded-lg">
             <Dumbbell className="h-6 w-6 text-primary" />
@@ -206,7 +206,7 @@ export default function MuscleGroupsPage() {
   }
 
   return (
-    <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
+    <div className="h-full w-full space-y-4 sm:space-y-6 lg:space-y-8">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center space-x-3">

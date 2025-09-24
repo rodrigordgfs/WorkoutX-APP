@@ -42,7 +42,7 @@ export default function WorkoutsPage() {
 
   if (error) {
     return (
-      <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
+      <div className="h-full w-full space-y-4 sm:space-y-6 lg:space-y-8">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center space-x-3 flex-1 min-w-0">
             <div className="p-2 bg-primary/10 rounded-lg flex-shrink-0">
@@ -64,7 +64,7 @@ export default function WorkoutsPage() {
 
   if (isLoading) {
     return (
-      <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
+      <div className="h-full w-full space-y-4 sm:space-y-6 lg:space-y-8">
         {/* Page Header Skeleton */}
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center space-x-3 flex-1 min-w-0">
@@ -87,7 +87,7 @@ export default function WorkoutsPage() {
   }
 
   return (
-    <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
+    <div className="h-full w-full space-y-4 sm:space-y-6 lg:space-y-8">
       {/* Page Header */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center space-x-3 flex-1 min-w-0">
@@ -110,16 +110,16 @@ export default function WorkoutsPage() {
       </div>
 
       {/* Workout Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {workouts.length === 0 ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <p className="text-muted-foreground mb-4">Nenhum treino encontrado</p>
-              <p className="text-sm text-muted-foreground">Crie seu primeiro treino para começar!</p>
-            </div>
+      {workouts.length === 0 ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-muted-foreground mb-4">Nenhum treino encontrado</p>
+            <p className="text-sm text-muted-foreground">Crie seu primeiro treino para começar!</p>
           </div>
-        ) : (
-          workouts.map((workout) => (
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {workouts.map((workout) => (
             <WorkoutCard
               key={workout.id}
               id={workout.id}
@@ -134,9 +134,9 @@ export default function WorkoutsPage() {
                 videoUrl: exercise.videoUrl
               }))}
             />
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

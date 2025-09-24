@@ -92,7 +92,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="h-full w-full p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
+    <div className="h-full w-full space-y-4 sm:space-y-6 lg:space-y-8">
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
