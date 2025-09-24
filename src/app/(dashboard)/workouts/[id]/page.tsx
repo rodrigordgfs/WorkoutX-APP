@@ -512,6 +512,11 @@ export default function WorkoutDetailPage() {
                 <Play className="h-5 w-5" />
                 {workout.name}
               </CardTitle>
+              {workout.description && (
+                <CardDescription className="text-sm mt-2">
+                  {workout.description}
+                </CardDescription>
+              )}
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Informações do Treino */}

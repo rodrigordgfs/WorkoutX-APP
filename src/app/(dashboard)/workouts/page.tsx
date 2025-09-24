@@ -124,6 +124,7 @@ export default function WorkoutsPage() {
               key={workout.id}
               id={workout.id}
               title={workout.name}
+              description={workout.description}
               exerciseCount={workout.exercises.length}
               likesCount={workout.likesCount}
               visibility={workout.visibility}

@@ -38,6 +38,7 @@ interface Exercise {
 interface WorkoutCardProps {
   id: string
   title: string
+  description?: string
   exerciseCount: number
   exercises: Exercise[]
   icon?: React.ReactNode
@@ -47,7 +48,8 @@ interface WorkoutCardProps {
 
 export function WorkoutCard({ 
   id,
-  title, 
+  title,
+  description,
   exerciseCount, 
   exercises,
   icon = <Dumbbell className="h-5 w-5 text-primary" />,
@@ -97,7 +99,12 @@ export function WorkoutCard({
             </div>
             <div className="min-w-0 flex-1">
               <h3 className="font-semibold text-base sm:text-lg truncate">{title}</h3>
-              <p className="text-sm text-muted-foreground">
+              {description && (
+                <p className="text-sm text-muted-foreground mt-1 line-clamp-1">
+                  {description}
+                </p>
+              )}
+              <p className="text-sm text-muted-foreground mt-2">
                 {exerciseCount} exercícios
                 {typeof likesCount === 'number' && (
                   <span className="inline-flex items-center gap-1 ml-2 align-middle">
