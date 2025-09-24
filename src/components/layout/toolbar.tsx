@@ -35,24 +35,9 @@ export function Toolbar({ showBackButton = false, backUrl = '/workouts' }: Toolb
       <div className="flex h-16 items-center px-6">
         {/* Mobile Layout */}
         <div className="flex w-full items-center justify-between md:hidden">
-          {/* Esquerda - Botão do Menu */}
-          <div className="flex items-center">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-10 w-10"
-              onClick={() => {
-                // Aqui você pode adicionar a lógica para abrir o menu mobile
-                console.log('Abrir menu mobile')
-              }}
-            >
-              <div className="h-5 w-5">
-                <div className="h-0.5 w-5 bg-current mb-1"></div>
-                <div className="h-0.5 w-5 bg-current mb-1"></div>
-                <div className="h-0.5 w-5 bg-current"></div>
-              </div>
-              <span className="sr-only">Menu</span>
-            </Button>
+          {/* Esquerda - Espaço para o botão do menu mobile (que está no sidebar) */}
+          <div className="flex items-center w-12">
+            {/* O botão do menu mobile está no componente MobileMenuButton */}
           </div>
           
           {/* Centro - Logo */}

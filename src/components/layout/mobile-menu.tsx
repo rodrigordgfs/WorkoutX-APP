@@ -12,20 +12,20 @@ export function MobileMenuButton() {
     <Button
       variant="ghost"
       size="icon"
-      className="fixed top-4 left-4 z-50 md:hidden bg-background/80 backdrop-blur-sm border shadow-lg hover:scale-105 active:scale-95 transition-transform duration-150"
+      className="fixed top-3 left-3 z-50 md:hidden bg-background/80 backdrop-blur-sm border shadow-lg hover:scale-105 active:scale-95 transition-transform duration-150 h-10 w-10"
       onClick={() => setMobileOpen(!isMobileOpen)}
       aria-label={isMobileOpen ? 'Fechar menu' : 'Abrir menu'}
     >
       <div className="relative">
         <Menu 
           className={cn(
-            "h-5 w-5 transition-all duration-200",
+            "h-4 w-4 transition-all duration-200",
             isMobileOpen && "opacity-0 rotate-90"
           )} 
         />
         <X 
           className={cn(
-            "h-5 w-5 absolute inset-0 transition-all duration-200",
+            "h-4 w-4 absolute inset-0 transition-all duration-200",
             !isMobileOpen && "opacity-0 -rotate-90"
           )} 
         />
