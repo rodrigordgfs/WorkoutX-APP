@@ -28,7 +28,7 @@ export interface WorkoutHistoryItem {
   workoutId: string
   workoutName: string
   workoutVisibility: 'PUBLIC' | 'PRIVATE'
-  status: 'COMPLETED' | 'IN_PROGRESS' | 'NOT_STARTED' | 'UNCOMPLETED'
+  status: 'COMPLETED' | 'IN_PROGRESS' | 'NOT_STARTED' | 'UNCOMPLETED' | 'STOPPED' | 'PAUSED'
   startedAt: string
   endedAt: string
   duration: number

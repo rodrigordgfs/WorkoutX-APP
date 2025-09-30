@@ -72,7 +72,7 @@ export interface ApiSessionExercise {
 
 export interface ApiSession {
   id?: string
-  status?: 'IN_PROGRESS' | 'COMPLETED'
+  status?: 'IN_PROGRESS' | 'COMPLETED' | 'STOPPED' | 'PAUSED'
   startedAt?: string
   endedAt?: string | null
   createdAt?: string
@@ -157,6 +157,24 @@ const stopWorkout = async (workoutId: string, token: string | null): Promise<Api
   console.log('Parando treino:', workoutId)
   
   return authenticatedRequest<ApiWorkout>(`${apiConfig.endpoints.workouts}/${workoutId}/stop`, {
+    method: 'PATCH',
+    token
+  })
+}
+
+const pauseWorkout = async (workoutId: string, token: string | null): Promise<ApiWorkout> => {
+  console.log('Pausando treino:', workoutId)
+  
+  return authenticatedRequest<ApiWorkout>(`${apiConfig.endpoints.workouts}/${workoutId}/pause`, {
+    method: 'PATCH',
+    token
+  })
+}
+
+const resumeWorkout = async (workoutId: string, token: string | null): Promise<ApiWorkout> => {
+  console.log('Retomando treino:', workoutId)
+  
+  return authenticatedRequest<ApiWorkout>(`${apiConfig.endpoints.workouts}/${workoutId}/start`, {
     method: 'PATCH',
     token
   })
@@ -353,6 +371,50 @@ export const useStopWorkout = () => {
     },
     onError: (error) => {
       console.error('Erro ao parar treino:', error)
+    },
+  })
+}
+
+// Hook para pausar um treino
+export const usePauseWorkout = () => {
+  const queryClient = useQueryClient()
+  const { getAuthToken } = useClerkToken()
+
+  return useMutation({
+    mutationFn: async (workoutId: string) => {
+      const token = await getAuthToken()
+      return pauseWorkout(workoutId, token)
+    },
+    onSuccess: (data, variables) => {
+      console.log('Treino pausado com sucesso:', data)
+      // Invalidar queries relacionadas
+      queryClient.invalidateQueries({ queryKey: ['workouts'] })
+      queryClient.invalidateQueries({ queryKey: ['workout', variables] })
+    },
+    onError: (error) => {
+      console.error('Erro ao pausar treino:', error)
+    },
+  })
+}
+
+// Hook para retomar um treino
+export const useResumeWorkout = () => {
+  const queryClient = useQueryClient()
+  const { getAuthToken } = useClerkToken()
+
+  return useMutation({
+    mutationFn: async (workoutId: string) => {
+      const token = await getAuthToken()
+      return resumeWorkout(workoutId, token)
+    },
+    onSuccess: (data, variables) => {
+      console.log('Treino retomado com sucesso:', data)
+      // Invalidar queries relacionadas
+      queryClient.invalidateQueries({ queryKey: ['workouts'] })
+      queryClient.invalidateQueries({ queryKey: ['workout', variables] })
+    },
+    onError: (error) => {
+      console.error('Erro ao retomar treino:', error)
     },
   })
 }

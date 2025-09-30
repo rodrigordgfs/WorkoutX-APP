@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { History, Search, ChevronDown, ChevronUp, Dumbbell, Clock, CheckCircle } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { History, Search, ChevronDown, ChevronUp, Dumbbell, Clock, CheckCircle, Play } from 'lucide-react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { Card, CardContent } from '@/components/ui/card'
@@ -11,6 +12,7 @@ import { useDebounce } from '@/hooks/use-debounce'
 
 
 export default function WorkoutHistoryPage() {
+  const router = useRouter()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [dateFrom, setDateFrom] = useState('')
@@ -61,6 +63,10 @@ export default function WorkoutHistoryPage() {
         return 'text-green-600 bg-green-100'
       case 'IN_PROGRESS':
         return 'text-blue-600 bg-blue-100'
+      case 'STOPPED':
+        return 'text-orange-600 bg-orange-100'
+      case 'PAUSED':
+        return 'text-yellow-600 bg-yellow-100'
       case 'NOT_STARTED':
         return 'text-gray-600 bg-gray-100'
       case 'UNCOMPLETED':
@@ -111,6 +117,10 @@ export default function WorkoutHistoryPage() {
         return 'Concluído'
       case 'IN_PROGRESS':
         return 'Em Andamento'
+      case 'STOPPED':
+        return 'Parado'
+      case 'PAUSED':
+        return 'Pausado'
       case 'NOT_STARTED':
         return 'Não Iniciado'
       case 'UNCOMPLETED':
@@ -134,6 +144,10 @@ export default function WorkoutHistoryPage() {
     setStatusFilter('all')
     setDateFrom('')
     setDateTo('')
+  }
+
+  const handleAccessWorkout = (workoutId: string) => {
+    router.push(`/workouts/${workoutId}`)
   }
 
   if (isLoading) {
@@ -216,10 +230,12 @@ export default function WorkoutHistoryPage() {
                   className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 >
                   <option value="all">Todos os status</option>
-                  <option value="COMPLETED">Concluído</option>
-                  <option value="IN_PROGRESS">Em Andamento</option>
-                  <option value="NOT_STARTED">Não Iniciado</option>
-                  <option value="UNCOMPLETED">Incompleto</option>
+                <option value="COMPLETED">Concluído</option>
+                <option value="IN_PROGRESS">Em Andamento</option>
+                <option value="STOPPED">Parado</option>
+                <option value="PAUSED">Pausado</option>
+                <option value="NOT_STARTED">Não Iniciado</option>
+                <option value="UNCOMPLETED">Incompleto</option>
                 </select>
               </div>
 
@@ -330,18 +346,33 @@ export default function WorkoutHistoryPage() {
                       </div>
                     </div>
                     
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleWorkout(workout.id)}
-                      className="cursor-pointer p-2 flex-shrink-0"
-                    >
-                      {expandedWorkouts.has(workout.id) ? (
-                        <ChevronUp className="h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4" />
+                    <div className="flex items-center space-x-2">
+          {/* Botão para acessar treino quando em andamento, pausado ou parado */}
+          {(workout.status === 'IN_PROGRESS' || workout.status === 'STOPPED' || workout.status === 'PAUSED') && (
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => handleAccessWorkout(workout.workoutId)}
+                          className="text-xs sm:text-sm"
+                        >
+                          <Play className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                          Acessar
+                        </Button>
                       )}
-                    </Button>
+                      
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleWorkout(workout.id)}
+                        className="cursor-pointer p-2 flex-shrink-0"
+                      >
+                        {expandedWorkouts.has(workout.id) ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 </div>
 

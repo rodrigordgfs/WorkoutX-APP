@@ -31,8 +31,10 @@ import {
   Timer,
   ChevronRight,
   Layers,
+  Pause,
+  RotateCcw,
 } from "lucide-react";
-import { useWorkout, useStartWorkout, useStopWorkout, useCompleteWorkout, useCompleteExercise } from "@/hooks/use-workouts";
+import { useWorkout, useStartWorkout, useStopWorkout, useCompleteWorkout, useCompleteExercise, usePauseWorkout, useResumeWorkout } from "@/hooks/use-workouts";
 import { toast } from "sonner";
 
 interface WorkoutExercise {
@@ -166,6 +168,8 @@ export default function WorkoutDetailPage() {
   const stopWorkoutMutation = useStopWorkout();
   const completeWorkoutMutation = useCompleteWorkout();
   const completeExerciseMutation = useCompleteExercise();
+  const pauseWorkoutMutation = usePauseWorkout();
+  const resumeWorkoutMutation = useResumeWorkout();
   const [selectedExercise, setSelectedExercise] =
     useState<WorkoutExercise | null>(null);
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
@@ -266,6 +270,30 @@ export default function WorkoutDetailPage() {
     } catch (error) {
       console.error('Erro ao parar treino:', error);
       toast.error('Erro ao parar treino. Tente novamente.');
+    }
+  };
+
+  const handlePauseWorkout = async () => {
+    if (!workout) return;
+    
+    try {
+      await pauseWorkoutMutation.mutateAsync(workoutId);
+      toast.success('Treino pausado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao pausar treino:', error);
+      toast.error('Erro ao pausar treino. Tente novamente.');
+    }
+  };
+
+  const handleResumeWorkout = async () => {
+    if (!workout) return;
+    
+    try {
+      await resumeWorkoutMutation.mutateAsync(workoutId);
+      toast.success('Treino retomado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao retomar treino:', error);
+      toast.error('Erro ao retomar treino. Tente novamente.');
     }
   };
 
@@ -552,6 +580,10 @@ export default function WorkoutDetailPage() {
                       ? "Treino não iniciado"
                       : getSessionStatus() === "IN_PROGRESS"
                       ? "Treino em andamento"
+                      : getSessionStatus() === "STOPPED"
+                      ? "Treino Parado"
+                      : getSessionStatus() === "PAUSED"
+                      ? "Treino Pausado"
                       : getSessionStatus() === "COMPLETED"
                       ? "Treino finalizado"
                       : "Treino não iniciado"}
@@ -561,43 +593,92 @@ export default function WorkoutDetailPage() {
 
               {/* Botões de Ação */}
               <div className="flex flex-col gap-2">
-                <Button
-                  onClick={
-                    getSessionStatus() === 'IN_PROGRESS' || getSessionStatus() === 'COMPLETED'
-                      ? isAllExercisesCompleted()
-                        ? handleFinishWorkout
-                        : handleStopWorkout
-                      : handleStartWorkout
-                  }
-                  className="w-full"
-                  variant={
-                    getSessionStatus() === 'IN_PROGRESS' || getSessionStatus() === 'COMPLETED'
-                      ? isAllExercisesCompleted()
-                        ? "default"
-                        : "destructive"
-                      : "default"
-                  }
-                  disabled={startWorkoutMutation.isPending || stopWorkoutMutation.isPending || completeWorkoutMutation.isPending}
-                >
-                  {getSessionStatus() === 'IN_PROGRESS' || getSessionStatus() === 'COMPLETED' ? (
-                    isAllExercisesCompleted() ? (
-                      <>
-                        <Play className="h-4 w-4 mr-2" />
-                        {completeWorkoutMutation.isPending ? 'Finalizando...' : 'Finalizar Treino'}
-                      </>
-                    ) : (
-                      <>
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        {stopWorkoutMutation.isPending ? 'Parando...' : 'Parar Treino'}
-                      </>
-                    )
-                  ) : (
-                    <>
+                {/* Botão para treino em andamento */}
+                {getSessionStatus() === 'IN_PROGRESS' && !isAllExercisesCompleted() && (
+                  <>
+                    <Button
+                      onClick={handlePauseWorkout}
+                      className="w-full"
+                      variant="outline"
+                      disabled={pauseWorkoutMutation.isPending}
+                    >
+                      <Pause className="h-4 w-4 mr-2" />
+                      {pauseWorkoutMutation.isPending ? 'Pausando...' : 'Pausar Treino'}
+                    </Button>
+                    <Button
+                      onClick={handleFinishWorkout}
+                      className="w-full"
+                      variant="destructive"
+                      disabled={completeWorkoutMutation.isPending}
+                    >
                       <Play className="h-4 w-4 mr-2" />
-                      {startWorkoutMutation.isPending ? 'Iniciando...' : 'Iniciar Treino'}
-                    </>
-                  )}
-                </Button>
+                      {completeWorkoutMutation.isPending ? 'Finalizando...' : 'Finalizar Treino'}
+                    </Button>
+                  </>
+                )}
+
+                {/* Botão para treino pausado */}
+                {getSessionStatus() === 'PAUSED' && (
+                  <>
+                    <Button
+                      onClick={handleResumeWorkout}
+                      className="w-full"
+                      variant="default"
+                      disabled={resumeWorkoutMutation.isPending}
+                    >
+                      <RotateCcw className="h-4 w-4 mr-2" />
+                      {resumeWorkoutMutation.isPending ? 'Retomando...' : 'Continuar Treino'}
+                    </Button>
+                    <Button
+                      onClick={handleStopWorkout}
+                      className="w-full"
+                      variant="destructive"
+                      disabled={stopWorkoutMutation.isPending}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      {stopWorkoutMutation.isPending ? 'Parando...' : 'Parar Treino'}
+                    </Button>
+                  </>
+                )}
+
+                {/* Botão para treino parado */}
+                {getSessionStatus() === 'STOPPED' && (
+                  <Button
+                    onClick={handleStartWorkout}
+                    className="w-full"
+                    variant="default"
+                    disabled={startWorkoutMutation.isPending}
+                  >
+                    <Play className="h-4 w-4 mr-2" />
+                    {startWorkoutMutation.isPending ? 'Iniciando...' : 'Começar Treino'}
+                  </Button>
+                )}
+
+                {/* Botão para começar treino */}
+                {getSessionStatus() === 'NOT_STARTED' && (
+                  <Button
+                    onClick={handleStartWorkout}
+                    className="w-full"
+                    variant="default"
+                    disabled={startWorkoutMutation.isPending}
+                  >
+                    <Play className="h-4 w-4 mr-2" />
+                    {startWorkoutMutation.isPending ? 'Iniciando...' : 'Começar Treino'}
+                  </Button>
+                )}
+
+                {/* Botão para finalizar treino */}
+                {getSessionStatus() === 'IN_PROGRESS' && isAllExercisesCompleted() && (
+                  <Button
+                    onClick={handleFinishWorkout}
+                    className="w-full"
+                    variant="default"
+                    disabled={completeWorkoutMutation.isPending}
+                  >
+                    <Play className="h-4 w-4 mr-2" />
+                    {completeWorkoutMutation.isPending ? 'Finalizando...' : 'Finalizar Treino'}
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -689,7 +770,7 @@ export default function WorkoutDetailPage() {
                       Grupo muscular: {selectedExercise.muscleGroup.name}
                     </CardDescription>
                   </div>
-                  {(getSessionStatus() === 'IN_PROGRESS' || getSessionStatus() === 'COMPLETED') && (
+                  {(getSessionStatus() === 'IN_PROGRESS' || getSessionStatus() === 'PAUSED') && (
                     <div className="flex flex-col gap-2">
                       <div className="flex gap-2">
                         {!isFirstExercise() && (

@@ -10,6 +10,7 @@ import { ExercisesProvider } from '@/contexts/exercises-context'
 import { clerkConfig, isInvalidKey } from '@/lib/clerk-config'
 import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/nextjs'
 import { AuthIntegration } from '@/components/auth/auth-integration'
+import { ActiveWorkoutNotification } from '@/components/active-workout-notification'
 import type { Route } from '@/types'
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
@@ -47,6 +48,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           </div>
         </main>
       </div>
+      <ActiveWorkoutNotification />
     </div>
   )
 }
