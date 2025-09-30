@@ -1,6 +1,8 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Dumbbell, Clock, Target } from 'lucide-react'
+import { formatDuration, intervalToDuration } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
 interface ActivityItemProps {
   title: string
@@ -47,6 +49,16 @@ export function ActivityItem({
     }
   }
 
+  const formatDurationText = (minutes: number) => {
+    const duration = intervalToDuration({ start: 0, end: minutes * 60 * 1000 })
+    
+    return formatDuration(duration, {
+      locale: ptBR,
+      format: ['hours', 'minutes'],
+      delimiter: ' '
+    }).replace('horas', 'h').replace('minutos', 'min').replace('hora', 'h').replace('minuto', 'min')
+  }
+
   return (
     <Card className="hover:shadow-md transition-shadow bg-card">
       <CardContent className="p-4">
@@ -64,7 +76,7 @@ export function ActivityItem({
                 </div>
                 <div className="flex items-center space-x-1">
                   <Clock className="h-3 w-3" />
-                  <span>{duration} min</span>
+                  <span>{formatDurationText(duration)}</span>
                 </div>
               </div>
               <p className="text-xs text-muted-foreground mt-1">{date}</p>
